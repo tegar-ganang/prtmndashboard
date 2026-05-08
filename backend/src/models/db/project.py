@@ -12,8 +12,8 @@ class Project(Base):  # type: ignore
     __tablename__ = "project"
 
     id: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(sqlalchemy.Uuid, primary_key=True, default=uuid.uuid4)
-    owner_account_id: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(
-        sqlalchemy.ForeignKey("account.id", ondelete="SET NULL"), nullable=False
+    owner_account_id: SQLAlchemyMapped[str | None] = sqlalchemy_mapped_column(
+        sqlalchemy.ForeignKey("account.id", ondelete="SET NULL"), nullable=True
     )
     document_created_at: SQLAlchemyMapped[datetime.date] = sqlalchemy_mapped_column(sqlalchemy.Date, nullable=False)
     operational_start_date: SQLAlchemyMapped[datetime.date] = sqlalchemy_mapped_column(sqlalchemy.Date, nullable=False)
