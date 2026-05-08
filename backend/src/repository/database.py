@@ -22,6 +22,8 @@ class AsyncDatabase:
             echo=settings.IS_DB_ECHO_LOG,
             pool_size=settings.DB_POOL_SIZE,
             max_overflow=settings.DB_POOL_OVERFLOW,
+            pool_pre_ping=True,
+            pool_recycle=3600,
         )
         self.async_session: SQLAlchemyAsyncSession = SQLAlchemyAsyncSession(bind=self.async_engine)
         self.pool: SQLAlchemyPool = self.async_engine.pool
