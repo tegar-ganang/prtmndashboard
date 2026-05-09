@@ -44,14 +44,31 @@ TRUNKLINE_MAPPER = {
     "Diameter": "diameter_inch",
 }
 
-def parse_date(date_str: str | None) -> date | None:
+def parse_date(date_val: typing.Any) -> date | None:
+    if not date_val:
+        return None
+    
+    # If it's already a date or datetime object, return it as a date
+    if isinstance(date_val, datetime):
+        return date_val.date()
+    if isinstance(date_val, date):
+        return date_val
+        
+    # Convert to string and try to parse
+    date_str = str(date_val).strip()
     if not date_str:
         return None
-    try:
-        # Assuming format is YYYY-MM-DD from frontend
-        return datetime.strptime(date_str, "%Y-%m-%d").date()
-    except ValueError:
-        return None
+        
+    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y", "%Y"):
+        try:
+            parsed = datetime.strptime(date_str, fmt).date()
+            # If we only matched a year (e.g. "2027"), it defaults to Jan 1st. 
+            # This is better than returning None for a year.
+            return parsed
+        except ValueError:
+            continue
+            
+    return None
 
 class MITCRUDRepository(BaseCRUDRepository):
     async def create_batch_mit(self, batch_data: DocumentBatchCreate, owner_account_id: str) -> str:

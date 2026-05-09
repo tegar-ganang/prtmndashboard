@@ -19,10 +19,9 @@ export const useMitBatchMutation = ({ onSuccess }: UseMitBatchMutationProps = {}
 			);
 
 			if (!OK) {
-				throw (
-					(Kind as ApiResponse<MITResponse>)?.err ??
-					new Error("Telah terjadi kesalahan saat upload data MIT")
-				);
+				const errorData = Kind as any;
+				const errorMessage = errorData?.err || errorData?.message || "Telah terjadi kesalahan saat upload data MIT";
+				throw new Error(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
 			}
 
 			const response = Kind as ApiResponse<MITResponse>;

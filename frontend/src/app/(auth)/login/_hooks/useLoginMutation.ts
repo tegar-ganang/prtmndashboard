@@ -29,10 +29,9 @@ export const useLoginMutation = ({ onSuccess }: UseLoginMutationProps = {}) => {
 			);
 
 			if (!OK) {
-				throw new Error(
-					(Kind as ApiResponse<LoginResponse>)?.err ??
-						"Tidak berhasil masuk. Mohon coba lagi.",
-				);
+				const errorData = Kind as any;
+				const errorMessage = errorData?.err || errorData?.message || "Tidak berhasil masuk. Mohon coba lagi.";
+				throw new Error(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
 			}
 
 			const response = Kind as ApiResponse<LoginResponse>;
