@@ -15,7 +15,10 @@ class MIT(Base):  # type: ignore
     owner_account_id: SQLAlchemyMapped[str | None] = sqlalchemy_mapped_column(
         sqlalchemy.Uuid, sqlalchemy.ForeignKey("account.id"), nullable=True
     )
-    
+    # Tracking Kolom Baru
+    reporting_year: SQLAlchemyMapped[int] = sqlalchemy_mapped_column(sqlalchemy.Integer, nullable=False)
+    reporting_quarter: SQLAlchemyMapped[int] = sqlalchemy_mapped_column(sqlalchemy.SmallInteger, nullable=False)
+
     # 1. No Registration Breakdown
     area: SQLAlchemyMapped[str | None] = sqlalchemy_mapped_column(sqlalchemy.String(length=100), nullable=True)
     reg_lokasi: SQLAlchemyMapped[str | None] = sqlalchemy_mapped_column(sqlalchemy.String(length=50), nullable=True)

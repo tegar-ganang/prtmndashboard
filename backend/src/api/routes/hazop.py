@@ -3,24 +3,24 @@ import fastapi
 from src.api.dependencies.authentication import get_current_account
 from src.api.dependencies.repository import get_repository
 from src.models.db.account import Account
-from src.models.schemas.mit import DocumentBatchCreate, MitHistoryResponse, MITResponse as MitDataResponse
+from src.models.schemas.hazop import DocumentMonthlyBatchCreate, HazopHistoryResponse, HazopResponse
 from src.models.schemas.response import APIResponse
-from src.repository.crud.mit import MITCRUDRepository
+from src.repository.crud.hazop import HazopCRUDRepository
 
-router = fastapi.APIRouter(prefix="/mit", tags=["mit"], dependencies=[fastapi.Depends(get_current_account)])
+router = fastapi.APIRouter(prefix="/hazop", tags=["hazop"], dependencies=[fastapi.Depends(get_current_account)])
 
 @router.get(
     path="/check-period",
-    name="mit:check-period",
+    name="hazop:check-period",
     response_model=APIResponse,
     status_code=fastapi.status.HTTP_200_OK,
 )
 async def check_period(
     year: int,
-    quarter: int,
-    mit_repo: MITCRUDRepository = fastapi.Depends(get_repository(repo_type=MITCRUDRepository)),
+    month: int,
+    repo: HazopCRUDRepository = fastapi.Depends(get_repository(repo_type=HazopCRUDRepository)),
 ) -> APIResponse:
-    exists = await mit_repo.check_period_exists(year, quarter)
+    exists = await repo.check_period_exists(year, month)
     return APIResponse(
         success=True,
         data={"exists": exists},
@@ -30,22 +30,20 @@ async def check_period(
 
 @router.post(
     path="/batch",
-    name="mit:batch-create",
+    name="hazop:batch-create",
     response_model=APIResponse,
     status_code=fastapi.status.HTTP_201_CREATED,
 )
-async def create_batch_mit(
-    batch_data: DocumentBatchCreate,
+async def create_batch(
+    batch_data: DocumentMonthlyBatchCreate,
     current_account: Account = fastapi.Depends(get_current_account),
-    mit_repo: MITCRUDRepository = fastapi.Depends(get_repository(repo_type=MITCRUDRepository)),
+    repo: HazopCRUDRepository = fastapi.Depends(get_repository(repo_type=HazopCRUDRepository)),
 ) -> APIResponse:
     try:
-        upload_batch_id = await mit_repo.create_batch_mit(
+        upload_batch_id = await repo.create_batch(
             batch_data=batch_data, owner_account_id=str(current_account.id)
         )
     except Exception as e:
-        # In a real app, you'd want to handle exceptions better, returning a 400 or 500
-        # based on the database exception type.
         raise fastapi.HTTPException(status_code=400, detail=str(e))
 
     return APIResponse(
@@ -57,37 +55,37 @@ async def create_batch_mit(
 
 @router.get(
     path="/history",
-    name="mit:history",
+    name="hazop:history",
     response_model=APIResponse,
     status_code=fastapi.status.HTTP_200_OK,
 )
 async def get_history(
-    mit_repo: MITCRUDRepository = fastapi.Depends(get_repository(repo_type=MITCRUDRepository)),
+    repo: HazopCRUDRepository = fastapi.Depends(get_repository(repo_type=HazopCRUDRepository)),
 ) -> APIResponse:
-    history = await mit_repo.get_upload_history()
+    history = await repo.get_upload_history()
     return APIResponse(
         success=True,
-        message="MIT upload history fetched successfully",
-        data=[MitHistoryResponse(**row) for row in history],
+        message="Upload history fetched successfully",
+        data=[HazopHistoryResponse(**row) for row in history],
         err=None,
     )
 
 @router.get(
     path="",
-    name="mit:get-all",
+    name="hazop:get-all",
     response_model=APIResponse,
     status_code=fastapi.status.HTTP_200_OK,
 )
-async def get_mit_data(
+async def get_data(
     batch_id: str | None = None,
     year: int | None = None,
-    quarter: int | None = None,
-    mit_repo: MITCRUDRepository = fastapi.Depends(get_repository(repo_type=MITCRUDRepository)),
+    month: int | None = None,
+    repo: HazopCRUDRepository = fastapi.Depends(get_repository(repo_type=HazopCRUDRepository)),
 ) -> APIResponse:
-    data = await mit_repo.get_mit_data(batch_id=batch_id, year=year, quarter=quarter)
+    data = await repo.get_data(batch_id=batch_id, year=year, month=month)
     return APIResponse(
         success=True,
-        message="MIT data fetched successfully",
-        data=[MitDataResponse.from_orm(row) for row in data],
+        message="Data fetched successfully",
+        data=[HazopResponse.from_orm(row) for row in data],
         err=None,
     )

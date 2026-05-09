@@ -27,6 +27,7 @@
 		"auto-zustand-selectors-hook": "3.0.1",
 		"axios": "1.12.0",
 		"clsx": "2.1.1",
+		"date-fns": "^4.1.0",
 		"immer": "10.1.1",
 		"lucide-react": "0.525.0",
 		"next": "15.4.10",

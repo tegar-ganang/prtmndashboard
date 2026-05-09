@@ -2,15 +2,24 @@ import typing
 import datetime
 from src.models.schemas.base import BaseSchemaModel
 
-class DocumentBatchCreate(BaseSchemaModel):
+import pydantic
+
+class DocumentBatchCreate(pydantic.BaseModel):
     doc_type: str
+    reporting_year: int
+    reporting_quarter: int
+    mode: str = "append"
     items: list[dict[str, typing.Any]]
 
+    class Config:
+        allow_population_by_field_name = True
+        orm_mode = True
+
 # Keeping MITResponse for when querying data (if needed)
-class MITResponse(BaseSchemaModel):
-    id: str
-    upload_batch_id: str
-    owner_account_id: str | None
+class MITResponse(pydantic.BaseModel):
+    id: typing.Any
+    upload_batch_id: typing.Any
+    owner_account_id: typing.Any | None
     area: str | None
     reg_lokasi: str | None
     reg_jenis_mit: str | None
@@ -39,3 +48,16 @@ class MITResponse(BaseSchemaModel):
     closing_date: datetime.date | None
     created_at: datetime.datetime
     updated_at: datetime.datetime | None
+
+    class Config:
+        orm_mode = True
+
+class MitHistoryResponse(pydantic.BaseModel):
+    upload_batch_id: typing.Any
+    reporting_year: int
+    reporting_quarter: int
+    upload_date: datetime.datetime
+    record_count: int
+    
+    class Config:
+        orm_mode = True
