@@ -25,7 +25,7 @@ function AdminLayout({ children, className }: LayoutProps) {
 			<AppSidebar />
 			<Backdrop />
 			<div
-				className={`flex-1 transition-all duration-300 ease-in-out ${mainContentMargin}`}
+				className={`flex-1 transition-all duration-300 ease-in-out overflow-hidden min-w-0 ${mainContentMargin}`}
 			>
 				<AppHeader />
 				<div className={`mx-auto ${className ?? ""}`}>{children}</div>

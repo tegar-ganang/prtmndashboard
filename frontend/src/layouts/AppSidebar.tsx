@@ -9,6 +9,7 @@ import {
 	HardHat,
 	LayoutDashboard,
 	Settings,
+	UploadCloud,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -47,6 +48,12 @@ const AppSidebar: React.FC = () => {
 				name: "Projects",
 				path: "/projects",
 				description: "Kelola proyek Anda secara efisien.",
+			},
+			{
+				icon: <UploadCloud className="w-5 h-5" />,
+				name: "Data Gathering",
+				path: "/data-gathering",
+				description: "Upload data MIT Register.",
 			}
 		],
 		[],

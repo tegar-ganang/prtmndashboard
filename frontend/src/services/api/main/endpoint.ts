@@ -10,4 +10,7 @@ export const MAIN_ENDPOINT = {
 		Update: (id: string) => `/projects/${id}`,
 		Delete: (id: string) => `/projects/${id}`,
 	},
+	Mit: {
+		BatchCreate: "/mit/batch",
+	},
 };

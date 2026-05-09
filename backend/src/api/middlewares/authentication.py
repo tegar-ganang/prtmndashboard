@@ -19,6 +19,7 @@ class JWTAuthenticationMiddleware(BaseHTTPMiddleware):
             f"{settings.API_PREFIX}/accounts",
             f"{settings.API_PREFIX}/projects",
             f"{settings.API_PREFIX}/auth/me",
+            f"{settings.API_PREFIX}/mit",
         )
 
     def _is_protected_path(self, path: str) -> bool:
