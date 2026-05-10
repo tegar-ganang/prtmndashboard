@@ -12,31 +12,31 @@ from src.config.manager import settings
 
 class AsyncDatabase:
     def __init__(self):
-        self.postgres_uri: pydantic.PostgresDsn = pydantic.PostgresDsn(
-            url=f"{settings.DB_POSTGRES_SCHEMA}://{settings.DB_POSTGRES_USERNAME}:{settings.DB_POSTGRES_PASSWORD}@{settings.DB_POSTGRES_HOST}:{settings.DB_POSTGRES_PORT}/{settings.DB_POSTGRES_NAME}",
-            scheme=settings.DB_POSTGRES_SCHEMA,
+        # We assemble the URI directly as a string for MSSQL to avoid PostgresDsn validation
+        self.postgres_uri: str = (
+            f"{settings.DB_POSTGRES_SCHEMA}://{settings.DB_POSTGRES_USERNAME}:{settings.DB_POSTGRES_PASSWORD}"
+            f"@{settings.DB_POSTGRES_HOST}:{settings.DB_POSTGRES_PORT}/{settings.DB_POSTGRES_NAME}"
         )
         self.async_engine: SQLAlchemyAsyncEngine = create_sqlalchemy_async_engine(
             url=self.set_async_db_uri,
             echo=settings.IS_DB_ECHO_LOG,
             pool_size=settings.DB_POOL_SIZE,
             max_overflow=settings.DB_POOL_OVERFLOW,
+            pool_pre_ping=True,
+            pool_recycle=3600,
         )
         self.async_session: SQLAlchemyAsyncSession = SQLAlchemyAsyncSession(bind=self.async_engine)
         self.pool: SQLAlchemyPool = self.async_engine.pool
 
     @property
-    def set_async_db_uri(self) -> str | pydantic.PostgresDsn:
+    def set_async_db_uri(self) -> str:
         """
-        Set the synchronous database driver into asynchronous version by utilizing AsyncPG:
-
-            `postgresql://` => `postgresql+asyncpg://`
+        Return the asynchronous database string for MS SQL Server using aioodbc.
         """
-        return (
-            self.postgres_uri.replace("postgresql://", "postgresql+asyncpg://")
-            if self.postgres_uri
-            else self.postgres_uri
-        )
+        # Return the URI appending driver configuration suitable for msodbcsql18
+        if "mssql" in self.postgres_uri and "?" not in self.postgres_uri:
+            return f"{self.postgres_uri}?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes"
+        return self.postgres_uri
 
 
 async_db: AsyncDatabase = AsyncDatabase()

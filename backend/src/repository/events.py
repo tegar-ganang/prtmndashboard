@@ -2,6 +2,7 @@ import os
 
 import fastapi
 import loguru
+import sqlalchemy
 from sqlalchemy import event
 from sqlalchemy.dialects.postgresql.asyncpg import AsyncAdapt_asyncpg_connection
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSessionTransaction
@@ -31,6 +32,14 @@ async def initialize_db_tables(connection: AsyncConnection) -> None:
     loguru.logger.info("Database Table Creation --- Initializing . . .")
 
     db_init_mode = os.getenv("DB_INIT_MODE", "create").strip().lower()
+
+    # MSSQL specific way to create schema if it doesn't exist
+    await connection.execute(sqlalchemy.text("""
+        IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'app')
+        BEGIN
+            EXEC('CREATE SCHEMA [app]');
+        END
+    """))
 
     if db_init_mode == "reset":
         loguru.logger.warning("Database Table Creation --- Reset mode enabled. Dropping all tables.")

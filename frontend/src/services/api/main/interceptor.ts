@@ -19,10 +19,10 @@ api.interceptors.request.use(async (config) => {
 			config.headers.Authorization = `Bearer ${token}`;
 		}
 	} else {
-		const token = document.cookie.replace(
-			/(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
-			"$1",
-		);
+		const key = ENV.TOKEN_KEY;
+		const match = document.cookie.match(new RegExp(`(?:^|;\\s*)${key}\\s*=\\s*([^;]*)`));
+		const token = match ? decodeURIComponent(match[1]) : "";
+
 		if (token) {
 			config.headers.Authorization = `Bearer ${token}`;
 		}

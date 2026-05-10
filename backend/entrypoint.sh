@@ -2,7 +2,7 @@
 
 echo "DB Connection --- Establishing . . ."
 
-while ! nc -z db 5432; do
+while ! nc -z $POSTGRES_HOST $POSTGRES_PORT; do
 
     echo "DB Connection -- Failed!"
 

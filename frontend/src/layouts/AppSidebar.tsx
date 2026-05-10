@@ -5,10 +5,10 @@ import {
 	Barrel,
 	Box,
 	ChevronDown,
-	Handshake,
-	HardHat,
 	LayoutDashboard,
+	Monitor,
 	Settings,
+	UploadCloud,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -47,7 +47,24 @@ const AppSidebar: React.FC = () => {
 				name: "Projects",
 				path: "/projects",
 				description: "Kelola proyek Anda secara efisien.",
-			}
+			},
+			{
+				icon: <UploadCloud className="w-5 h-5" />,
+				name: "Data Gathering",
+				path: "/data-gathering",
+				description: "Upload data MIT, HAZID, HAZOP, LOPA.",
+			},
+			{
+				icon: <Monitor className="w-5 h-5" />,
+				name: "Monitoring",
+				description: "Dashboard monitoring per dokumen.",
+				subItems: [
+					{ name: "MIT (Quartal)", path: "/monitoring/mit", description: "Major Integrity Threat - Quarterly" },
+					{ name: "HAZID (Bulanan)", path: "/monitoring/hazid", description: "Hazard Identification - Monthly" },
+					{ name: "HAZOP (Bulanan)", path: "/monitoring/hazop", description: "Hazard & Operability Study - Monthly" },
+					{ name: "LOPA (Bulanan)", path: "/monitoring/lopa", description: "Layer of Protection Analysis - Monthly" },
+				],
+			},
 		],
 		[],
 	);

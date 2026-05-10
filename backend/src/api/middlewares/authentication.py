@@ -19,6 +19,7 @@ class JWTAuthenticationMiddleware(BaseHTTPMiddleware):
             f"{settings.API_PREFIX}/accounts",
             f"{settings.API_PREFIX}/projects",
             f"{settings.API_PREFIX}/auth/me",
+            f"{settings.API_PREFIX}/mit",
         )
 
     def _is_protected_path(self, path: str) -> bool:
@@ -46,7 +47,8 @@ class JWTAuthenticationMiddleware(BaseHTTPMiddleware):
         account_repo = AccountCRUDRepository(async_session=async_db.async_session)
 
         try:
-            _, email = jwt_generator.retrieve_details_from_token(token=token, secret_key=settings.JWT_SECRET_KEY)
+            details = jwt_generator.retrieve_details_from_token(token=token, secret_key=settings.JWT_SECRET_KEY)
+            email = details[1]
             current_account: Account = await account_repo.read_account_by_email(email=email)
 
         except (ValueError, EntityDoesNotExist):

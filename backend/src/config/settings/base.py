@@ -1,6 +1,6 @@
 import logging
 import pathlib
-
+import typing
 import decouple
 import pydantic
 
@@ -11,7 +11,7 @@ class BackendBaseSettings(pydantic.BaseSettings):
     TITLE: str = "DAPSQL FARN-Stack Template Application"
     VERSION: str = "0.1.0"
     TIMEZONE: str = "UTC"
-    DESCRIPTION: str | None = None
+    DESCRIPTION: str = ""
     DEBUG: bool = False
 
     SERVER_HOST: str = decouple.config("BACKEND_SERVER_HOST", cast=str)  # type: ignore
