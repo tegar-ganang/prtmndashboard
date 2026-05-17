@@ -20,12 +20,19 @@ class JWTAuthenticationMiddleware(BaseHTTPMiddleware):
             f"{settings.API_PREFIX}/projects",
             f"{settings.API_PREFIX}/auth/me",
             f"{settings.API_PREFIX}/mit",
+            f"{settings.API_PREFIX}/hazid",
+            f"{settings.API_PREFIX}/hazop",
+            f"{settings.API_PREFIX}/lopa",
+            f"{settings.API_PREFIX}/locations",
         )
 
     def _is_protected_path(self, path: str) -> bool:
         return path.startswith(self.protected_paths)
 
     async def dispatch(self, request: Request, call_next) -> Response:
+        if request.method == "OPTIONS":
+            return await call_next(request)
+
         if not self._is_protected_path(request.url.path):
             return await call_next(request)
 

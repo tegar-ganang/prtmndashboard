@@ -7,3 +7,4 @@ from .mit import MIT
 from .hazid import Hazid
 from .hazop import Hazop
 from .lopa import Lopa
+from .location import FieldLocation

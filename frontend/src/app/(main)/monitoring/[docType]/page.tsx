@@ -13,6 +13,7 @@ import Select from "react-select";
 import { History, X, ChevronLeft, ChevronRight, Loader2, AlertCircle } from "lucide-react";
 
 import Button from "@/components/button/Button";
+import { useLocationsQuery } from "../../data-gathering/_hooks/useLocationsQuery";
 import { useMonitoringData } from "../_hooks/useMonitoringData";
 import { MONITORING_CONFIGS } from "../_configs/monitoringConfig";
 
@@ -41,6 +42,8 @@ const YEAR_OPTIONS = [
 	})
 ];
 
+const EMPTY_DATA: any[] = [];
+
 export default function DynamicMonitoringPage({ params }: { params: Promise<{ docType: string }> }) {
 	const { docType: docTypeSlug } = use(params);
 	const searchParams = useSearchParams();
@@ -53,12 +56,37 @@ export default function DynamicMonitoringPage({ params }: { params: Promise<{ do
 	const [selectedPeriod, setSelectedPeriod] = useState<{value: number | null, label: string}>(
 		config?.periodType === "quarter" ? QUARTER_OPTIONS[0] : MONTH_OPTIONS[0]
 	);
+	const [selectedLocation, setSelectedLocation] = useState<{value: string | null, label: string}>({
+		value: null,
+		label: "Semua Lokasi",
+	});
 
-	const { data = [], isLoading, error } = useMonitoringData(docTypeSlug, {
+	const { data: locationsData } = useLocationsQuery();
+
+	const locationOptions = useMemo(() => {
+		const baseOptions = [{ value: null, label: "Semua Lokasi" }];
+		if (locationsData && locationsData.length > 0) {
+			return [
+				...baseOptions,
+				...locationsData.map((loc) => ({
+					value: loc.code,
+					label: loc.name,
+				})),
+			];
+		}
+		return [
+			...baseOptions,
+			{ value: "DONGGI", label: "Donggi" },
+			{ value: "MATINDOK", label: "Matindok" },
+		];
+	}, [locationsData]);
+
+	const { data = EMPTY_DATA, isLoading, error } = useMonitoringData(docTypeSlug, {
 		batch_id: batchId,
 		year: batchId ? null : selectedYear.value,
 		month: (batchId || config?.periodType === "quarter") ? null : selectedPeriod.value,
 		quarter: (batchId || config?.periodType === "month") ? null : selectedPeriod.value,
+		field: batchId ? null : selectedLocation.value,
 	});
 
 	const activeBatchLabel = useMemo(() => {
@@ -74,11 +102,11 @@ export default function DynamicMonitoringPage({ params }: { params: Promise<{ do
 		return batchId;
 	}, [batchId, data, config]);
 
-	const ch = createColumnHelper<any>();
 	const columns = useMemo(() => {
 		if (!config) return [];
+		const ch = createColumnHelper<any>();
 		return config.getColumns(ch);
-	}, [config, ch]);
+	}, [config]);
 
 	const table = useReactTable({
 		data,
@@ -143,6 +171,16 @@ export default function DynamicMonitoringPage({ params }: { params: Promise<{ do
 								options={config.periodType === "quarter" ? QUARTER_OPTIONS : MONTH_OPTIONS} 
 								value={selectedPeriod} 
 								onChange={(v) => v && setSelectedPeriod(v)}
+								className="text-xs"
+								styles={{ control: (b) => ({ ...b, borderRadius: '0.5rem' }) }}
+							/>
+						</div>
+						<div className="w-48">
+							<label className="block text-[10px] font-bold text-gray-400 uppercase mb-1.5 ml-1">Lokasi / Field</label>
+							<Select 
+								options={locationOptions} 
+								value={selectedLocation} 
+								onChange={(v) => v && setSelectedLocation(v)}
 								className="text-xs"
 								styles={{ control: (b) => ({ ...b, borderRadius: '0.5rem' }) }}
 							/>

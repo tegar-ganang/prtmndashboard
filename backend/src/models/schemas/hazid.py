@@ -6,6 +6,7 @@ class DocumentMonthlyBatchCreate(pydantic.BaseModel):
     doc_type: str
     reporting_year: int
     reporting_month: int
+    field: str | None = None
     mode: str = "append"
     items: list[dict[str, typing.Any]]
 
@@ -19,6 +20,7 @@ class HazidResponse(pydantic.BaseModel):
     owner_account_id: typing.Any | None
     reporting_year: int
     reporting_month: int
+    field: str | None
     node_no: str | None
     rec_no: str | None
     node: str | None
@@ -49,6 +51,7 @@ class HazidHistoryResponse(pydantic.BaseModel):
     upload_batch_id: typing.Any
     reporting_year: int
     reporting_month: int
+    field: str | None
     upload_date: datetime.datetime
     record_count: int
     

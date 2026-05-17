@@ -34,4 +34,7 @@ export const MAIN_ENDPOINT = {
 		GetAll: "/lopa",
 		History: "/lopa/history",
 	},
+	Locations: {
+		GetAll: "/locations",
+	},
 };

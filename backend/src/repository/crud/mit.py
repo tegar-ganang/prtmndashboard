@@ -42,7 +42,8 @@ class MITCRUDRepository(BaseMonitoringRepository):
         return await self.get_data(
             batch_id=kwargs.get("batch_id"),
             year=kwargs.get("year"),
-            period=kwargs.get("quarter")
+            period=kwargs.get("quarter"),
+            field=kwargs.get("field")
         )
         
     async def create_batch_mit(self, **kwargs) -> str:

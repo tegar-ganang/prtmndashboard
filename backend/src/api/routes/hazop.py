@@ -18,9 +18,10 @@ router = fastapi.APIRouter(prefix="/hazop", tags=["hazop"], dependencies=[fastap
 async def check_period(
     year: int,
     month: int,
+    field: str | None = None,
     repo: HazopCRUDRepository = fastapi.Depends(get_repository(repo_type=HazopCRUDRepository)),
 ) -> APIResponse:
-    exists = await repo.check_period_exists(year, month)
+    exists = await repo.check_period_exists(year, month, field)
     return APIResponse(
         success=True,
         data={"exists": exists},
@@ -80,9 +81,10 @@ async def get_data(
     batch_id: str | None = None,
     year: int | None = None,
     month: int | None = None,
+    field: str | None = None,
     repo: HazopCRUDRepository = fastapi.Depends(get_repository(repo_type=HazopCRUDRepository)),
 ) -> APIResponse:
-    data = await repo.get_data(batch_id=batch_id, year=year, month=month)
+    data = await repo.get_data(batch_id=batch_id, year=year, month=month, field=field)
     return APIResponse(
         success=True,
         message="Data fetched successfully",
