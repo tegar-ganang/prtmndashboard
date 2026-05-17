@@ -45,7 +45,8 @@ async def create_batch(
             batch_data=batch_data, owner_account_id=str(current_account.id)
         )
     except Exception as e:
-        raise fastapi.HTTPException(status_code=400, detail=str(e))
+        print(f"Error bulk inserting HAZID: {str(e)}")
+        raise fastapi.HTTPException(status_code=400, detail="Gagal menyimpan data ke database. Silakan pastikan format template sudah benar atau hubungi administrator.")
 
     return APIResponse(
         success=True,

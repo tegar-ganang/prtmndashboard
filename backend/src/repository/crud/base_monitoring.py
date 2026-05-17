@@ -10,8 +10,10 @@ from src.repository.crud.base import BaseCRUDRepository
 def parse_date(date_val: typing.Any) -> date | None:
     if not date_val:
         return None
-    if isinstance(date_val, (datetime, date)):
-        return date_val if isinstance(date_val, date) else date_val.date()
+    if isinstance(date_val, datetime):
+        return date_val.date()
+    if isinstance(date_val, date):
+        return date_val
     
     date_str = str(date_val).strip()
     if not date_str:
@@ -78,13 +80,20 @@ class BaseMonitoringRepository(BaseCRUDRepository):
                 if db_column in self.date_columns:
                     kwargs[db_column] = parse_date(value)
                 else:
-                    kwargs[db_column] = str(value) if value is not None else None
+                    if value is not None:
+                        val_str = str(value)
+                        col_attr = getattr(self.model, db_column, None)
+                        if col_attr is not None and hasattr(col_attr, "type") and hasattr(col_attr.type, "length") and col_attr.type.length is not None:
+                            val_str = val_str[:col_attr.type.length]
+                        kwargs[db_column] = val_str
+                    else:
+                        kwargs[db_column] = None
             
             dicts_to_insert.append(kwargs)
             
         if dicts_to_insert:
-            stmt = sqlalchemy.insert(self.model).values(dicts_to_insert)
-            await self.async_session.execute(stmt)
+            stmt = sqlalchemy.insert(self.model)
+            await self.async_session.execute(stmt, dicts_to_insert)
             await self.async_session.commit()
             
         return upload_batch_id
