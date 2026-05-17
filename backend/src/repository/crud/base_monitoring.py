@@ -62,9 +62,10 @@ class BaseMonitoringRepository(BaseCRUDRepository):
             await self.async_session.execute(delete_stmt)
             await self.async_session.flush()
 
-        objects = []
+        dicts_to_insert = []
         for item in batch_data.items:
             kwargs = {
+                "id": uuid.uuid4(),
                 "reporting_year": batch_data.reporting_year,
                 self.period_col: period_value,
                 "field": field_value,
@@ -79,11 +80,11 @@ class BaseMonitoringRepository(BaseCRUDRepository):
                 else:
                     kwargs[db_column] = str(value) if value is not None else None
             
-            obj = self.model(**kwargs)
-            objects.append(obj)
+            dicts_to_insert.append(kwargs)
             
-        if objects:
-            self.async_session.add_all(objects)
+        if dicts_to_insert:
+            stmt = sqlalchemy.insert(self.model).values(dicts_to_insert)
+            await self.async_session.execute(stmt)
             await self.async_session.commit()
             
         return upload_batch_id

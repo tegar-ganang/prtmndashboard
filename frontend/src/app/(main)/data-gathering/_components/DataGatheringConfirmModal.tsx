@@ -14,9 +14,11 @@ interface DataGatheringConfirmModalProps {
 	periodLabel: string;
 	yearLabel: string;
 	isUploading: boolean;
+	isDataExists?: boolean;
 	onConfirm: () => void;
 	onClose: () => void;
 }
+
 
 export default function DataGatheringConfirmModal({
 	open,
@@ -25,6 +27,7 @@ export default function DataGatheringConfirmModal({
 	periodLabel,
 	yearLabel,
 	isUploading,
+	isDataExists = true,
 	onConfirm,
 	onClose,
 }: DataGatheringConfirmModalProps) {
@@ -41,21 +44,29 @@ export default function DataGatheringConfirmModal({
 							<Dialog.Panel className="relative transform overflow-hidden rounded-xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md">
 								<div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
 									<div className="sm:flex sm:items-start">
-										<div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-yellow-100 sm:mx-0 sm:h-10 sm:w-10">
-											<AlertCircle className="h-6 w-6 text-yellow-600" aria-hidden="true" />
+										<div className={`mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full sm:mx-0 sm:h-10 sm:w-10 ${isDataExists ? "bg-yellow-100" : "bg-blue-100"}`}>
+											<AlertCircle className={`h-6 w-6 ${isDataExists ? "text-yellow-600" : "text-blue-600"}`} aria-hidden="true" />
 										</div>
 										<div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
 											<Dialog.Title as="h3" className="text-base font-semibold leading-6 text-gray-900">
-												Data Periode Ini Sudah Ada
+												{isDataExists ? "Data Periode Ini Sudah Ada" : "Konfirmasi Proses Data"}
 											</Dialog.Title>
 											<div className="mt-2">
-												<p className="text-sm text-gray-500">
-													Data {docType} untuk <b>{fieldLabel} — {periodLabel} Tahun {yearLabel}</b> sudah tersedia di database.
-												</p>
-												<p className="text-sm text-gray-500 mt-2">
-													Apakah Anda ingin memproses data ini? <br />
-													<span className="text-red-500 font-semibold">Peringatan:</span> Memproses akan menghapus data lama pada periode yang sama.
-												</p>
+												{isDataExists ? (
+													<>
+														<p className="text-sm text-gray-500">
+															Data {docType} untuk <b>{fieldLabel} — {periodLabel} Tahun {yearLabel}</b> sudah tersedia di database.
+														</p>
+														<p className="text-sm text-gray-500 mt-2">
+															Apakah Anda ingin memproses data ini? <br />
+															<span className="text-red-500 font-semibold">Peringatan:</span> Memproses akan menghapus data lama pada periode yang sama.
+														</p>
+													</>
+												) : (
+													<p className="text-sm text-gray-500">
+														Apakah Anda yakin ingin memproses data {docType} untuk <b>{fieldLabel} — {periodLabel} Tahun {yearLabel}</b>?
+													</p>
+												)}
 											</div>
 										</div>
 									</div>

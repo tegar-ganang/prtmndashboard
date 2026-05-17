@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useMonitoringBatchMutation } from "../_hooks/useMonitoringBatchMutation";
 import { useLocationsQuery } from "../_hooks/useLocationsQuery";
 import { useExcelProcessor } from "../_hooks/useExcelProcessor";
+import { checkMonitoringPeriodExists } from "../_hooks/useMonitoringCheckPeriod";
 import {
 	DOC_TYPE_CONFIG,
 	DOCUMENT_OPTIONS,
@@ -62,6 +63,7 @@ export default function DataGatheringContainer() {
 
 	const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 	const [isCheckingPeriod, setIsCheckingPeriod] = useState(false);
+	const [isDataExists, setIsDataExists] = useState(false);
 	const docConfig = DOC_TYPE_CONFIG[docType.value];
 
 	const router = useRouter();
@@ -123,9 +125,29 @@ export default function DataGatheringContainer() {
 		uploadBatch({ ...basePayload, ...periodPayload });
 	};
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		if (!canSubmit) return;
-		setConfirmModalOpen(true);
+		setIsCheckingPeriod(true);
+		try {
+			const periodVal = docConfig.period === "quarter"
+				? parseInt(quarter.value.replace("Q", ""), 10)
+				: parseInt(month.value, 10);
+			const exists = await checkMonitoringPeriodExists(
+				docType.value,
+				parseInt(year.value, 10),
+				periodVal,
+				field.value
+			);
+			setIsDataExists(exists);
+			setConfirmModalOpen(true);
+		} catch (error) {
+			console.error("Failed to check period existence:", error);
+			// Fallback to true so it shows warning just in case
+			setIsDataExists(true);
+			setConfirmModalOpen(true);
+		} finally {
+			setIsCheckingPeriod(false);
+		}
 	};
 
 	return (
@@ -193,6 +215,7 @@ export default function DataGatheringContainer() {
 				periodLabel={docConfig.period === "quarter" ? quarter.value : month.label}
 				yearLabel={year.value}
 				isUploading={isUploading}
+				isDataExists={isDataExists}
 				onConfirm={() => handleProceedUpload("overwrite")}
 				onClose={() => setConfirmModalOpen(false)}
 			/>

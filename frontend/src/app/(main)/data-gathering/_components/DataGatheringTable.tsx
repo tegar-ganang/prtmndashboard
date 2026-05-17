@@ -5,9 +5,10 @@ import {
 	createColumnHelper,
 	flexRender,
 	getCoreRowModel,
+	getPaginationRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
-import { AlertCircle, CheckCircle2, Eye } from "lucide-react";
+import { AlertCircle, CheckCircle2, Eye, ChevronLeft, ChevronRight } from "lucide-react";
 
 import clsxm from "@/lib/clsxm";
 import { DOC_TYPE_CONFIG, type DocTypeValue } from "../_constants/dataGathering.constants";
@@ -177,7 +178,17 @@ export default function DataGatheringTable({
 	);
 
 	const columns = useMemo(() => [...staticCols, ...dynCols], [staticCols, dynCols]);
-	const table = useReactTable({ data, columns, getCoreRowModel: getCoreRowModel() });
+	const table = useReactTable({
+		data,
+		columns,
+		getCoreRowModel: getCoreRowModel(),
+		getPaginationRowModel: getPaginationRowModel(),
+		initialState: {
+			pagination: {
+				pageSize: 50,
+			},
+		},
+	});
 
 	return (
 		<div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden w-full max-w-full">
@@ -236,6 +247,52 @@ export default function DataGatheringTable({
 						))}
 					</tbody>
 				</table>
+			</div>
+			{/* Pagination Controls */}
+			<div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+				<div className="flex flex-1 justify-between sm:hidden">
+					<button
+						onClick={() => table.previousPage()}
+						disabled={!table.getCanPreviousPage()}
+						className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+					>
+						Previous
+					</button>
+					<button
+						onClick={() => table.nextPage()}
+						disabled={!table.getCanNextPage()}
+						className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+					>
+						Next
+					</button>
+				</div>
+				<div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+					<div>
+						<p className="text-sm text-gray-700">
+							Menampilkan <span className="font-medium">{table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}</span> hingga <span className="font-medium">{Math.min((table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize, data.length)}</span> dari <span className="font-medium">{data.length}</span> data
+						</p>
+					</div>
+					<div>
+						<nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+							<button
+								onClick={() => table.previousPage()}
+								disabled={!table.getCanPreviousPage()}
+								className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+							>
+								<span className="sr-only">Previous</span>
+								<ChevronLeft className="h-5 w-5" aria-hidden="true" />
+							</button>
+							<button
+								onClick={() => table.nextPage()}
+								disabled={!table.getCanNextPage()}
+								className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+							>
+								<span className="sr-only">Next</span>
+								<ChevronRight className="h-5 w-5" aria-hidden="true" />
+							</button>
+						</nav>
+					</div>
+				</div>
 			</div>
 		</div>
 	);
