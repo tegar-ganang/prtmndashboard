@@ -1,6 +1,7 @@
 import typing
 import datetime
 from src.models.schemas.base import BaseSchemaModel
+from src.models.schemas.location import FieldLocationResponse
 
 import pydantic
 
@@ -8,6 +9,7 @@ class DocumentBatchCreate(pydantic.BaseModel):
     doc_type: str
     reporting_year: int
     reporting_quarter: int
+    field: str | None = None
     mode: str = "append"
     items: list[dict[str, typing.Any]]
 
@@ -21,6 +23,8 @@ class MITResponse(pydantic.BaseModel):
     upload_batch_id: typing.Any
     owner_account_id: typing.Any | None
     area: str | None
+    field: str | None
+    field_location: FieldLocationResponse | None = None
     reg_lokasi: str | None
     reg_jenis_mit: str | None
     reg_kategori: str | None
@@ -56,6 +60,7 @@ class MitHistoryResponse(pydantic.BaseModel):
     upload_batch_id: typing.Any
     reporting_year: int
     reporting_quarter: int
+    field: str | None
     upload_date: datetime.datetime
     record_count: int
     

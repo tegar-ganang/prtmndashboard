@@ -30,7 +30,7 @@ export const useLoginMutation = ({ onSuccess }: UseLoginMutationProps = {}) => {
 
 			if (!OK) {
 				const errorData = Kind as any;
-				const errorMessage = errorData?.err || errorData?.message || "Tidak berhasil masuk. Mohon coba lagi.";
+				const errorMessage = errorData?.err || errorData?.message || errorData?.Message || "Tidak berhasil masuk. Mohon coba lagi.";
 				throw new Error(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
 			}
 

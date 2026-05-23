@@ -1,9 +1,15 @@
 import datetime
 import uuid
+import typing
+from typing import TYPE_CHECKING
 
 import sqlalchemy
 from sqlalchemy.orm import Mapped as SQLAlchemyMapped, mapped_column as sqlalchemy_mapped_column, relationship
 from sqlalchemy.sql import functions as sqlalchemy_functions
+
+if TYPE_CHECKING:
+    from src.models.db.account import Account
+    from src.models.db.location import FieldLocation
 
 from src.repository.table import Base
 
@@ -19,6 +25,9 @@ class Hazop(Base):  # type: ignore
     # Period Tracking
     reporting_year: SQLAlchemyMapped[int] = sqlalchemy_mapped_column(sqlalchemy.Integer, nullable=False)
     reporting_month: SQLAlchemyMapped[int] = sqlalchemy_mapped_column(sqlalchemy.SmallInteger, nullable=False)
+    field: SQLAlchemyMapped[str | None] = sqlalchemy_mapped_column(
+        sqlalchemy.String(length=50), sqlalchemy.ForeignKey("field_location.code"), nullable=True
+    )
 
     # HAZOP Fields
     node_no: SQLAlchemyMapped[str | None] = sqlalchemy_mapped_column(sqlalchemy.String(length=100), nullable=True)
@@ -54,5 +63,8 @@ class Hazop(Base):  # type: ignore
     )
 
     owner: SQLAlchemyMapped["Account"] = relationship("Account", lazy="selectin")
+    field_location: SQLAlchemyMapped[typing.Optional["FieldLocation"]] = relationship(
+        "FieldLocation", back_populates="hazop_monitorings", lazy="selectin"
+    )
 
     __mapper_args__ = {"eager_defaults": True}

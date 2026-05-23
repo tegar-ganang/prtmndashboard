@@ -25,6 +25,7 @@ const useAuthStoreBase = create<AuthStoreType>((set) => ({
 		set(
 			produce<AuthStoreType>((state) => {
 				state.isAuthed = true;
+				state.isLoading = false;
 				state.user = {
 					id: user.authorizedAccount.email,
 					name: user.authorizedAccount.name,
@@ -42,6 +43,7 @@ const useAuthStoreBase = create<AuthStoreType>((set) => ({
 		set(
 			produce<AuthStoreType>((state) => {
 				state.isAuthed = true;
+				state.isLoading = false;
 				state.user = user;
 			}),
 		);

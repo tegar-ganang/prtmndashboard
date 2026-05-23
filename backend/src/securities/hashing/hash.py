@@ -44,13 +44,16 @@ class HashGenerator:
         """
         A function that decodes users' password and verifies whether it is the correct password.
         """
-        # Try with raw password first (for backward compatibility)
-        result = self._hash_ctx_layer_2.verify(secret=password, hash=hashed_password)
-        
-        # If raw password verification fails, try with normalized password
+        # Try with normalized password first (standard for all new passwords to avoid length limits)
+        try:
+            result = self._hash_ctx_layer_2.verify(secret=self._normalize_password_secret(secret=password), hash=hashed_password)
+        except ValueError:
+            result = False
+
+        # If normalized password verification fails, try with raw password (for backward compatibility with old accounts)
         if not result:
             try:
-                result = self._hash_ctx_layer_2.verify(secret=self._normalize_password_secret(secret=password), hash=hashed_password)
+                result = self._hash_ctx_layer_2.verify(secret=password, hash=hashed_password)
             except ValueError:
                 return False
         

@@ -18,9 +18,10 @@ router = fastapi.APIRouter(prefix="/hazop", tags=["hazop"], dependencies=[fastap
 async def check_period(
     year: int,
     month: int,
+    field: str | None = None,
     repo: HazopCRUDRepository = fastapi.Depends(get_repository(repo_type=HazopCRUDRepository)),
 ) -> APIResponse:
-    exists = await repo.check_period_exists(year, month)
+    exists = await repo.check_period_exists(year, month, field)
     return APIResponse(
         success=True,
         data={"exists": exists},
@@ -44,7 +45,10 @@ async def create_batch(
             batch_data=batch_data, owner_account_id=str(current_account.id)
         )
     except Exception as e:
-        raise fastapi.HTTPException(status_code=400, detail=str(e))
+        print(f"Error bulk inserting HAZOP: {str(e)}", flush=True)
+        import traceback
+        traceback.print_exc()
+        raise fastapi.HTTPException(status_code=400, detail="Gagal menyimpan data ke database. Silakan pastikan format template sudah benar atau hubungi administrator.")
 
     return APIResponse(
         success=True,
@@ -80,9 +84,10 @@ async def get_data(
     batch_id: str | None = None,
     year: int | None = None,
     month: int | None = None,
+    field: str | None = None,
     repo: HazopCRUDRepository = fastapi.Depends(get_repository(repo_type=HazopCRUDRepository)),
 ) -> APIResponse:
-    data = await repo.get_data(batch_id=batch_id, year=year, month=month)
+    data = await repo.get_data(batch_id=batch_id, year=year, month=month, field=field)
     return APIResponse(
         success=True,
         message="Data fetched successfully",

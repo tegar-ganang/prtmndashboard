@@ -10,8 +10,10 @@ from src.repository.crud.base import BaseCRUDRepository
 def parse_date(date_val: typing.Any) -> date | None:
     if not date_val:
         return None
-    if isinstance(date_val, (datetime, date)):
-        return date_val if isinstance(date_val, date) else date_val.date()
+    if isinstance(date_val, datetime):
+        return date_val.date()
+    if isinstance(date_val, date):
+        return date_val
     
     date_str = str(date_val).strip()
     if not date_str:
@@ -30,12 +32,16 @@ class BaseMonitoringRepository(BaseCRUDRepository):
     date_columns: list[str] = ["target_date", "completion_date", "mit_declaration_date", "target_closing", "closing_date"]
     period_col: str = "reporting_month" # default for most
 
-    async def check_period_exists(self, year: int, period: int) -> bool:
+    async def check_period_exists(self, year: int, period: int, field: str | None = None) -> bool:
         period_attr = getattr(self.model, self.period_col)
-        stmt = sqlalchemy.select(self.model.id).where(
+        conditions = [
             self.model.reporting_year == year,
             period_attr == period
-        ).limit(1)
+        ]
+        if field is not None:
+            conditions.append(self.model.field == field)
+
+        stmt = sqlalchemy.select(self.model.id).where(*conditions).limit(1)
         res = await self.async_session.execute(stmt)
         return res.first() is not None
 
@@ -44,21 +50,27 @@ class BaseMonitoringRepository(BaseCRUDRepository):
         
         # Determine period value based on input schema (reporting_quarter or reporting_month)
         period_value = getattr(batch_data, self.period_col)
+        field_value: str | None = getattr(batch_data, "field", None)
 
         if batch_data.mode == "overwrite":
             period_attr = getattr(self.model, self.period_col)
-            delete_stmt = sqlalchemy.delete(self.model).where(
+            conditions = [
                 self.model.reporting_year == batch_data.reporting_year,
-                period_attr == period_value
-            )
+                period_attr == period_value,
+            ]
+            if field_value is not None:
+                conditions.append(self.model.field == field_value)
+            delete_stmt = sqlalchemy.delete(self.model).where(*conditions)
             await self.async_session.execute(delete_stmt)
             await self.async_session.flush()
 
-        objects = []
+        dicts_to_insert = []
         for item in batch_data.items:
             kwargs = {
+                "id": uuid.uuid4(),
                 "reporting_year": batch_data.reporting_year,
                 self.period_col: period_value,
+                "field": field_value,
                 "upload_batch_id": upload_batch_id,
                 "owner_account_id": owner_account_id,
             }
@@ -68,13 +80,20 @@ class BaseMonitoringRepository(BaseCRUDRepository):
                 if db_column in self.date_columns:
                     kwargs[db_column] = parse_date(value)
                 else:
-                    kwargs[db_column] = str(value) if value is not None else None
+                    if value is not None:
+                        val_str = str(value)
+                        col_attr = getattr(self.model, db_column, None)
+                        if col_attr is not None and hasattr(col_attr, "type") and hasattr(col_attr.type, "length") and col_attr.type.length is not None:
+                            val_str = val_str[:col_attr.type.length]
+                        kwargs[db_column] = val_str
+                    else:
+                        kwargs[db_column] = None
             
-            obj = self.model(**kwargs)
-            objects.append(obj)
+            dicts_to_insert.append(kwargs)
             
-        if objects:
-            self.async_session.add_all(objects)
+        if dicts_to_insert:
+            stmt = sqlalchemy.insert(self.model)
+            await self.async_session.execute(stmt, dicts_to_insert)
             await self.async_session.commit()
             
         return upload_batch_id
@@ -86,17 +105,24 @@ class BaseMonitoringRepository(BaseCRUDRepository):
                 self.model.upload_batch_id,
                 self.model.reporting_year,
                 period_attr.label(self.period_col),
+                self.model.field,
                 sqlalchemy_functions.min(self.model.created_at).label("upload_date"),
                 sqlalchemy_functions.count(self.model.id).label("record_count"),
             )
-            .group_by(self.model.upload_batch_id, self.model.reporting_year, period_attr)
+            .group_by(self.model.upload_batch_id, self.model.reporting_year, period_attr, self.model.field)
             .order_by(sqlalchemy.desc("upload_date"))
         )
         res = await self.async_session.execute(stmt)
         return [dict(row._mapping) for row in res.all()]
 
     async def get_data(
-        self, batch_id: str | None = None, year: int | None = None, period: int | None = None
+        self,
+        batch_id: str | None = None,
+        year: int | None = None,
+        period: int | None = None,
+        month: int | None = None,
+        quarter: int | None = None,
+        field: str | None = None,
     ) -> list[typing.Any]:
         stmt = sqlalchemy.select(self.model)
         
@@ -105,9 +131,14 @@ class BaseMonitoringRepository(BaseCRUDRepository):
             conditions.append(self.model.upload_batch_id == batch_id)
         if year:
             conditions.append(self.model.reporting_year == year)
-        if period:
+            
+        filter_period = period or month or quarter
+        if filter_period:
             period_attr = getattr(self.model, self.period_col)
-            conditions.append(period_attr == period)
+            conditions.append(period_attr == filter_period)
+            
+        if field:
+            conditions.append(self.model.field == field)
             
         if conditions:
             stmt = stmt.where(sqlalchemy.and_(*conditions))

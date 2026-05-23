@@ -25,7 +25,7 @@ export const useMonitoringBatchMutation = ({ docType, onSuccess }: UseMonitoring
 
 			if (!OK) {
 				const errorData = Kind as any;
-				const errorMessage = errorData?.err || errorData?.message || `Telah terjadi kesalahan saat upload data ${docType}`;
+				const errorMessage = errorData?.err || errorData?.message || errorData?.Message || `Telah terjadi kesalahan saat upload data ${docType}`;
 				throw new Error(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
 			}
 

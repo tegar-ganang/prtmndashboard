@@ -6,7 +6,7 @@ interface CheckPeriodResponse {
 	exists: boolean;
 }
 
-export const checkMonitoringPeriodExists = async (docType: string, year: number, period: number): Promise<boolean> => {
+export const checkMonitoringPeriodExists = async (docType: string, year: number, period: number, field?: string): Promise<boolean> => {
 	let endpoint = MAIN_ENDPOINT.Mit.CheckPeriod;
 	let query = `?year=${year}&quarter=${period}`;
 
@@ -21,11 +21,15 @@ export const checkMonitoringPeriodExists = async (docType: string, year: number,
 		query = `?year=${year}&month=${period}`;
 	}
 
+	if (field) {
+		query += `&field=${field}`;
+	}
+
 	const { Kind, OK } = await get<ApiResponse<CheckPeriodResponse>>(`${endpoint}${query}`);
 
 	if (!OK) {
 		const errorData = Kind as any;
-		const errorMessage = errorData?.err || errorData?.message || `Telah terjadi kesalahan saat mengecek data periode ${docType}`;
+		const errorMessage = errorData?.err || errorData?.message || errorData?.Message || `Telah terjadi kesalahan saat mengecek data periode ${docType}`;
 		throw new Error(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
 	}
 

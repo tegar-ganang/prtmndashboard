@@ -1,9 +1,13 @@
 import datetime
 import uuid
+from typing import TYPE_CHECKING
 
 import sqlalchemy
 from sqlalchemy.orm import Mapped as SQLAlchemyMapped, mapped_column as sqlalchemy_mapped_column, relationship
 from sqlalchemy.sql import functions as sqlalchemy_functions
+
+if TYPE_CHECKING:
+    from src.models.db.role import Role
 
 from src.repository.table import Base
 

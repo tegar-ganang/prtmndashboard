@@ -35,7 +35,7 @@ export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
     title: "Major Integrity Threat (MIT)",
     periodType: "quarter",
     getColumns: (ch) => [
-      ch.accessor("area", { header: "Area", cell: i => <span className="text-xs font-medium text-gray-900">{i.getValue() || "—"}</span> }),
+      ch.accessor("field", { header: "Field/Area", cell: i => <span className="text-xs font-medium text-gray-900">{i.getValue() || "—"}</span> }),
       ch.accessor("reg_no", { header: "No. Reg", cell: i => <span className="text-xs font-mono text-gray-500">{i.getValue() || "—"}</span> }),
       ch.accessor("mit_title_asset", { 
         header: "MIT Title / Asset", 
@@ -51,6 +51,7 @@ export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
     title: "Hazard Identification (HAZID)",
     periodType: "month",
     getColumns: (ch) => [
+      ch.accessor("field", { header: "Field/Area", cell: i => <span className="text-xs font-medium text-gray-900">{i.getValue() || "—"}</span> }),
       ch.accessor("node", { header: "Node", cell: i => <span className="text-xs font-medium">{i.getValue() || "—"}</span> }),
       ch.accessor("hazard", { header: "Hazard", cell: i => <div className="text-xs max-w-[200px] truncate" title={i.getValue()}>{i.getValue() || "—"}</div> }),
       ch.accessor("risk", { header: "Risk", cell: i => badge(i.getValue(), "risk") }),
@@ -63,6 +64,7 @@ export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
     title: "Hazard and Operability Study (HAZOP)",
     periodType: "month",
     getColumns: (ch) => [
+      ch.accessor("field", { header: "Field/Area", cell: i => <span className="text-xs font-medium text-gray-900">{i.getValue() || "—"}</span> }),
       ch.accessor("node", { header: "Node", cell: i => <span className="text-xs font-medium">{i.getValue() || "—"}</span> }),
       ch.accessor("deviation", { header: "Deviation", cell: i => <div className="text-xs max-w-[150px] truncate" title={i.getValue()}>{i.getValue() || "—"}</div> }),
       ch.accessor("risk", { header: "Risk", cell: i => badge(i.getValue(), "risk") }),
@@ -75,6 +77,7 @@ export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
     title: "Layer of Protection Analysis (LOPA)",
     periodType: "month",
     getColumns: (ch) => [
+      ch.accessor("field", { header: "Field/Area", cell: i => <span className="text-xs font-medium text-gray-900">{i.getValue() || "—"}</span> }),
       ch.accessor("function_name", { header: "Function", cell: i => <span className="text-xs font-medium">{i.getValue() || "—"}</span> }),
       ch.accessor("final_element", { header: "Final Element", cell: i => <div className="text-xs max-w-[150px] truncate" title={i.getValue()}>{i.getValue() || "—"}</div> }),
       ch.accessor("rrf_gap_value", { header: "RRF Gap", cell: i => <span className="text-xs">{i.getValue() || "—"}</span> }),

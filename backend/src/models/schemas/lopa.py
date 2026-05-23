@@ -1,11 +1,13 @@
 import typing
 import datetime
 import pydantic
+from src.models.schemas.location import FieldLocationResponse
 
 class DocumentMonthlyBatchCreate(pydantic.BaseModel):
     doc_type: str
     reporting_year: int
     reporting_month: int
+    field: str | None = None
     mode: str = "append"
     items: list[dict[str, typing.Any]]
 
@@ -19,6 +21,8 @@ class LopaResponse(pydantic.BaseModel):
     owner_account_id: typing.Any | None
     reporting_year: int
     reporting_month: int
+    field: str | None
+    field_location: FieldLocationResponse | None = None
     function_no: str | None
     function_name: str | None
     function_description: str | None
@@ -43,6 +47,7 @@ class LopaHistoryResponse(pydantic.BaseModel):
     upload_batch_id: typing.Any
     reporting_year: int
     reporting_month: int
+    field: str | None
     upload_date: datetime.datetime
     record_count: int
     

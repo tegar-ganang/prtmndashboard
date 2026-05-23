@@ -10,6 +10,7 @@ from src.repository.crud.account import AccountCRUDRepository
 from src.repository.database import async_db
 from src.securities.authorizations.jwt import jwt_generator
 from src.utilities.exceptions.database import EntityDoesNotExist
+from sqlalchemy.ext.asyncio import AsyncSession as SQLAlchemyAsyncSession
 
 
 class JWTAuthenticationMiddleware(BaseHTTPMiddleware):
@@ -20,12 +21,19 @@ class JWTAuthenticationMiddleware(BaseHTTPMiddleware):
             f"{settings.API_PREFIX}/projects",
             f"{settings.API_PREFIX}/auth/me",
             f"{settings.API_PREFIX}/mit",
+            f"{settings.API_PREFIX}/hazid",
+            f"{settings.API_PREFIX}/hazop",
+            f"{settings.API_PREFIX}/lopa",
+            f"{settings.API_PREFIX}/locations",
         )
 
     def _is_protected_path(self, path: str) -> bool:
         return path.startswith(self.protected_paths)
 
     async def dispatch(self, request: Request, call_next) -> Response:
+        if request.method == "OPTIONS":
+            return await call_next(request)
+
         if not self._is_protected_path(request.url.path):
             return await call_next(request)
 
@@ -44,18 +52,20 @@ class JWTAuthenticationMiddleware(BaseHTTPMiddleware):
             )
 
         token = authorization.removeprefix(prefix).strip()
-        account_repo = AccountCRUDRepository(async_session=async_db.async_session)
+        
+        async with SQLAlchemyAsyncSession(bind=async_db.async_engine, expire_on_commit=False) as async_session:
+            account_repo = AccountCRUDRepository(async_session=async_session)
 
-        try:
-            details = jwt_generator.retrieve_details_from_token(token=token, secret_key=settings.JWT_SECRET_KEY)
-            email = details[1]
-            current_account: Account = await account_repo.read_account_by_email(email=email)
+            try:
+                details = jwt_generator.retrieve_details_from_token(token=token, secret_key=settings.JWT_SECRET_KEY)
+                email = details[1]
+                current_account: Account = await account_repo.read_account_by_email(email=email)
 
-        except (ValueError, EntityDoesNotExist):
-            return fastapi_responses.JSONResponse(
-                status_code=fastapi.status.HTTP_401_UNAUTHORIZED,
-                content={"success": False, "message": "Unauthorized", "data": None, "err": "Invalid JWT token"},
-            )
+            except (ValueError, EntityDoesNotExist):
+                return fastapi_responses.JSONResponse(
+                    status_code=fastapi.status.HTTP_401_UNAUTHORIZED,
+                    content={"success": False, "message": "Unauthorized", "data": None, "err": "Invalid JWT token"},
+                )
 
         request.state.current_account = current_account
         request.state.current_account_token = token

@@ -18,9 +18,10 @@ router = fastapi.APIRouter(prefix="/mit", tags=["mit"], dependencies=[fastapi.De
 async def check_period(
     year: int,
     quarter: int,
+    field: str | None = None,
     mit_repo: MITCRUDRepository = fastapi.Depends(get_repository(repo_type=MITCRUDRepository)),
 ) -> APIResponse:
-    exists = await mit_repo.check_period_exists(year, quarter)
+    exists = await mit_repo.check_period_exists(year, quarter, field)
     return APIResponse(
         success=True,
         data={"exists": exists},
@@ -82,9 +83,10 @@ async def get_mit_data(
     batch_id: str | None = None,
     year: int | None = None,
     quarter: int | None = None,
+    field: str | None = None,
     mit_repo: MITCRUDRepository = fastapi.Depends(get_repository(repo_type=MITCRUDRepository)),
 ) -> APIResponse:
-    data = await mit_repo.get_mit_data(batch_id=batch_id, year=year, quarter=quarter)
+    data = await mit_repo.get_mit_data(batch_id=batch_id, year=year, quarter=quarter, field=field)
     return APIResponse(
         success=True,
         message="MIT data fetched successfully",
