@@ -105,10 +105,11 @@ class BaseMonitoringRepository(BaseCRUDRepository):
                 self.model.upload_batch_id,
                 self.model.reporting_year,
                 period_attr.label(self.period_col),
+                self.model.field,
                 sqlalchemy_functions.min(self.model.created_at).label("upload_date"),
                 sqlalchemy_functions.count(self.model.id).label("record_count"),
             )
-            .group_by(self.model.upload_batch_id, self.model.reporting_year, period_attr)
+            .group_by(self.model.upload_batch_id, self.model.reporting_year, period_attr, self.model.field)
             .order_by(sqlalchemy.desc("upload_date"))
         )
         res = await self.async_session.execute(stmt)

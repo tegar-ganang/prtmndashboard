@@ -1,6 +1,7 @@
 import typing
 import datetime
 from src.models.schemas.base import BaseSchemaModel
+from src.models.schemas.location import FieldLocationResponse
 
 import pydantic
 
@@ -23,6 +24,7 @@ class MITResponse(pydantic.BaseModel):
     owner_account_id: typing.Any | None
     area: str | None
     field: str | None
+    field_location: FieldLocationResponse | None = None
     reg_lokasi: str | None
     reg_jenis_mit: str | None
     reg_kategori: str | None

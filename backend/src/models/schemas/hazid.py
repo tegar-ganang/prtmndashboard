@@ -1,6 +1,7 @@
 import typing
 import datetime
 import pydantic
+from src.models.schemas.location import FieldLocationResponse
 
 class DocumentMonthlyBatchCreate(pydantic.BaseModel):
     doc_type: str
@@ -21,6 +22,7 @@ class HazidResponse(pydantic.BaseModel):
     reporting_year: int
     reporting_month: int
     field: str | None
+    field_location: FieldLocationResponse | None = None
     node_no: str | None
     rec_no: str | None
     node: str | None

@@ -1,6 +1,7 @@
 import typing
 import datetime
 import pydantic
+from src.models.schemas.location import FieldLocationResponse
 
 class DocumentMonthlyBatchCreate(pydantic.BaseModel):
     doc_type: str
@@ -21,6 +22,7 @@ class LopaResponse(pydantic.BaseModel):
     reporting_year: int
     reporting_month: int
     field: str | None
+    field_location: FieldLocationResponse | None = None
     function_no: str | None
     function_name: str | None
     function_description: str | None

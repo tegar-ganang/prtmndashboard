@@ -13,7 +13,7 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 	MIT: {
 		label: "Major Integrity Threat (MIT)",
 		expectedHeaders: [
-			"Area", "No Registration - Lokasi", "No Registration - Jenis MIT",
+			"No Registration - Jenis MIT",
 			"No Registration - Kategori", "No Registration - Tahun", "No Registration - No",
 			"MIT Declaration Date", "MIT Title / Asset", "Integrity Threats",
 			"Possible Scenario", "Consequences", "Available Safeguard/Control",
@@ -24,11 +24,11 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 			"Risk", "MIT Status", "Evidence", "Closing Date",
 		],
 		glanceCols: [
-			"Area", "No Registration - No", "MIT Title / Asset",
+			"No Registration - No", "MIT Title / Asset",
 			"Current Risk - Risk", "MIT Status", "PIC", "Target Closing",
 		],
 		templateUrl: "/templates/Template MIT Quartal.xlsx",
-		requiredFields: ["MIT Title / Asset", "Area"],
+		requiredFields: ["MIT Title / Asset"],
 		period: "quarter",
 	},
 	HAZID: {
@@ -111,7 +111,7 @@ export const YEAR_OPTIONS = Array.from({ length: 5 }, (_, i) => {
 });
 
 export const DRAWER_SECTIONS = [
-	{ title: "Identitas & Registration", keys: ["Area", "No Registration - Lokasi", "No Registration - Jenis MIT", "No Registration - Kategori", "No Registration - Tahun", "No Registration - No"] },
+	{ title: "Identitas & Registration", keys: ["No Registration - Jenis MIT", "No Registration - Kategori", "No Registration - Tahun", "No Registration - No"] },
 	{ title: "Informasi MIT", keys: ["MIT Declaration Date", "MIT Title / Asset", "Integrity Threats", "Possible Scenario", "Consequences", "Available Safeguard/Control"] },
 	{ title: "Current Risk", keys: ["Current Risk - Likelihood", "Current Risk - Severity", "Current Risk - Risk"] },
 	{ title: "Rekomendasi", keys: ["Rec. No.", "Recommendation / Action", "PIC", "Target Closing", "Remarks"] },

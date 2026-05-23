@@ -35,7 +35,21 @@ class AsyncDatabase:
         """
         # Return the URI appending driver configuration suitable for msodbcsql18
         if "mssql" in self.postgres_uri and "?" not in self.postgres_uri:
-            return f"{self.postgres_uri}?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes"
+            import pyodbc
+            drivers = pyodbc.drivers()
+            selected_driver = "ODBC Driver 18 for SQL Server"
+            if "ODBC Driver 18 for SQL Server" in drivers:
+                selected_driver = "ODBC Driver 18 for SQL Server"
+            elif "ODBC Driver 17 for SQL Server" in drivers:
+                selected_driver = "ODBC Driver 17 for SQL Server"
+            elif "SQL Server" in drivers:
+                selected_driver = "SQL Server"
+            
+            driver_param = selected_driver.replace(" ", "+")
+            if selected_driver == "SQL Server":
+                # Legacy SQL Server driver doesn't support TrustServerCertificate
+                return f"{self.postgres_uri}?driver={driver_param}&database={settings.DB_POSTGRES_NAME}"
+            return f"{self.postgres_uri}?driver={driver_param}&TrustServerCertificate=yes&database={settings.DB_POSTGRES_NAME}"
         return self.postgres_uri
 
 

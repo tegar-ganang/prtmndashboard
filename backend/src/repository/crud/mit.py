@@ -3,8 +3,6 @@ from src.models.db.mit import MIT
 from src.repository.crud.base_monitoring import BaseMonitoringRepository
 
 MIT_MAPPER = {
-    "Area": "area",
-    "No Registration - Lokasi": "reg_lokasi",
     "No Registration - Jenis MIT": "reg_jenis_mit",
     "No Registration - Kategori": "reg_kategori",
     "No Registration - Tahun": "reg_tahun",

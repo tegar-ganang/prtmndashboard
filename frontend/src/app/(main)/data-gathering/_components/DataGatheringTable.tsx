@@ -97,14 +97,6 @@ export default function DataGatheringTable({
 			});
 
 			baseCols.push(
-				ch.accessor("Area", {
-					header: "Area",
-					cell: (i) => (
-						<div className="w-24 truncate text-xs font-medium text-gray-900" title={i.getValue() as string}>
-							{i.getValue() ? String(i.getValue()) : "—"}
-						</div>
-					),
-				}),
 				ch.accessor("No Registration - No", {
 					header: "No. Reg",
 					cell: (i) => (

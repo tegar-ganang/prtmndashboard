@@ -29,7 +29,7 @@ export const checkMonitoringPeriodExists = async (docType: string, year: number,
 
 	if (!OK) {
 		const errorData = Kind as any;
-		const errorMessage = errorData?.err || errorData?.message || `Telah terjadi kesalahan saat mengecek data periode ${docType}`;
+		const errorMessage = errorData?.err || errorData?.message || errorData?.Message || `Telah terjadi kesalahan saat mengecek data periode ${docType}`;
 		throw new Error(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
 	}
 
