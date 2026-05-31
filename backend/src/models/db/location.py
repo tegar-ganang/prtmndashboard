@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from src.models.db.hazop import Hazop
     from src.models.db.lopa import Lopa
     from src.models.db.mit import MIT
+    from src.models.db.produksi import Produksi
 
 class FieldLocation(Base):
     __tablename__ = "field_location"
@@ -39,4 +40,7 @@ class FieldLocation(Base):
     )
     lopa_monitorings: SQLAlchemyMapped[list["Lopa"]] = relationship(
         "Lopa", back_populates="field_location", lazy="selectin"
+    )
+    produksi_monitorings: SQLAlchemyMapped[list["Produksi"]] = relationship(
+        "Produksi", back_populates="field_location", lazy="selectin"
     )

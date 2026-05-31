@@ -56,11 +56,10 @@ const AppHeader: React.FC = () => {
 	}, []);
 
 	return (
-		<header
-			className={`sticky top-0 flex w-full bg-white border-gray-200 z-999 border ${isMobile ? "" : "hidden"}`}
-		>
+		<header className="sticky top-0 flex w-full bg-white border-gray-200 z-999 border">
 			<div className="flex flex-col items-center justify-between grow lg:px-8 lg:flex-row">
 				<div className="flex items-center justify-between w-full gap-4 px-3 py-3 border-b border-gray-200 sm:gap-7 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-2">
+					{/* Hamburger / toggle sidebar — tampil di semua ukuran layar */}
 					<button
 						type="button"
 						className="items-center justify-center hover:bg-gray-100 flex w-10 h-10 transition-colors duration-200 cursor-pointer text-gray-500 border-gray-200 rounded-lg z-50 lg:h-11 lg:w-11 lg:border"

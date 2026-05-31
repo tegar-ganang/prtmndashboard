@@ -56,16 +56,18 @@ export default function DataGatheringSidebar({
 					styles={SELECT_STYLES}
 				/>
 
-				<div className="mt-4">
-					<label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Lokasi / Field</label>
-					<Select
-						options={fieldOptions}
-						value={field}
-						onChange={(v) => v && onFieldChange(v as DocumentOption)}
-						className="text-sm"
-						styles={SELECT_STYLES}
-					/>
-				</div>
+				{docType.value !== "PRODUKSI" && (
+					<div className="mt-4">
+						<label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Lokasi / Field</label>
+						<Select
+							options={fieldOptions}
+							value={field}
+							onChange={(v) => v && onFieldChange(v as DocumentOption)}
+							className="text-sm"
+							styles={SELECT_STYLES}
+						/>
+					</div>
+				)}
 
 				<div className="mt-4 grid grid-cols-2 gap-2">
 					{docConfig.period === "quarter" ? (

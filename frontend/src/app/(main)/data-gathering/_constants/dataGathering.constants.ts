@@ -1,6 +1,6 @@
 import type { StylesConfig } from "react-select";
 
-export type DocTypeValue = "MIT" | "HAZID" | "HAZOP" | "LOPA";
+export type DocTypeValue = "MIT" | "HAZID" | "HAZOP" | "LOPA" | "PRODUKSI" | "PRODUKSI_TARGET" | "PRODUKSI_REALISASI";
 
 export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 	label: string;
@@ -70,12 +70,46 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		requiredFields: ["FUNCTION NAME"],
 		period: "month",
 	},
+	PRODUKSI: {
+		label: "Produksi Harian (Gas)",
+		expectedHeaders: [], // Backend yang parse — tidak ada client-side header check
+		glanceCols: [],
+		templateUrl: "/templates/Template - Produksi.xlsx",
+		requiredFields: [],
+		period: "month" as const,
+	},
+	PRODUKSI_TARGET: {
+		label: "Target Bulanan (Gas)",
+		expectedHeaders: [],
+		glanceCols: ["Bulan", "Target DMF (MMSCFD)"],
+		templateUrl: "/templates/Template - Produksi.xlsx",
+		requiredFields: [],
+		period: "month" as const,
+	},
+	PRODUKSI_REALISASI: {
+		label: "Realisasi Harian (Gas)",
+		expectedHeaders: [],
+		glanceCols: [
+			"Tanggal",
+			"PUPO/SOT Real (BOPD)",
+			"Op Real (BOPD)",
+			"Donggi Prod (MMSCFD)",
+			"Matindok Prod (MMSCFD)",
+			"Safe Man Hours",
+			"Target DMF (MMSCFD)",
+		],
+		templateUrl: "/templates/Template - Produksi.xlsx",
+		requiredFields: [],
+		period: "month" as const,
+	},
 };
 
-export const DOCUMENT_OPTIONS = (Object.keys(DOC_TYPE_CONFIG) as DocTypeValue[]).map((key) => ({
-	value: key,
-	label: DOC_TYPE_CONFIG[key].label,
-}));
+export const DOCUMENT_OPTIONS = (Object.keys(DOC_TYPE_CONFIG) as DocTypeValue[])
+	.filter((key) => key !== "PRODUKSI_TARGET" && key !== "PRODUKSI_REALISASI")
+	.map((key) => ({
+		value: key,
+		label: DOC_TYPE_CONFIG[key].label,
+	}));
 
 export const QUARTER_OPTIONS = [
 	{ value: "Q1", label: "Q1" },

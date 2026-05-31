@@ -52,7 +52,7 @@ const AppSidebar: React.FC = () => {
 				icon: <UploadCloud className="w-5 h-5" />,
 				name: "Data Gathering",
 				path: "/data-gathering",
-				description: "Upload data MIT, HAZID, HAZOP, LOPA.",
+				description: "Upload data MIT, HAZID, HAZOP, LOPA, Produksi.",
 			},
 			{
 				icon: <Monitor className="w-5 h-5" />,
@@ -63,6 +63,7 @@ const AppSidebar: React.FC = () => {
 					{ name: "HAZID (Bulanan)", path: "/monitoring/hazid", description: "Hazard Identification - Monthly" },
 					{ name: "HAZOP (Bulanan)", path: "/monitoring/hazop", description: "Hazard & Operability Study - Monthly" },
 					{ name: "LOPA (Bulanan)", path: "/monitoring/lopa", description: "Layer of Protection Analysis - Monthly" },
+					{ name: "Produksi (Bulanan)", path: "/monitoring/produksi", description: "Monitoring produksi gas harian Donggi-Matindok" },
 				],
 			},
 		],

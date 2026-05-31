@@ -8,3 +8,5 @@ from .hazid import Hazid
 from .hazop import Hazop
 from .lopa import Lopa
 from .location import FieldLocation
+from .produksi_target import ProduksiTarget  # must be imported before Produksi (FK dependency)
+from .produksi import Produksi

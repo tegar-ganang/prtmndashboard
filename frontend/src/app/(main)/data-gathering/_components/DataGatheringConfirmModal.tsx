@@ -55,7 +55,7 @@ export default function DataGatheringConfirmModal({
 												{isDataExists ? (
 													<>
 														<p className="text-sm text-gray-500">
-															Data {docType} untuk <b>{fieldLabel} — {periodLabel} Tahun {yearLabel}</b> sudah tersedia di database.
+															Data {docType} untuk <b>{docType === "PRODUKSI" ? "" : `${fieldLabel} — `}{periodLabel} Tahun {yearLabel}</b> sudah tersedia di database.
 														</p>
 														<p className="text-sm text-gray-500 mt-2">
 															Apakah Anda ingin memproses data ini? <br />
@@ -64,7 +64,7 @@ export default function DataGatheringConfirmModal({
 													</>
 												) : (
 													<p className="text-sm text-gray-500">
-														Apakah Anda yakin ingin memproses data {docType} untuk <b>{fieldLabel} — {periodLabel} Tahun {yearLabel}</b>?
+														Apakah Anda yakin ingin memproses data {docType} untuk <b>{docType === "PRODUKSI" ? "" : `${fieldLabel} — `}{periodLabel} Tahun {yearLabel}</b>?
 													</p>
 												)}
 											</div>
