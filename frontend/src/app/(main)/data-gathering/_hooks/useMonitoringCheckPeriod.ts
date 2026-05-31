@@ -19,6 +19,9 @@ export const checkMonitoringPeriodExists = async (docType: string, year: number,
 	} else if (docType === "LOPA") {
 		endpoint = MAIN_ENDPOINT.Lopa.CheckPeriod;
 		query = `?year=${year}&month=${period}`;
+	} else if (docType === "PRODUKSI") {
+		endpoint = MAIN_ENDPOINT.Produksi.CheckPeriod;
+		query = `?year=${year}&month=${period}`;
 	}
 
 	if (field) {

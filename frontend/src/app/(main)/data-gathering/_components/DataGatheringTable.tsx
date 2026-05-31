@@ -135,9 +135,10 @@ export default function DataGatheringTable({
 							const isStatus = col.includes("STATUS");
 							if (isRisk) return badge(i.getValue(), "risk");
 							if (isStatus) return badge(i.getValue(), "status");
+							const val = i.getValue();
 							return (
-								<div className="w-32 truncate text-xs font-medium text-gray-900" title={i.getValue() as string}>
-									{i.getValue() ? String(i.getValue()) : "—"}
+								<div className="w-32 truncate text-xs font-medium text-gray-900" title={val !== null && val !== undefined ? String(val) : ""}>
+									{val !== null && val !== undefined ? String(val) : "—"}
 								</div>
 							);
 						},

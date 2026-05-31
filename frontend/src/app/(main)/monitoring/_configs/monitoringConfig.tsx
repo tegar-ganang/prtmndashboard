@@ -85,5 +85,43 @@ export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
       ch.accessor("responsibility_pic", { header: "PIC", cell: i => <span className="text-xs">{i.getValue() || "—"}</span> }),
       ch.accessor("target_date", { header: "Target Date", cell: i => dateCell(i.getValue()) }),
     ]
+  },
+  produksi: {
+    title: "Monitoring Produksi Harian",
+    periodType: "month",
+    getColumns: (ch) => [
+      ch.accessor("tanggal", {
+        header: "Tanggal",
+        cell: i => <span className="text-xs font-mono text-gray-700 whitespace-nowrap">{i.getValue() ? format(new Date(i.getValue()), "dd MMM yyyy") : "—"}</span>,
+      }),
+      ch.accessor("donggi_prod", {
+        header: "Donggi Prod (MMSCFD)",
+        cell: i => <span className="text-xs font-semibold text-blue-700">{i.getValue() != null ? Number(i.getValue()).toFixed(2) : "—"}</span>,
+      }),
+      ch.accessor("matindok_prod", {
+        header: "Matindok Prod (MMSCFD)",
+        cell: i => <span className="text-xs font-semibold text-indigo-700">{i.getValue() != null ? Number(i.getValue()).toFixed(2) : "—"}</span>,
+      }),
+      // target_dmf kini ada di tabel produksi_target (nested via FK target_id → target.target_dmf)
+      ch.accessor((row: any) => row?.target?.target_dmf ?? null, {
+        id: "target_dmf",
+        header: "Target DMF (MMSCFD)",
+        cell: i => <span className="text-xs text-emerald-700 font-bold">{i.getValue() != null ? Number(i.getValue()).toFixed(2) : "—"}</span>,
+      }),
+      ch.accessor("op_real", {
+        header: "Op Real (BOPD)",
+        cell: i => <span className="text-xs text-gray-600">{i.getValue() != null ? Number(i.getValue()).toFixed(3) : "—"}</span>,
+      }),
+      ch.accessor("pupo_sot_real", {
+        header: "PUPO/SOT Real (BOPD)",
+        cell: i => <span className="text-xs text-gray-600">{i.getValue() != null ? Number(i.getValue()).toFixed(3) : "—"}</span>,
+      }),
+      ch.accessor((row: any) => row.safe_man_hours_actl ?? row.safe_man_hours_dmf ?? null, {
+        id: "safe_man_hours",
+        header: "Safe Man Hours",
+        cell: i => <span className="text-xs text-gray-500">{i.getValue() != null ? Number(i.getValue()).toLocaleString() : "—"}</span>,
+      }),
+    ]
   }
 };
+

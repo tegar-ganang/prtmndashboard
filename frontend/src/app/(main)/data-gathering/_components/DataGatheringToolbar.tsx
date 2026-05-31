@@ -63,7 +63,7 @@ export default function DataGatheringToolbar({
 			</div>
 
 			<div className="flex items-center gap-2">
-				<div className="relative" ref={colMenuRef}>
+				<div className="relative" ref={colMenuRef} onMouseDown={(e) => e.stopPropagation()}>
 					<Button
 						variant="outline"
 						size="sm"

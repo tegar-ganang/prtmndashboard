@@ -34,6 +34,12 @@ export const MAIN_ENDPOINT = {
 		GetAll: "/lopa",
 		History: "/lopa/history",
 	},
+	Produksi: {
+		Upload: "/produksi/upload-excel",
+		CheckPeriod: "/produksi/check-period",
+		GetAll: "/produksi",
+		History: "/produksi/history",
+	},
 	Locations: {
 		GetAll: "/locations",
 	},
