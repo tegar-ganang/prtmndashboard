@@ -17,11 +17,11 @@ function AdminLayout({ children, className }: LayoutProps) {
 	const mainContentMargin = isMobileOpen
 		? "ml-0"
 		: isExpanded || isHovered
-			? "lg:ml-[279px]"
-			: "lg:ml-[88px]";
+			? "lg:ml-70"
+			: "lg:ml-22.5";
 
 	return (
-		<div className="min-h-screen xl:flex">
+		<div className="min-h-screen lg:flex">
 			<AppSidebar />
 			<Backdrop />
 			<div

@@ -64,7 +64,7 @@ export default function DataGatheringTable({
 					e.stopPropagation();
 					onSelectRow(i.row.original);
 				}}
-					className="p-1 text-blue-600 hover:bg-blue-50 rounded border border-gray-200 bg-white shadow-sm"
+					className="p-1 text-green-600 hover:bg-green-50 rounded border border-gray-200 bg-white shadow-sm"
 				>
 					<Eye className="w-3.5 h-3.5" />
 				</button>
@@ -216,7 +216,7 @@ export default function DataGatheringTable({
 									"border-b border-gray-100 cursor-pointer transition-colors group",
 									!row.original._isValid
 										? "bg-red-50 hover:bg-red-100/60"
-										: "bg-white hover:bg-blue-50/40"
+										: "bg-white hover:bg-green-50/40"
 								)}
 							>
 								{row.getVisibleCells().map((cell, ci) => (
@@ -230,7 +230,7 @@ export default function DataGatheringTable({
 											ci === 2 && "left-[4rem]",
 											!row.original._isValid
 												? "bg-red-50 group-hover:bg-red-100/60"
-												: "bg-white group-hover:bg-blue-50/40"
+												: "bg-white group-hover:bg-green-50/40"
 										)}
 									>
 										{flexRender(cell.column.columnDef.cell, cell.getContext())}

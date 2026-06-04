@@ -106,11 +106,11 @@ export default function DataGatheringSidebar({
 				</div>
 			</div>
 
-			<div className="bg-blue-50 rounded-xl border border-blue-100 p-4">
-				<h3 className="text-sm font-semibold text-blue-900 mb-1">Butuh template?</h3>
-				<p className="text-xs text-blue-700 mb-3">Gunakan template resmi agar kolom sesuai database.</p>
+			<div className="bg-green-50 rounded-xl border border-green-100 p-4">
+				<h3 className="text-sm font-semibold text-green-900 mb-1">Butuh template?</h3>
+				<p className="text-xs text-green-700 mb-3">Gunakan template resmi agar kolom sesuai database.</p>
 				<a href={docConfig.templateUrl} download>
-					<Button variant="blue" size="sm" className="w-full justify-center gap-2">
+					<Button variant="green" size="sm" className="w-full justify-center gap-2">
 						<Download className="w-4 h-4" /> Download Template
 					</Button>
 				</a>

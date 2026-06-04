@@ -51,9 +51,9 @@ export default function DataGatheringToolbar({
 		<div className="bg-white rounded-xl border border-gray-200 shadow-sm px-5 py-3 flex flex-wrap gap-3 items-center justify-between w-full min-w-0">
 			<div className="flex gap-3 flex-wrap">
 				{[
-					{ label: "Total", val: total, cls: "border-gray-200 text-gray-900" },
-					{ label: "Valid", val: valid, cls: "border-green-100 bg-green-50 text-green-700" },
-					{ label: "Error", val: errors, cls: "border-red-100 bg-red-50 text-red-700" },
+					{ label: "Total Data", val: total, cls: "border-gray-200 text-gray-900" },
+					{ label: "Data Valid", val: valid, cls: "border-green-100 bg-green-50 text-green-700" },
+					{ label: "Data Error", val: errors, cls: "border-red-100 bg-red-50 text-red-700" },
 				].map(({ label, val, cls }) => (
 					<div key={label} className={clsxm("px-3 py-1.5 rounded-lg border flex items-center gap-2 shadow-sm", cls)}>
 						<span className="text-[10px] font-bold uppercase tracking-wider opacity-70">{label}</span>
@@ -72,7 +72,7 @@ export default function DataGatheringToolbar({
 					>
 						<Columns className="w-4 h-4" />
 						Kolom
-						<span className="text-[10px] bg-blue-100 text-blue-700 rounded-full px-1.5 font-bold">
+						<span className="text-[10px] bg-green-100 text-green-700 rounded-full px-1.5 font-bold">
 							{selectedCount}
 						</span>
 					</Button>
@@ -86,7 +86,7 @@ export default function DataGatheringToolbar({
 											type="checkbox"
 											checked={!!extraCols[col]}
 											onChange={() => onToggleExtraCol(col)}
-											className="mt-0.5 rounded border-gray-300 text-blue-600 shrink-0"
+											className="mt-0.5 rounded border-gray-300 text-green-600 shrink-0"
 										/>
 										<span className="text-xs text-gray-700 leading-snug">{col}</span>
 									</label>
@@ -98,7 +98,7 @@ export default function DataGatheringToolbar({
 
 				<Button
 					onClick={onSubmit}
-					variant="blue"
+					variant="green"
 					disabled={!canSubmit || isUploading || isCheckingPeriod}
 					isLoading={isUploading || isCheckingPeriod}
 					className="flex items-center gap-2"
