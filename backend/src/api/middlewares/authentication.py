@@ -26,6 +26,7 @@ class JWTAuthenticationMiddleware(BaseHTTPMiddleware):
             f"{settings.API_PREFIX}/lopa",
             f"{settings.API_PREFIX}/locations",
             f"{settings.API_PREFIX}/produksi",
+            f"{settings.API_PREFIX}/moc",
         )
 
     def _is_protected_path(self, path: str) -> bool:

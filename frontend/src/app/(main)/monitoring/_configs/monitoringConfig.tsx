@@ -224,6 +224,40 @@ export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
         cell: i => <span className="text-xs text-gray-500">{i.getValue() != null ? Number(i.getValue()).toLocaleString() : "—"}</span>,
       }),
     ]
-  }
+  },
+  moc: {
+    title: "Management of Change (MOC)",
+    periodType: "month",
+    getColumns: (ch) => [
+      ch.accessor("moc_number", {
+        header: "MOC Number",
+        cell: info => {
+          const row = info.row.original;
+          return (
+            <div className="flex flex-col gap-1 py-1">
+              <span className="text-sm font-mono font-semibold text-gray-900 leading-snug">{row.moc_number || "—"}</span>
+              <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">{row.field || "—"} • Step: {row.ongoing_step || "—"}</span>
+            </div>
+          );
+        }
+      }),
+      ch.accessor("change_desc", {
+        header: "Change Description",
+        cell: i => (
+          <div className="max-w-xs truncate text-sm text-gray-800" title={String(i.getValue() ?? "")}>
+            {i.getValue() || "—"}
+          </div>
+        )
+      }),
+      ch.accessor("status", { header: "Status", cell: i => renderStatusBadge(i.getValue()) }),
+      ch.accessor("done", {
+        header: "Done (%)",
+        cell: i => <span className="text-sm font-semibold text-gray-800">{i.getValue() ?? "—"}</span>
+      }),
+      ch.accessor("pic", { header: "PIC", cell: i => <span className="text-sm font-medium text-gray-800">{i.getValue() || "—"}</span> }),
+      ch.accessor("issued_date", { header: "Issued Date", cell: i => renderDateCell(i.getValue()) }),
+      ch.accessor("last_updated", { header: "Last Updated", cell: i => renderDateCell(i.getValue()) }),
+    ]
+  },
 };
 

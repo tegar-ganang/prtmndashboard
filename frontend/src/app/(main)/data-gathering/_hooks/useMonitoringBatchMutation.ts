@@ -17,6 +17,7 @@ export const useMonitoringBatchMutation = ({ docType, onSuccess }: UseMonitoring
 			if (docType === "HAZID") endpoint = MAIN_ENDPOINT.Hazid.BatchCreate;
 			if (docType === "HAZOP") endpoint = MAIN_ENDPOINT.Hazop.BatchCreate;
 			if (docType === "LOPA") endpoint = MAIN_ENDPOINT.Lopa.BatchCreate;
+			if (docType === "MOC") endpoint = MAIN_ENDPOINT.Moc.BatchCreate;
 
 			const { Kind, OK } = await post<ApiResponse<{ upload_batch_id: string }>>(
 				endpoint,

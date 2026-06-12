@@ -17,14 +17,15 @@ import {
 	ChevronRight, 
 	AlertCircle, 
 	RotateCcw, 
-	Filter, 
-	MoreVertical 
+	Filter 
 } from "lucide-react";
 
 import Button from "@/components/button/Button";
 import { useLocationsQuery } from "../../data-gathering/_hooks/useLocationsQuery";
 import { useMonitoringData } from "../_hooks/useMonitoringData";
 import { MONITORING_CONFIGS } from "../_configs/monitoringConfig";
+import DataGatheringDetailModal from "../../data-gathering/_components/DataGatheringDetailModal";
+import type { DocTypeValue } from "../../data-gathering/_constants/dataGathering.constants";
 
 const MONTH_OPTIONS = [
 	{ value: null, label: "Semua Bulan" },
@@ -102,6 +103,8 @@ export default function MonitoringView({ docTypeSlug }: MonitoringViewProps) {
 	
 	const config = MONITORING_CONFIGS[docTypeSlug.toLowerCase()];
 	const batchId = searchParams.get("batch_id");
+	
+	const [selectedRow, setSelectedRow] = useState<any | null>(null);
 
 	// Local Filter State (Unapplied)
 	const [tempYear, setTempYear] = useState<{value: number | null, label: string}>(YEAR_OPTIONS[0]);
@@ -185,22 +188,7 @@ export default function MonitoringView({ docTypeSlug }: MonitoringViewProps) {
 	const columns = useMemo(() => {
 		if (!config) return [];
 		const ch = createColumnHelper<any>();
-		const baseCols = config.getColumns(ch);
-
-		// Append Actions Column to match the mockup
-		const actionCol = ch.display({
-			id: "actions",
-			header: "",
-			cell: () => (
-				<div className="flex justify-end pr-2">
-					<button className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600 transition-colors">
-						<MoreVertical className="w-4.5 h-4.5" />
-					</button>
-				</div>
-			),
-		});
-
-		return [...baseCols, actionCol];
+		return config.getColumns(ch);
 	}, [config]);
 
 	const table = useReactTable({
@@ -376,7 +364,11 @@ export default function MonitoringView({ docTypeSlug }: MonitoringViewProps) {
 								</tr>
 							) : (
 								table.getRowModel().rows.map(row => (
-									<tr key={row.id} className="hover:bg-gray-50 transition-colors">
+									<tr
+										key={row.id}
+										onClick={() => setSelectedRow(row.original)}
+										className="hover:bg-gray-50 transition-colors cursor-pointer"
+									>
 										{row.getVisibleCells().map(cell => (
 											<td key={cell.id} className="px-4 py-3.5 text-sm text-gray-800 align-middle">
 												{flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -414,6 +406,11 @@ export default function MonitoringView({ docTypeSlug }: MonitoringViewProps) {
 					</div>
 				</div>
 			</div>
+			<DataGatheringDetailModal
+				docType={docTypeSlug.toUpperCase() as DocTypeValue}
+				selectedRow={selectedRow ? { ...selectedRow, _isValid: true, _errors: [] } : null}
+				onClose={() => setSelectedRow(null)}
+			/>
 		</div>
 	);
 }

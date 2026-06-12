@@ -7,6 +7,7 @@ from src.api.routes.mit import router as mit_router
 from src.api.routes.hazid import router as hazid_router
 from src.api.routes.hazop import router as hazop_router
 from src.api.routes.lopa import router as lopa_router
+from src.api.routes.moc import router as moc_router
 from src.api.routes.produksi import router as produksi_router
 from src.api.routes.location import router as location_router
 
@@ -19,5 +20,6 @@ router.include_router(router=mit_router)
 router.include_router(router=hazid_router)
 router.include_router(router=hazop_router)
 router.include_router(router=lopa_router)
+router.include_router(router=moc_router)
 router.include_router(router=produksi_router)
 router.include_router(router=location_router)

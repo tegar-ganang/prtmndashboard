@@ -34,6 +34,12 @@ export const MAIN_ENDPOINT = {
 		GetAll: "/lopa",
 		History: "/lopa/history",
 	},
+	Moc: {
+		BatchCreate: "/moc/batch",
+		CheckPeriod: "/moc/check-period",
+		GetAll: "/moc",
+		History: "/moc/history",
+	},
 	Produksi: {
 		Upload: "/produksi/upload-excel",
 		CheckPeriod: "/produksi/check-period",

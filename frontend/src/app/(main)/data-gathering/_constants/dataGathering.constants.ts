@@ -1,6 +1,6 @@
 import type { StylesConfig } from "react-select";
 
-export type DocTypeValue = "MIT" | "HAZID" | "HAZOP" | "LOPA" | "PRODUKSI" | "PRODUKSI_TARGET" | "PRODUKSI_REALISASI";
+export type DocTypeValue = "MIT" | "HAZID" | "HAZOP" | "LOPA" | "MOC" | "PRODUKSI" | "PRODUKSI_TARGET" | "PRODUKSI_REALISASI";
 
 export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 	label: string;
@@ -69,6 +69,17 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		templateUrl: "/templates/Template LOPA.xlsx",
 		requiredFields: ["FUNCTION NAME"],
 		period: "month",
+	},
+	MOC: {
+		label: "Management of Change (MOC)",
+		expectedHeaders: [
+			"MOC_NUMBER", "CHANGE_DESC", "ISSUED_DATE", "FIELD", "DONE",
+			"MOC_OWNER", "LAST_UPDATED", "ONGOING_STEP", "PIC", "STATUS",
+		],
+		glanceCols: ["MOC_NUMBER", "CHANGE_DESC", "STATUS", "PIC", "ISSUED_DATE"],
+		templateUrl: "/templates/Template MOC.xlsx",
+		requiredFields: ["MOC_NUMBER"],
+		period: "month" as const,
 	},
 	PRODUKSI: {
 		label: "Produksi Harian (Gas)",

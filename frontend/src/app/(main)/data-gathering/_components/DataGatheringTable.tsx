@@ -93,7 +93,7 @@ export default function DataGatheringTable({
 		if (docType === "MIT") {
 			const targetClosingCol = ch.accessor("Target Closing", {
 				header: "Target Closing",
-				cell: (i) => <span className="text-xs text-gray-600 whitespace-nowrap">{i.getValue() || "—"}</span>,
+				cell: (i) => <span className="text-xs text-gray-600 whitespace-nowrap">{i.getValue() ? String(i.getValue()) : "—"}</span>,
 			});
 
 			baseCols.push(
@@ -124,6 +124,46 @@ export default function DataGatheringTable({
 					),
 				}),
 				targetClosingCol
+			);
+		} else if (docType === "MOC") {
+			baseCols.push(
+				ch.accessor("MOC_NUMBER", {
+					header: "MOC No.",
+					cell: (i) => (
+						<div className="w-32 truncate text-xs font-mono text-gray-700" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("CHANGE_DESC", {
+					header: "Change Description",
+					cell: (i) => (
+						<div className="w-56 truncate text-xs font-medium text-gray-900" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("STATUS", { header: "Status", cell: (i) => badge(i.getValue(), "status") }),
+				ch.accessor("ONGOING_STEP", {
+					header: "Ongoing Step",
+					cell: (i) => (
+						<div className="w-32 truncate text-xs text-gray-600" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("PIC", {
+					header: "PIC",
+					cell: (i) => (
+						<div className="w-24 truncate text-xs text-gray-600" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("ISSUED_DATE", {
+					header: "Issued Date",
+					cell: (i) => <span className="text-xs text-gray-600 whitespace-nowrap">{i.getValue() ? String(i.getValue()) : "—"}</span>,
+				}),
 			);
 		} else {
 			DOC_TYPE_CONFIG[docType].glanceCols.forEach((col) => {

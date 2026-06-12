@@ -85,7 +85,8 @@ const AppSidebar: React.FC = () => {
 							{ name: "AIRMS", path: "/monitoring/airms", description: "AIRMS Monitoring" },
 							{ name: "PSAIMS", path: "/monitoring/psaims", description: "PSAIMS Monitoring" },
 							{ name: "I2AIMS", path: "/monitoring/i2aims", description: "I2AIMS Monitoring" },
-							{ name: "MIT & MOC", path: "/monitoring/mit", description: "Major Integrity Threat & Management of Change" },
+							{ name: "MIT", path: "/monitoring/mit", description: "Major Integrity Threat" },
+							{ name: "MOC", path: "/monitoring/moc", description: "Management of Change" },
 							{ name: "OPE", path: "/monitoring/ope", description: "Operational Performance & Excellence" },
 						],
 					},
@@ -363,41 +364,39 @@ const AppSidebar: React.FC = () => {
 			onMouseEnter={() => !isExpanded && setIsHovered(true)}
 			onMouseLeave={() => setIsHovered(false)}
 		>
-			<div>
-				<div
-					className={`flex items-center gap-2 ${
-						!isExpanded && !isHovered
-							? "lg:justify-center mb-8"
-							: "justify-start mb-8"
+			<div
+				className={`flex items-center gap-2 ${
+					!isExpanded && !isHovered
+						? "lg:justify-center mb-8"
+						: "justify-start mb-8"
+				}`}
+			>
+				<Link
+					href="/"
+					className={`flex items-center justify-center bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 ${
+						isExpanded || isHovered || isMobileOpen ? "p-3 w-full" : "p-1.5 w-12 h-12"
 					}`}
 				>
-					<Link
-						href="/"
-						className={`flex items-center justify-center bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 ${
-							isExpanded || isHovered || isMobileOpen ? "p-3 w-full" : "p-1.5 w-12 h-12"
-						}`}
-					>
-						<Image
-							src={
-								isExpanded || isHovered || isMobileOpen
-									? "/PertaminaLogo.png"
-									: "/PertaminaLogoSmall.png"
-							}
-							alt="Pertamina Logo"
-							width={160}
-							height={40}
-							className="rounded-lg object-contain"
-							priority
-						/>
-					</Link>
-				</div>
-				<div className="flex flex-col overflow-x-hidden overflow-y-auto duration-300 ease-linear no-scrollbar">
-					<nav className="mb-6">
-						<div className="flex flex-col gap-4">
-							<div>{renderMenuItems(filteredNavItems, "main")}</div>
-						</div>
-					</nav>
-				</div>
+					<Image
+						src={
+							isExpanded || isHovered || isMobileOpen
+								? "/PertaminaLogo.png"
+								: "/PertaminaLogoSmall.png"
+						}
+						alt="Pertamina Logo"
+						width={160}
+						height={40}
+						className="rounded-lg object-contain"
+						priority
+					/>
+				</Link>
+			</div>
+			<div className="flex-1 flex flex-col overflow-x-hidden overflow-y-auto duration-300 ease-linear no-scrollbar mb-4 min-h-0">
+				<nav className="mb-6">
+					<div className="flex flex-col gap-4">
+						<div>{renderMenuItems(filteredNavItems, "main")}</div>
+					</div>
+				</nav>
 			</div>
 			<div className="mt-auto pt-4 border-t border-white/20">
 				<button

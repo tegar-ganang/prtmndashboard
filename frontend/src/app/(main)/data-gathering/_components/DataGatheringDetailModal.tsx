@@ -24,6 +24,14 @@ export default function DataGatheringDetailModal({
 	};
 	const displayTitle = titleMap[docType] || docType;
 
+	const formatKeyLabel = (k: string) => {
+		if (k.includes(" ") || (k === k.toUpperCase() && !k.includes("_"))) return k;
+		return k
+			.split("_")
+			.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+			.join(" ");
+	};
+
 	return (
 		<Transition.Root show={selectedRow !== null} as={Fragment}>
 			<Dialog as="div" className="relative z-[999]" onClose={onClose}>
@@ -82,10 +90,13 @@ export default function DataGatheringDetailModal({
 													<h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-2 mb-3">Data {docType}</h4>
 													<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 														{Object.keys(selectedRow)
-															.filter((k) => !k.startsWith("_"))
+															.filter((k) => 
+																!k.startsWith("_") && 
+																!["id", "created_at", "updated_at", "owner_account_id", "upload_batch_id", "batch_id", "target_id", "owner_id"].includes(k.toLowerCase())
+															)
 															.map((k) => (
 																<div key={k} className={LONG_KEYS.has(k) || k.length > 20 ? "col-span-1 md:col-span-2 lg:col-span-3" : ""}>
-																	<p className="text-[11px] text-gray-500 mb-1">{k}</p>
+																	<p className="text-[11px] text-gray-500 mb-1">{formatKeyLabel(k)}</p>
 																	<p className="text-sm font-medium text-gray-900 whitespace-pre-wrap break-words">
 																		{selectedRow[k] !== null && selectedRow[k] !== undefined && selectedRow[k] !== "" ? (
 																			String(selectedRow[k])
