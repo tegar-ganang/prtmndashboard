@@ -2,7 +2,7 @@ import React from "react";
 import { ColumnHelper } from "@tanstack/react-table";
 import { format } from "date-fns";
 
-export type PeriodType = "month" | "quarter";
+export type PeriodType = "month" | "quarter" | "year";
 
 export interface MonitoringConfig {
   title: string;
@@ -259,5 +259,94 @@ export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
       ch.accessor("last_updated", { header: "Last Updated", cell: i => renderDateCell(i.getValue()) }),
     ]
   },
+  zona_indicator: {
+    title: "PSAIMS — Zona Indicator",
+    periodType: "year",
+    getColumns: (ch) => [
+      ch.accessor("indicator", {
+        header: "Indicator",
+        cell: info => {
+          const row = info.row.original;
+          return (
+            <div className="flex flex-col gap-1 py-1">
+              <span className="text-sm font-semibold text-gray-900 leading-snug">{row.indicator || "—"}</span>
+              <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">
+                {row.ind_type || "—"} • {row.unit || "—"}
+              </span>
+            </div>
+          );
+        }
+      }),
+      ch.accessor("zona", { header: "Zona", cell: i => <span className="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md">{i.getValue() || "—"}</span> }),
+      ch.accessor("pic_name", { header: "PIC", cell: i => <span className="text-sm font-medium text-gray-800">{i.getValue() || "—"}</span> }),
+      ch.accessor("jan", { header: "Jan", cell: i => <span className="text-xs font-semibold text-gray-700">{i.getValue() != null ? Number(i.getValue()).toLocaleString() : "—"}</span> }),
+      ch.accessor("feb", { header: "Feb", cell: i => <span className="text-xs font-semibold text-gray-700">{i.getValue() != null ? Number(i.getValue()).toLocaleString() : "—"}</span> }),
+      ch.accessor("mar", { header: "Mar", cell: i => <span className="text-xs font-semibold text-gray-700">{i.getValue() != null ? Number(i.getValue()).toLocaleString() : "—"}</span> }),
+      ch.accessor("ytd", {
+        header: "YTD",
+        cell: i => <span className="text-xs font-bold text-emerald-700">{i.getValue() != null ? Number(i.getValue()).toLocaleString() : "—"}</span>
+      }),
+      ch.accessor("basis", { header: "Basis", cell: i => <span className="text-xs text-gray-500">{i.getValue() || "—"}</span> }),
+    ]
+  },
+  zona_pse_list: {
+    title: "PSAIMS — Zona PSE List",
+    periodType: "month",
+    getColumns: (ch) => [
+      ch.accessor("no", {
+        header: "No. Event",
+        cell: info => {
+          const row = info.row.original;
+          return (
+            <div className="flex flex-col gap-1 py-1">
+              <span className="text-sm font-mono font-semibold text-gray-900">{row.no || "—"}</span>
+              <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">
+                {row.zona ? `Zona ${row.zona}` : "—"} • {row.field_area || "—"}
+              </span>
+            </div>
+          );
+        }
+      }),
+      ch.accessor("short_description", {
+        header: "Short Description",
+        cell: i => (
+          <div className="max-w-sm truncate text-sm text-gray-800" title={String(i.getValue() ?? "")}>
+            {i.getValue() || "—"}
+          </div>
+        )
+      }),
+      ch.accessor("pse_tier", {
+        header: "PSE Tier",
+        cell: i => {
+          const val = i.getValue();
+          if (!val) return <span className="text-gray-300 italic">—</span>;
+          const s = String(val).toLowerCase();
+          const cls = s.includes("1") || s === "tier 1"
+            ? "bg-red-50 text-red-700 border-red-100"
+            : s.includes("2") || s === "tier 2"
+            ? "bg-orange-50 text-orange-700 border-orange-100"
+            : "bg-gray-50 text-gray-600 border-gray-200";
+          return <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border uppercase ${cls}`}>{val}</span>;
+        }
+      }),
+      ch.accessor("event_issue_category", {
+        header: "Kategori",
+        cell: i => <span className="text-xs text-gray-600 max-w-[150px] truncate block" title={String(i.getValue() ?? "")}>{i.getValue() || "—"}</span>
+      }),
+      ch.accessor("lokasi", { header: "Lokasi", cell: i => <span className="text-sm text-gray-700">{i.getValue() || "—"}</span> }),
+      ch.accessor("date_start", { header: "Tanggal Mulai", cell: i => renderDateCell(i.getValue()) }),
+      ch.accessor("lopc_released", {
+        header: "LOPC",
+        cell: i => {
+          const val = i.getValue();
+          if (!val) return <span className="text-gray-300 italic">—</span>;
+          const s = String(val).toUpperCase();
+          const cls = s === "OUTDOOR" ? "bg-red-50 text-red-600 border-red-100" : s === "INDOOR" ? "bg-yellow-50 text-yellow-600 border-yellow-100" : "bg-gray-50 text-gray-600 border-gray-200";
+          return <span className={`px-2 py-0.5 rounded text-xs font-bold border ${cls}`}>{val}</span>;
+        }
+      }),
+    ]
+  },
 };
+
 

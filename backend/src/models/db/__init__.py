@@ -11,3 +11,5 @@ from .moc import MOC
 from .location import FieldLocation
 from .produksi_target import ProduksiTarget  # must be imported before Produksi (FK dependency)
 from .produksi import Produksi
+from .zona_indicator import ZonaIndicator
+from .zona_pse_list import ZonaPseList

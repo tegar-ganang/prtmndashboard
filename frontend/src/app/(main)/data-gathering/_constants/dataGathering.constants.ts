@@ -1,6 +1,6 @@
 import type { StylesConfig } from "react-select";
 
-export type DocTypeValue = "MIT" | "HAZID" | "HAZOP" | "LOPA" | "MOC" | "PRODUKSI" | "PRODUKSI_TARGET" | "PRODUKSI_REALISASI";
+export type DocTypeValue = "MIT" | "HAZID" | "HAZOP" | "LOPA" | "MOC" | "PRODUKSI" | "PRODUKSI_TARGET" | "PRODUKSI_REALISASI" | "ZONA_INDICATOR" | "ZONA_PSE_LIST";
 
 export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 	label: string;
@@ -113,14 +113,45 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		requiredFields: [],
 		period: "month" as const,
 	},
+	ZONA_INDICATOR: {
+		label: "PSAIMS — Zona Indicator",
+		expectedHeaders: [
+			"IND TYPE", "INDICATOR", "UNIT", "DESCRIPTION", "BASIS",
+			"PIC Name", "PIC Email",
+			"January", "February", "March", "April", "May", "June",
+			"July", "August", "September", "October", "November", "December",
+			"YTD", "Comment",
+		],
+		glanceCols: ["IND TYPE", "INDICATOR", "UNIT", "PIC Name", "January", "YTD"],
+		templateUrl: "/templates/Template Zona Indicator.xlsx",
+		requiredFields: ["INDICATOR"],
+		period: "month" as const, // period not used — upload per year
+	},
+	ZONA_PSE_LIST: {
+		label: "PSAIMS — Zona PSE List",
+		expectedHeaders: [
+			"NO", "ZONA", "FIELD / AREA", "LOKASI", "UNIT / DETAIL ",
+			"SHORT DESCRIPTION", "EVENT ISSUE CATEGORY", "ACTIVITY",
+			"TYPE LOCATION", "DATE START (DD/MM/YYYY)",
+		],
+		glanceCols: ["NO", "FIELD / AREA", "LOKASI", "SHORT DESCRIPTION", "PSE TIER", "DATE START (DD/MM/YYYY)"],
+		templateUrl: "/templates/Template Zona PSE List.xlsx",
+		requiredFields: ["NO"],
+		period: "month" as const,
+	},
 };
 
 export const DOCUMENT_OPTIONS = (Object.keys(DOC_TYPE_CONFIG) as DocTypeValue[])
-	.filter((key) => key !== "PRODUKSI_TARGET" && key !== "PRODUKSI_REALISASI")
+	.filter((key) => key !== "PRODUKSI_TARGET" && key !== "PRODUKSI_REALISASI" && key !== "ZONA_INDICATOR" && key !== "ZONA_PSE_LIST")
 	.map((key) => ({
 		value: key,
 		label: DOC_TYPE_CONFIG[key].label,
 	}));
+
+export const PSAIMS_OPTIONS = [
+	{ value: "ZONA_INDICATOR" as DocTypeValue, label: "Zona Indicator" },
+	{ value: "ZONA_PSE_LIST" as DocTypeValue, label: "Zona PSE List" },
+];
 
 export const QUARTER_OPTIONS = [
 	{ value: "Q1", label: "Q1" },

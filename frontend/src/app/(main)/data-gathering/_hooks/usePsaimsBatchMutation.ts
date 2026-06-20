@@ -3,20 +3,20 @@ import { toast } from "react-hot-toast";
 
 import axiosInstance from "@/services/api/main/interceptor";
 import { MAIN_ENDPOINT } from "@/services/api/main/endpoint";
+import type { DocTypeValue } from "../_constants/dataGathering.constants";
 
-interface UseMonitoringBatchMutationProps {
-	docType: string;
+interface UsePsaimsBatchMutationProps {
+	docType: DocTypeValue;
 	onSuccess?: (response: { upload_batch_id: string }) => void;
 }
 
-export const useMonitoringBatchMutation = ({ docType, onSuccess }: UseMonitoringBatchMutationProps) => {
+export const usePsaimsBatchMutation = ({ docType, onSuccess }: UsePsaimsBatchMutationProps) => {
 	return useMutation({
 		mutationFn: async (data: any) => {
-			let endpoint = MAIN_ENDPOINT.Mit.BatchCreate;
-			if (docType === "HAZID") endpoint = MAIN_ENDPOINT.Hazid.BatchCreate;
-			if (docType === "HAZOP") endpoint = MAIN_ENDPOINT.Hazop.BatchCreate;
-			if (docType === "LOPA") endpoint = MAIN_ENDPOINT.Lopa.BatchCreate;
-			if (docType === "MOC") endpoint = MAIN_ENDPOINT.Moc.BatchCreate;
+			const endpoint =
+				docType === "ZONA_INDICATOR"
+					? MAIN_ENDPOINT.ZonaIndicator.BatchCreate
+					: MAIN_ENDPOINT.ZonaPseList.BatchCreate;
 
 			const response = await axiosInstance.post(endpoint, data);
 
@@ -32,7 +32,6 @@ export const useMonitoringBatchMutation = ({ docType, onSuccess }: UseMonitoring
 			if (!uploadData) {
 				throw new Error("Data response is empty");
 			}
-
 			return uploadData as { upload_batch_id: string };
 		},
 		onSuccess: (data) => {

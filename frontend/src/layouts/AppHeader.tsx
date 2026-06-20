@@ -15,6 +15,8 @@ const AppHeader: React.FC = () => {
 
 	const inputRef = useRef<HTMLInputElement>(null);
 
+	const { user } = useAuthStore();
+
 	const handleToggle = () => {
 		if (window.innerWidth >= 1024) {
 			toggleSidebar();
@@ -76,13 +78,13 @@ const AppHeader: React.FC = () => {
 						<div className="flex items-center justify-between">
 							<h3 className="hidden pointer-events-none rounded-xl px-4 py-2 sm:flex gap-2 items-center text-gray-700 text-base">
 								<Image
-									src="/LogoGlobalJaya.png"
+									src="/profile.png"
 									alt="User"
-									width={20}
-									height={20}
-									className="w-8 h-8 rounded-full"
+									width={32}
+									height={32}
+									className="w-8 h-8 rounded-full object-cover"
 								/>
-								<p>Kevin Andreas</p>
+								<p>{user?.name || "Tegar Priambodo"}</p>
 							</h3>
 						</div>
 					</div>

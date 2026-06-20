@@ -49,4 +49,16 @@ export const MAIN_ENDPOINT = {
 	Locations: {
 		GetAll: "/locations",
 	},
+	ZonaIndicator: {
+		BatchCreate: "/zona-indicator/batch",
+		CheckPeriod: "/zona-indicator/check-period",
+		GetAll: "/zona-indicator",
+		History: "/zona-indicator/history",
+	},
+	ZonaPseList: {
+		BatchCreate: "/zona-pse-list/batch",
+		CheckPeriod: "/zona-pse-list/check-period",
+		GetAll: "/zona-pse-list",
+		History: "/zona-pse-list/history",
+	},
 };

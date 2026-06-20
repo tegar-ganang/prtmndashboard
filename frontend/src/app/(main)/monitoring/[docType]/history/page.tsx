@@ -49,6 +49,8 @@ export default function DynamicHistoryPage({ params }: { params: Promise<{ docTy
 				const row = i.row.original;
 				const periodLabel = config?.periodType === "quarter" 
 					? `Q${row.reporting_quarter}` 
+					: config?.periodType === "year" || !row.reporting_month
+					? "Tahunan"
 					: MONTH_NAMES[row.reporting_month - 1];
 				return (
 					<div className="flex flex-col">

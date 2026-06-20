@@ -7,12 +7,14 @@ interface MonitoringParams {
   month?: number | null;
   quarter?: number | null;
   field?: string | null;
+  zona?: string | null;
 }
 
 // Map dari docType slug ke base endpoint path
-// Produksi pakai /produksi (beda dengan pattern /{docType} lainnya)
 const DOC_TYPE_ENDPOINT_MAP: Record<string, string> = {
   produksi: "produksi",
+  zona_indicator: "zona-indicator",
+  zona_pse_list: "zona-pse-list",
 };
 
 function getEndpoint(docType: string): string {
@@ -32,6 +34,7 @@ export function useMonitoringData(docType: string, params: MonitoringParams) {
           month: params.month,
           quarter: params.quarter,
           field: params.field,
+          zona: params.zona,
         },
       });
       return data.data;
@@ -39,6 +42,7 @@ export function useMonitoringData(docType: string, params: MonitoringParams) {
     enabled: !!docType,
   });
 }
+
 
 export function useMonitoringHistory(docType: string) {
   const endpoint = getEndpoint(docType);

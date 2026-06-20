@@ -410,7 +410,7 @@ const AppSidebar: React.FC = () => {
 					aria-label="Profile"
 				>
 					<Image
-						src="/PertaminaLogo.png"
+						src="/profile.png"
 						alt="Profile"
 						width={40}
 						height={40}
@@ -419,7 +419,7 @@ const AppSidebar: React.FC = () => {
 					{(isExpanded || isHovered || isMobileOpen) && (
 						<div className="min-w-0 flex-1">
 							<p className="truncate text-sm font-semibold text-white">
-								{user?.name || "Name Not Available"}
+								{user?.name || "Tegar Priambodo"}
 							</p>
 							<p className="truncate text-xs text-white/70">Profile</p>
 						</div>
