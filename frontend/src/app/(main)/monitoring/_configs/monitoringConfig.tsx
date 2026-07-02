@@ -2,7 +2,7 @@ import React from "react";
 import { ColumnHelper } from "@tanstack/react-table";
 import { format } from "date-fns";
 
-export type PeriodType = "month" | "quarter";
+export type PeriodType = "month" | "quarter" | "year";
 
 export interface MonitoringConfig {
   title: string;
@@ -10,80 +10,182 @@ export interface MonitoringConfig {
   getColumns: (ch: ColumnHelper<any>) => any[];
 }
 
-const badge = (val: any, type: "risk" | "status") => {
+export const renderRiskBadge = (val: any) => {
+  if (!val) return <span className="text-gray-300 italic">—</span>;
+  const s = String(val).trim();
+  const num = parseInt(s);
+  
+  let scoreText = s;
+  let label = s;
+  let bg = "bg-gray-50 text-gray-600 border-gray-200";
+  let textCls = "text-gray-600";
+  
+  if (!isNaN(num)) {
+    scoreText = String(num);
+    if (num >= 12) {
+      bg = "bg-red-50 text-red-600 border-red-100";
+      textCls = "text-red-600";
+      label = "High";
+    } else if (num >= 9) {
+      bg = "bg-orange-50 text-orange-600 border-orange-100";
+      textCls = "text-orange-600";
+      label = "High";
+    } else if (num >= 6) {
+      bg = "bg-yellow-50 text-yellow-600 border-yellow-100";
+      textCls = "text-yellow-600";
+      label = "Medium";
+    } else {
+      bg = "bg-green-50 text-green-600 border-green-100";
+      textCls = "text-green-600";
+      label = "Low";
+    }
+    return (
+      <div className="flex items-center gap-2">
+        <span className={`px-2.5 py-0.5 rounded-lg text-xs font-bold border ${bg}`}>{scoreText}</span>
+        <span className={`text-sm font-semibold ${textCls}`}>{label}</span>
+      </div>
+    );
+  } else {
+    const lower = s.toLowerCase();
+    if (lower.includes("high") || lower.includes("critical")) {
+      bg = "bg-red-50 text-red-600 border-red-100";
+      textCls = "text-red-600";
+      label = "High";
+    } else if (lower.includes("medium")) {
+      bg = "bg-yellow-50 text-yellow-600 border-yellow-100";
+      textCls = "text-yellow-600";
+      label = "Medium";
+    } else if (lower.includes("low")) {
+      bg = "bg-green-50 text-green-600 border-green-100";
+      textCls = "text-green-600";
+      label = "Low";
+    }
+    return (
+      <div className="flex items-center gap-2">
+        <span className={`px-2.5 py-0.5 rounded-lg text-xs font-bold border ${bg}`}>
+          {label ? label[0].toUpperCase() : "—"}
+        </span>
+        <span className={`text-sm font-semibold ${textCls}`}>{label}</span>
+      </div>
+    );
+  }
+};
+
+export const renderStatusBadge = (val: any) => {
   if (!val) return <span className="text-gray-300 italic">—</span>;
   const s = String(val).toLowerCase();
-  const cls = type === "risk"
-    ? s.includes("high") || s.includes("critical") ? "bg-red-100 text-red-700 border-red-200"
-      : s.includes("medium") ? "bg-yellow-100 text-yellow-700 border-yellow-200"
-      : s.includes("low") ? "bg-green-100 text-green-700 border-green-200"
-      : "bg-gray-100 text-gray-600 border-gray-200"
-    : s.includes("close") ? "bg-green-100 text-green-700 border-green-200"
-      : s.includes("progress") || s.includes("going") ? "bg-blue-100 text-blue-700 border-blue-200"
-      : "bg-gray-100 text-gray-600 border-gray-200";
+  let dotCls = "bg-gray-400";
+  let badgeCls = "bg-gray-50 text-gray-700 border-gray-200";
+  if (s.includes("close")) {
+    dotCls = "bg-green-500";
+    badgeCls = "bg-green-50 text-green-700 border-green-100";
+  } else if (s.includes("progress") || s.includes("going")) {
+    dotCls = "bg-blue-500";
+    badgeCls = "bg-blue-50 text-blue-700 border-blue-100";
+  }
   return (
-    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${cls}`}>
+    <div className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border uppercase whitespace-nowrap ${badgeCls}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${dotCls}`}></span>
       {val}
-    </span>
+    </div>
   );
 };
 
-const dateCell = (v: any) => v ? <span className="text-xs text-gray-500">{format(new Date(v), "dd MMM yyyy")}</span> : <span className="text-gray-300">—</span>;
+export const renderDateCell = (v: any) => {
+  if (!v) return <span className="text-gray-300">—</span>;
+  return <span className="text-sm font-bold text-red-600 whitespace-nowrap">{format(new Date(v), "dd MMM yyyy")}</span>;
+};
 
 export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
   mit: {
     title: "Major Integrity Threat (MIT)",
     periodType: "quarter",
     getColumns: (ch) => [
-      ch.accessor("field", { header: "Field/Area", cell: i => <span className="text-xs font-medium text-gray-900">{i.getValue() || "—"}</span> }),
-      ch.accessor("reg_no", { header: "No. Reg", cell: i => <span className="text-xs font-mono text-gray-500">{i.getValue() || "—"}</span> }),
       ch.accessor("mit_title_asset", { 
         header: "MIT Title / Asset", 
-        cell: i => <div className="text-xs font-medium text-gray-900 max-w-[200px] truncate" title={i.getValue()}>{i.getValue() || "—"}</div> 
+        cell: info => {
+          const row = info.row.original;
+          return (
+            <div className="flex flex-col gap-1 py-1">
+              <span className="text-sm font-semibold text-gray-900 leading-snug">{row.mit_title_asset || "—"}</span>
+              <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">{row.field || "—"} • REG-{row.reg_no || "—"}</span>
+            </div>
+          );
+        }
       }),
-      ch.accessor("current_risk_rating", { header: "Risk", cell: i => badge(i.getValue(), "risk") }),
-      ch.accessor("mit_status", { header: "Status", cell: i => badge(i.getValue(), "status") }),
-      ch.accessor("pic", { header: "PIC", cell: i => <span className="text-xs">{i.getValue() || "—"}</span> }),
-      ch.accessor("target_closing", { header: "Target", cell: i => dateCell(i.getValue()) }),
+      ch.accessor("current_risk_rating", { header: "Risk", cell: i => renderRiskBadge(i.getValue()) }),
+      ch.accessor("mit_status", { header: "Status", cell: i => renderStatusBadge(i.getValue()) }),
+      ch.accessor("pic", { header: "PIC", cell: i => <span className="text-sm font-medium text-gray-800">{i.getValue() || "—"}</span> }),
+      ch.accessor("target_closing", { header: "Target", cell: i => renderDateCell(i.getValue()) }),
     ]
   },
   hazid: {
     title: "Hazard Identification (HAZID)",
     periodType: "month",
     getColumns: (ch) => [
-      ch.accessor("field", { header: "Field/Area", cell: i => <span className="text-xs font-medium text-gray-900">{i.getValue() || "—"}</span> }),
-      ch.accessor("node", { header: "Node", cell: i => <span className="text-xs font-medium">{i.getValue() || "—"}</span> }),
-      ch.accessor("hazard", { header: "Hazard", cell: i => <div className="text-xs max-w-[200px] truncate" title={i.getValue()}>{i.getValue() || "—"}</div> }),
-      ch.accessor("risk", { header: "Risk", cell: i => badge(i.getValue(), "risk") }),
-      ch.accessor("status", { header: "Status", cell: i => badge(i.getValue(), "status") }),
-      ch.accessor("responsibility_pic", { header: "PIC", cell: i => <span className="text-xs">{i.getValue() || "—"}</span> }),
-      ch.accessor("target_date", { header: "Target Date", cell: i => dateCell(i.getValue()) }),
+      ch.accessor("hazard", {
+        header: "HAZID Hazard",
+        cell: info => {
+          const row = info.row.original;
+          return (
+            <div className="flex flex-col gap-1 py-1">
+              <span className="text-sm font-semibold text-gray-900 leading-snug">{row.hazard || "—"}</span>
+              <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">{row.field || "—"} • NODE-{row.node || "—"}</span>
+            </div>
+          );
+        }
+      }),
+      ch.accessor("risk", { header: "Risk", cell: i => renderRiskBadge(i.getValue()) }),
+      ch.accessor("status", { header: "Status", cell: i => renderStatusBadge(i.getValue()) }),
+      ch.accessor("responsibility_pic", { header: "PIC", cell: i => <span className="text-sm font-medium text-gray-800">{i.getValue() || "—"}</span> }),
+      ch.accessor("target_date", { header: "Target Date", cell: i => renderDateCell(i.getValue()) }),
     ]
   },
   hazop: {
     title: "Hazard and Operability Study (HAZOP)",
     periodType: "month",
     getColumns: (ch) => [
-      ch.accessor("field", { header: "Field/Area", cell: i => <span className="text-xs font-medium text-gray-900">{i.getValue() || "—"}</span> }),
-      ch.accessor("node", { header: "Node", cell: i => <span className="text-xs font-medium">{i.getValue() || "—"}</span> }),
-      ch.accessor("deviation", { header: "Deviation", cell: i => <div className="text-xs max-w-[150px] truncate" title={i.getValue()}>{i.getValue() || "—"}</div> }),
-      ch.accessor("risk", { header: "Risk", cell: i => badge(i.getValue(), "risk") }),
-      ch.accessor("status", { header: "Status", cell: i => badge(i.getValue(), "status") }),
-      ch.accessor("responsibility_pic", { header: "PIC", cell: i => <span className="text-xs">{i.getValue() || "—"}</span> }),
-      ch.accessor("target_date", { header: "Target Date", cell: i => dateCell(i.getValue()) }),
+      ch.accessor("deviation", {
+        header: "HAZOP Deviation",
+        cell: info => {
+          const row = info.row.original;
+          return (
+            <div className="flex flex-col gap-1 py-1">
+              <span className="text-sm font-semibold text-gray-900 leading-snug">{row.deviation || "—"}</span>
+              <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">{row.field || "—"} • NODE-{row.node || "—"}</span>
+            </div>
+          );
+        }
+      }),
+      ch.accessor("risk", { header: "Risk", cell: i => renderRiskBadge(i.getValue()) }),
+      ch.accessor("status", { header: "Status", cell: i => renderStatusBadge(i.getValue()) }),
+      ch.accessor("responsibility_pic", { header: "PIC", cell: i => <span className="text-sm font-medium text-gray-800">{i.getValue() || "—"}</span> }),
+      ch.accessor("target_date", { header: "Target Date", cell: i => renderDateCell(i.getValue()) }),
     ]
   },
   lopa: {
     title: "Layer of Protection Analysis (LOPA)",
     periodType: "month",
     getColumns: (ch) => [
-      ch.accessor("field", { header: "Field/Area", cell: i => <span className="text-xs font-medium text-gray-900">{i.getValue() || "—"}</span> }),
-      ch.accessor("function_name", { header: "Function", cell: i => <span className="text-xs font-medium">{i.getValue() || "—"}</span> }),
-      ch.accessor("final_element", { header: "Final Element", cell: i => <div className="text-xs max-w-[150px] truncate" title={i.getValue()}>{i.getValue() || "—"}</div> }),
-      ch.accessor("rrf_gap_value", { header: "RRF Gap", cell: i => <span className="text-xs">{i.getValue() || "—"}</span> }),
-      ch.accessor("status", { header: "Status", cell: i => badge(i.getValue(), "status") }),
-      ch.accessor("responsibility_pic", { header: "PIC", cell: i => <span className="text-xs">{i.getValue() || "—"}</span> }),
-      ch.accessor("target_date", { header: "Target Date", cell: i => dateCell(i.getValue()) }),
+      ch.accessor("function_name", {
+        header: "LOPA Function",
+        cell: info => {
+          const row = info.row.original;
+          return (
+            <div className="flex flex-col gap-1 py-1">
+              <span className="text-sm font-semibold text-gray-900 leading-snug">{row.function_name || "—"}</span>
+              <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">{row.field || "—"} • ELEMENT: {row.final_element || "—"}</span>
+            </div>
+          );
+        }
+      }),
+      ch.accessor("rrf_gap_value", { 
+        header: "RRF Gap", 
+        cell: i => <span className="text-sm font-semibold text-gray-800">{i.getValue() || "—"}</span> 
+      }),
+      ch.accessor("status", { header: "Status", cell: i => renderStatusBadge(i.getValue()) }),
+      ch.accessor("responsibility_pic", { header: "PIC", cell: i => <span className="text-sm font-medium text-gray-800">{i.getValue() || "—"}</span> }),
+      ch.accessor("target_date", { header: "Target Date", cell: i => renderDateCell(i.getValue()) }),
     ]
   },
   produksi: {
@@ -122,6 +224,407 @@ export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
         cell: i => <span className="text-xs text-gray-500">{i.getValue() != null ? Number(i.getValue()).toLocaleString() : "—"}</span>,
       }),
     ]
-  }
+  },
+  moc: {
+    title: "Management of Change (MOC)",
+    periodType: "month",
+    getColumns: (ch) => [
+      ch.accessor("moc_number", {
+        header: "MOC Number",
+        cell: info => {
+          const row = info.row.original;
+          return (
+            <div className="flex flex-col gap-1 py-1">
+              <span className="text-sm font-mono font-semibold text-gray-900 leading-snug">{row.moc_number || "—"}</span>
+              <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">{row.field || "—"} • Step: {row.ongoing_step || "—"}</span>
+            </div>
+          );
+        }
+      }),
+      ch.accessor("change_desc", {
+        header: "Change Description",
+        cell: i => (
+          <div className="max-w-xs truncate text-sm text-gray-800" title={String(i.getValue() ?? "")}>
+            {i.getValue() || "—"}
+          </div>
+        )
+      }),
+      ch.accessor("status", { header: "Status", cell: i => renderStatusBadge(i.getValue()) }),
+      ch.accessor("done", {
+        header: "Done (%)",
+        cell: i => <span className="text-sm font-semibold text-gray-800">{i.getValue() ?? "—"}</span>
+      }),
+      ch.accessor("pic", { header: "PIC", cell: i => <span className="text-sm font-medium text-gray-800">{i.getValue() || "—"}</span> }),
+      ch.accessor("issued_date", { header: "Issued Date", cell: i => renderDateCell(i.getValue()) }),
+      ch.accessor("last_updated", { header: "Last Updated", cell: i => renderDateCell(i.getValue()) }),
+    ]
+  },
+  hsse: {
+    title: "HSSE",
+    periodType: "month",
+
+    getColumns: (ch) => [
+      ch.accessor("id_izin", {
+        header: "ID Izin",
+        cell: info => {
+          const row = info.row.original;
+          return (
+            <div className="flex flex-col gap-1 py-1">
+              <span className="text-sm font-mono font-semibold text-gray-900 leading-snug">{row.id_izin || "—"}</span>
+              <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">{row.field || "—"} • {row.lokasi || "—"}</span>
+            </div>
+          );
+        }
+      }),
+      ch.accessor("jenis_izin_kerja", {
+        header: "Jenis Izin Kerja",
+        cell: i => <span className="text-sm text-gray-800 font-medium">{i.getValue() || "—"}</span>
+      }),
+      ch.accessor("tingkat_resiko", { header: "Tingkat Risiko", cell: i => renderRiskBadge(i.getValue()) }),
+      ch.accessor("status_dispensasi", { header: "Status Dispensasi", cell: i => <span className="text-sm text-gray-600 font-medium">{i.getValue() || "—"}</span> }),
+      ch.accessor("status_deviasi", { header: "Status Deviasi", cell: i => renderStatusBadge(i.getValue()) }),
+      ch.accessor("jumlah_icc", { header: "Jumlah ICC", cell: i => <span className="text-sm font-semibold text-gray-800">{i.getValue() ?? "—"}</span> }),
+      ch.accessor("tanggal", { header: "Tanggal", cell: i => renderDateCell(i.getValue()) }),
+    ]
+  },
+  airms: {
+    title: "AIRMS",
+    periodType: "month",
+    getColumns: (ch) => [
+      ch.accessor("asset_id", {
+        header: "Asset ID",
+        cell: info => {
+          const row = info.row.original;
+          return (
+            <div className="flex flex-col gap-1 py-1">
+              <span className="text-sm font-mono font-semibold text-gray-900 leading-snug">{row.asset_id || "—"}</span>
+              <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">{row.field || "—"} • {row.area || "—"}</span>
+            </div>
+          );
+        }
+      }),
+      ch.accessor("asset_name", {
+        header: "Asset Name",
+        cell: i => <span className="text-sm font-semibold text-gray-900">{i.getValue() || "—"}</span>
+      }),
+      ch.accessor("availability", {
+        header: "Availability",
+        cell: i => {
+          const val = i.getValue();
+          if (!val) return <span className="text-gray-300">—</span>;
+          return <span className="text-sm font-bold text-gray-800">{val}%</span>;
+        }
+      }),
+      ch.accessor("reliability", {
+        header: "Reliability",
+        cell: i => {
+          const val = i.getValue();
+          if (!val) return <span className="text-gray-300">—</span>;
+          return <span className="text-sm font-bold text-gray-800">{val}%</span>;
+        }
+      }),
+      ch.accessor("health_index", {
+        header: "Health Index",
+        cell: i => {
+          const val = i.getValue();
+          if (!val) return <span className="text-gray-300">—</span>;
+          const num = parseFloat(String(val));
+          let bg = "bg-gray-50 text-gray-700 border-gray-200";
+          if (!isNaN(num)) {
+            if (num >= 90) bg = "bg-green-50 text-green-700 border-green-200";
+            else if (num >= 75) bg = "bg-yellow-50 text-yellow-700 border-yellow-200";
+            else bg = "bg-red-50 text-red-700 border-red-200";
+          }
+          return (
+            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-extrabold border ${bg}`}>
+              {val}%
+            </span>
+          );
+        }
+      }),
+      ch.accessor("wo_status", {
+        header: "WO Status",
+        cell: i => {
+          const val = i.getValue();
+          if (!val) return <span className="text-gray-300">—</span>;
+          const s = String(val).toLowerCase();
+          let dotCls = "bg-gray-400";
+          let badgeCls = "bg-gray-50 text-gray-700 border-gray-200";
+          if (s.includes("complete")) {
+            dotCls = "bg-green-500";
+            badgeCls = "bg-green-50 text-green-700 border-green-100";
+          } else if (s.includes("open")) {
+            dotCls = "bg-yellow-500";
+            badgeCls = "bg-yellow-50 text-yellow-700 border-yellow-100";
+          }
+          return (
+            <div className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border uppercase whitespace-nowrap ${badgeCls}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${dotCls}`}></span>
+              {val}
+            </div>
+          );
+        }
+      }),
+      ch.accessor("date", { header: "Date", cell: i => renderDateCell(i.getValue()) }),
+    ]
+  },
+  i2aims: {
+    title: "I2AIMS",
+    periodType: "month",
+    getColumns: (ch) => [
+      ch.accessor("asset_id", {
+        header: "Asset ID",
+        cell: info => {
+          const row = info.row.original;
+          return (
+            <div className="flex flex-col gap-1 py-1">
+              <span className="text-sm font-mono font-semibold text-gray-900 leading-snug">{row.asset_id || "—"}</span>
+              <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">{row.field || "—"} • {row.area || "—"}</span>
+            </div>
+          );
+        }
+      }),
+      ch.accessor("asset_name", {
+        header: "Asset Name",
+        cell: info => {
+          const row = info.row.original;
+          return (
+            <div className="flex flex-col gap-0.5">
+              <span className="text-sm font-semibold text-gray-900 leading-snug">{row.asset_name || "—"}</span>
+              <span className="text-xs text-gray-400 font-medium">{row.asset_type || "—"} • {row.sce_category || "—"}</span>
+            </div>
+          );
+        }
+      }),
+      ch.accessor("integrity_status", {
+        header: "Integrity Status",
+        cell: i => {
+          const val = i.getValue();
+          if (!val) return <span className="text-gray-300">—</span>;
+          const s = String(val).toLowerCase();
+          let badgeCls = "bg-gray-50 text-gray-700 border-gray-200";
+          if (s.includes("good")) {
+            badgeCls = "bg-green-50 text-green-700 border-green-100";
+          } else if (s.includes("fair")) {
+            badgeCls = "bg-blue-50 text-blue-700 border-blue-100";
+          } else if (s.includes("monitor")) {
+            badgeCls = "bg-yellow-50 text-yellow-700 border-yellow-100";
+          }
+          return (
+            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-bold border whitespace-nowrap ${badgeCls}`}>
+              {val}
+            </span>
+          );
+        }
+      }),
+      ch.accessor("inspection_compliance", {
+        header: "Compliance",
+        cell: i => {
+          const val = i.getValue();
+          if (!val) return <span className="text-gray-300">—</span>;
+          return <span className="text-sm font-bold text-gray-800">{val}%</span>;
+        }
+      }),
+      ch.accessor("barrier_health", {
+        header: "Barrier Health",
+        cell: i => {
+          const val = i.getValue();
+          if (!val) return <span className="text-gray-300">—</span>;
+          const num = parseFloat(String(val));
+          let bg = "bg-gray-50 text-gray-700 border-gray-200";
+          if (!isNaN(num)) {
+            if (num >= 90) bg = "bg-green-50 text-green-700 border-green-200";
+            else if (num >= 75) bg = "bg-yellow-50 text-yellow-700 border-yellow-200";
+            else bg = "bg-red-50 text-red-700 border-red-200";
+          }
+          return (
+            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-extrabold border ${bg}`}>
+              {val}%
+            </span>
+          );
+        }
+      }),
+      ch.accessor("recommendation_status", {
+        header: "Rec. Status",
+        cell: i => {
+          const val = i.getValue();
+          if (!val) return <span className="text-gray-300">—</span>;
+          const s = String(val).toLowerCase();
+          let dotCls = "bg-gray-400";
+          let badgeCls = "bg-gray-50 text-gray-700 border-gray-200";
+          if (s.includes("close")) {
+            dotCls = "bg-green-500";
+            badgeCls = "bg-green-50 text-green-700 border-green-100";
+          } else if (s.includes("open")) {
+            dotCls = "bg-yellow-500";
+            badgeCls = "bg-yellow-50 text-yellow-700 border-yellow-100";
+          } else if (s.includes("progress")) {
+            dotCls = "bg-blue-500";
+            badgeCls = "bg-blue-50 text-blue-700 border-blue-100";
+          }
+          return (
+            <div className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border uppercase whitespace-nowrap ${badgeCls}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${dotCls}`}></span>
+              {val}
+            </div>
+          );
+        }
+      }),
+      ch.accessor("inspection_date", { header: "Inspection Date", cell: i => renderDateCell(i.getValue()) }),
+    ]
+  },
+  zona_indicator: {
+
+
+
+    title: "PSAIMS — Zona Indicator",
+    periodType: "year",
+    getColumns: (ch) => [
+      ch.accessor("indicator", {
+        header: "Indicator",
+        cell: info => {
+          const row = info.row.original;
+          return (
+            <div className="flex flex-col gap-1 py-1">
+              <span className="text-sm font-semibold text-gray-900 leading-snug">{row.indicator || "—"}</span>
+              <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">
+                {row.ind_type || "—"} • {row.unit || "—"}
+              </span>
+            </div>
+          );
+        }
+      }),
+      ch.accessor("zona", { header: "Zona", cell: i => <span className="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md">{i.getValue() || "—"}</span> }),
+      ch.accessor("pic_name", { header: "PIC", cell: i => <span className="text-sm font-medium text-gray-800">{i.getValue() || "—"}</span> }),
+      ch.accessor("jan", { header: "Jan", cell: i => <span className="text-xs font-semibold text-gray-700">{i.getValue() != null ? Number(i.getValue()).toLocaleString() : "—"}</span> }),
+      ch.accessor("feb", { header: "Feb", cell: i => <span className="text-xs font-semibold text-gray-700">{i.getValue() != null ? Number(i.getValue()).toLocaleString() : "—"}</span> }),
+      ch.accessor("mar", { header: "Mar", cell: i => <span className="text-xs font-semibold text-gray-700">{i.getValue() != null ? Number(i.getValue()).toLocaleString() : "—"}</span> }),
+      ch.accessor("ytd", {
+        header: "YTD",
+        cell: i => <span className="text-xs font-bold text-emerald-700">{i.getValue() != null ? Number(i.getValue()).toLocaleString() : "—"}</span>
+      }),
+      ch.accessor("basis", { header: "Basis", cell: i => <span className="text-xs text-gray-500">{i.getValue() || "—"}</span> }),
+    ]
+  },
+  zona_pse_list: {
+    title: "PSAIMS — Zona PSE List",
+    periodType: "month",
+    getColumns: (ch) => [
+      ch.accessor("no", {
+        header: "No. Event",
+        cell: info => {
+          const row = info.row.original;
+          return (
+            <div className="flex flex-col gap-1 py-1">
+              <span className="text-sm font-mono font-semibold text-gray-900">{row.no || "—"}</span>
+              <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">
+                {row.zona ? `Zona ${row.zona}` : "—"} • {row.field_area || "—"}
+              </span>
+            </div>
+          );
+        }
+      }),
+      ch.accessor("short_description", {
+        header: "Short Description",
+        cell: i => (
+          <div className="max-w-sm truncate text-sm text-gray-800" title={String(i.getValue() ?? "")}>
+            {i.getValue() || "—"}
+          </div>
+        )
+      }),
+      ch.accessor("pse_tier", {
+        header: "PSE Tier",
+        cell: i => {
+          const val = i.getValue();
+          if (!val) return <span className="text-gray-300 italic">—</span>;
+          const s = String(val).toLowerCase();
+          const cls = s.includes("1") || s === "tier 1"
+            ? "bg-red-50 text-red-700 border-red-100"
+            : s.includes("2") || s === "tier 2"
+            ? "bg-orange-50 text-orange-700 border-orange-100"
+            : "bg-gray-50 text-gray-600 border-gray-200";
+          return <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border uppercase ${cls}`}>{val}</span>;
+        }
+      }),
+      ch.accessor("event_issue_category", {
+        header: "Kategori",
+        cell: i => <span className="text-xs text-gray-600 max-w-[150px] truncate block" title={String(i.getValue() ?? "")}>{i.getValue() || "—"}</span>
+      }),
+      ch.accessor("lokasi", { header: "Lokasi", cell: i => <span className="text-sm text-gray-700">{i.getValue() || "—"}</span> }),
+      ch.accessor("date_start", { header: "Tanggal Mulai", cell: i => renderDateCell(i.getValue()) }),
+      ch.accessor("lopc_released", {
+        header: "LOPC",
+        cell: i => {
+          const val = i.getValue();
+          if (!val) return <span className="text-gray-300 italic">—</span>;
+          const s = String(val).toUpperCase();
+          const cls = s === "OUTDOOR" ? "bg-red-50 text-red-600 border-red-100" : s === "INDOOR" ? "bg-yellow-50 text-yellow-600 border-yellow-100" : "bg-gray-50 text-gray-600 border-gray-200";
+          return <span className={`px-2 py-0.5 rounded text-xs font-bold border ${cls}`}>{val}</span>;
+        }
+      }),
+    ]
+  },
+  lcv_project_charter_budaya: {
+    title: "LCV — Project Charter Budaya",
+    periodType: "year",
+    getColumns: (ch) => [
+      ch.accessor("id_project", {
+        header: "ID Project",
+        cell: i => <span className="text-sm font-mono font-semibold text-gray-700">{i.getValue() || "—"}</span>
+      }),
+      ch.accessor("judul_project", {
+        header: "Judul Project",
+        cell: i => <span className="text-sm font-semibold text-gray-900 leading-snug">{i.getValue() || "—"}</span>
+      }),
+      ch.accessor("tanggal", { header: "Tanggal", cell: i => renderDateCell(i.getValue()) }),
+    ]
+  },
+  lcv_monitoring: {
+    title: "LCV — Monitoring",
+    periodType: "year",
+    getColumns: (ch) => [
+      ch.accessor("namapegawai", {
+        header: "Nama Pegawai",
+        cell: info => {
+          const row = info.row.original;
+          return (
+            <div className="flex flex-col gap-0.5 py-0.5">
+              <span className="text-sm font-semibold text-gray-900">{row.namapegawai || "—"}</span>
+              <span className="text-xs text-gray-400 font-mono font-semibold uppercase">{row.nip || "—"}</span>
+            </div>
+          );
+        }
+      }),
+      ch.accessor("departemen", { header: "Departemen", cell: i => <span className="text-sm text-gray-700 font-medium">{i.getValue() || "—"}</span> }),
+      ch.accessor("lcv_conflictofinterest", { header: "Conflict of Interest", cell: i => renderLcvStatus(i.getValue()) }),
+      ch.accessor("lcv_codeofconduct", { header: "Code of Conduct", cell: i => renderLcvStatus(i.getValue()) }),
+      ch.accessor("lcv_laporgratifikasi", { header: "Lapor Gratifikasi", cell: i => renderLcvStatus(i.getValue()) }),
+      ch.accessor("lcv_sosialisasi_lcv", { header: "Sosialisasi LCV", cell: i => renderLcvStatus(i.getValue()) }),
+      ch.accessor("lcv_lhkpn", { header: "LHKPN", cell: i => renderLcvStatus(i.getValue()) }),
+      ch.accessor("training_lcv", { header: "Training LCV", cell: i => renderLcvStatus(i.getValue()) }),
+      ch.accessor("projectchapterbudaya", { header: "Budaya Kerja", cell: i => renderLcvStatus(i.getValue()) }),
+      ch.accessor("tahun", { header: "Tahun", cell: i => <span className="text-sm text-gray-500 font-semibold">{i.getValue() || "—"}</span> }),
+    ]
+  },
 };
+
+const renderLcvStatus = (val: any) => {
+  if (!val) return <span className="text-gray-300">—</span>;
+  const s = String(val).toLowerCase();
+  let bg = "bg-gray-50 text-gray-700 border-gray-200";
+  if (s === "selesai" || s === "nihil" || s === "dilaporkan" || s === "hadir" || s === "amanah" || s === "kompeten" || s === "harmonis" || s === "loyal" || s === "adaptif" || s === "kolaboratif") {
+    bg = "bg-green-50 text-green-700 border-green-200";
+  } else if (s === "belum" || s === "tidak hadir" || s === "belum lapor" || s === "ada laporan") {
+    bg = "bg-red-50 text-red-700 border-red-200";
+  } else if (s === "tidak wajib") {
+    bg = "bg-blue-50 text-blue-700 border-blue-200";
+  }
+  return (
+    <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-bold border ${bg}`}>
+      {val}
+    </span>
+  );
+};
+
+
 

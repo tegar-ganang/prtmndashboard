@@ -1,6 +1,6 @@
 "use client";
-import { Logs, X } from "lucide-react";
-import Image from "next/image";
+import { Logs, User, X } from "lucide-react";
+
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
@@ -14,6 +14,8 @@ const AppHeader: React.FC = () => {
 	const router = useRouter();
 
 	const inputRef = useRef<HTMLInputElement>(null);
+
+	const { user } = useAuthStore();
 
 	const handleToggle = () => {
 		if (window.innerWidth >= 1024) {
@@ -75,14 +77,10 @@ const AppHeader: React.FC = () => {
 
 						<div className="flex items-center justify-between">
 							<h3 className="hidden pointer-events-none rounded-xl px-4 py-2 sm:flex gap-2 items-center text-gray-700 text-base">
-								<Image
-									src="/LogoGlobalJaya.png"
-									alt="User"
-									width={20}
-									height={20}
-									className="w-8 h-8 rounded-full"
-								/>
-								<p>Kevin Andreas</p>
+								<div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+									<User className="w-4 h-4 text-gray-500" />
+								</div>
+								<p>{user?.name || "Tegar Priambodo"}</p>
 							</h3>
 						</div>
 					</div>

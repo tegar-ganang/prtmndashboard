@@ -64,7 +64,7 @@ export default function DataGatheringTable({
 					e.stopPropagation();
 					onSelectRow(i.row.original);
 				}}
-					className="p-1 text-blue-600 hover:bg-blue-50 rounded border border-gray-200 bg-white shadow-sm"
+					className="p-1 text-green-600 hover:bg-green-50 rounded border border-gray-200 bg-white shadow-sm"
 				>
 					<Eye className="w-3.5 h-3.5" />
 				</button>
@@ -93,7 +93,7 @@ export default function DataGatheringTable({
 		if (docType === "MIT") {
 			const targetClosingCol = ch.accessor("Target Closing", {
 				header: "Target Closing",
-				cell: (i) => <span className="text-xs text-gray-600 whitespace-nowrap">{i.getValue() || "—"}</span>,
+				cell: (i) => <span className="text-xs text-gray-600 whitespace-nowrap">{i.getValue() ? String(i.getValue()) : "—"}</span>,
 			});
 
 			baseCols.push(
@@ -125,7 +125,286 @@ export default function DataGatheringTable({
 				}),
 				targetClosingCol
 			);
+		} else if (docType === "MOC") {
+			baseCols.push(
+				ch.accessor("MOC_NUMBER", {
+					header: "MOC No.",
+					cell: (i) => (
+						<div className="w-32 truncate text-xs font-mono text-gray-700" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("CHANGE_DESC", {
+					header: "Change Description",
+					cell: (i) => (
+						<div className="w-56 truncate text-xs font-medium text-gray-900" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("STATUS", { header: "Status", cell: (i) => badge(i.getValue(), "status") }),
+				ch.accessor("ONGOING_STEP", {
+					header: "Ongoing Step",
+					cell: (i) => (
+						<div className="w-32 truncate text-xs text-gray-600" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("PIC", {
+					header: "PIC",
+					cell: (i) => (
+						<div className="w-24 truncate text-xs text-gray-600" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("ISSUED_DATE", {
+					header: "Issued Date",
+					cell: (i) => <span className="text-xs text-gray-600 whitespace-nowrap">{i.getValue() ? String(i.getValue()) : "—"}</span>,
+				}),
+			);
+		} else if (docType === "HSSE") {
+			baseCols.push(
+				ch.accessor("ID_Izin", {
+					header: "ID Izin",
+					cell: (i) => (
+						<div className="w-32 truncate text-xs font-mono text-gray-700" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("Tanggal", {
+					header: "Tanggal",
+					cell: (i) => <span className="text-xs text-gray-600 whitespace-nowrap">{i.getValue() ? String(i.getValue()) : "—"}</span>,
+				}),
+				ch.accessor("Lokasi", {
+					header: "Lokasi",
+					cell: (i) => (
+						<div className="w-32 truncate text-xs font-medium text-gray-900" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("Jenis_Izin_Kerja", {
+					header: "Jenis Izin Kerja",
+					cell: (i) => (
+						<div className="w-48 truncate text-xs text-gray-600" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("Tingkat_Resiko", {
+					header: "Tingkat Risiko",
+					cell: (i) => badge(i.getValue() as string, "risk"),
+				}),
+			);
+		} else if (docType === "AIRMS") {
+			baseCols.push(
+				ch.accessor("record_id", {
+					header: "Record ID",
+					cell: (i) => (
+						<div className="w-16 truncate text-xs font-mono text-gray-500" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("date", {
+					header: "Date",
+					cell: (i) => <span className="text-xs text-gray-600 whitespace-nowrap">{i.getValue() ? String(i.getValue()) : "—"}</span>,
+				}),
+				ch.accessor("asset_id", {
+					header: "Asset ID",
+					cell: (i) => (
+						<div className="w-24 truncate text-xs font-mono font-medium text-gray-700" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("asset_name", {
+					header: "Asset Name",
+					cell: (i) => (
+						<div className="w-48 truncate text-xs font-semibold text-gray-900" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("area", {
+					header: "Area",
+					cell: (i) => <span className="text-xs text-gray-600 font-medium">{i.getValue() ? String(i.getValue()) : "—"}</span>,
+				}),
+				ch.accessor("health_index", {
+					header: "Health Index",
+					cell: (i) => {
+						const val = i.getValue();
+						if (!val) return <span className="text-gray-300">—</span>;
+						const num = parseFloat(String(val));
+						let colorClass = "text-gray-900 bg-gray-50 border-gray-200";
+						if (!isNaN(num)) {
+							if (num >= 90) colorClass = "text-green-700 bg-green-50 border-green-200";
+							else if (num >= 75) colorClass = "text-yellow-700 bg-yellow-50 border-yellow-200";
+							else colorClass = "text-red-700 bg-red-50 border-red-200";
+						}
+						return (
+							<span className={clsxm("px-2.5 py-0.5 rounded-full text-xs font-bold border", colorClass)}>
+								{String(val)}%
+							</span>
+						);
+					}
+
+				}),
+			);
+		} else if (docType === "I2AIMS") {
+			baseCols.push(
+				ch.accessor("record_id", {
+					header: "Record ID",
+					cell: (i) => (
+						<div className="w-16 truncate text-xs font-mono text-gray-500" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("inspection_date", {
+					header: "Inspection Date",
+					cell: (i) => <span className="text-xs text-gray-600 whitespace-nowrap">{i.getValue() ? String(i.getValue()) : "—"}</span>,
+				}),
+				ch.accessor("asset_id", {
+					header: "Asset ID",
+					cell: (i) => (
+						<div className="w-24 truncate text-xs font-mono font-medium text-gray-700" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("asset_name", {
+					header: "Asset Name",
+					cell: (i) => (
+						<div className="w-48 truncate text-xs font-semibold text-gray-900" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("integrity_status", {
+					header: "Integrity Status",
+					cell: (i) => {
+						const val = i.getValue();
+						if (!val) return <span className="text-gray-300">—</span>;
+						const s = String(val).toLowerCase();
+						let badgeCls = "bg-gray-100 text-gray-700 border-gray-200";
+						if (s.includes("good")) {
+							badgeCls = "bg-green-100 text-green-700 border-green-200";
+						} else if (s.includes("fair")) {
+							badgeCls = "bg-blue-100 text-blue-700 border-blue-200";
+						} else if (s.includes("monitor")) {
+							badgeCls = "bg-yellow-100 text-yellow-700 border-yellow-200";
+						}
+						return (
+							<span className={clsxm("px-2 py-0.5 rounded-full text-xs font-semibold border whitespace-nowrap", badgeCls)}>
+								{String(val)}
+							</span>
+						);
+					}
+				}),
+				ch.accessor("barrier_health", {
+					header: "Barrier Health",
+					cell: (i) => {
+						const val = i.getValue();
+						if (!val) return <span className="text-gray-300">—</span>;
+						const num = parseFloat(String(val));
+						let colorClass = "text-gray-900 bg-gray-50 border-gray-200";
+						if (!isNaN(num)) {
+							if (num >= 90) colorClass = "text-green-700 bg-green-50 border-green-200";
+							else if (num >= 75) colorClass = "text-yellow-700 bg-yellow-50 border-yellow-200";
+							else colorClass = "text-red-700 bg-red-50 border-red-200";
+						}
+						return (
+							<span className={clsxm("px-2.5 py-0.5 rounded-full text-xs font-bold border", colorClass)}>
+								{String(val)}%
+							</span>
+						);
+					}
+				}),
+			);
+
+		} else if (docType === "LCV_PROJECT_CHARTER_BUDAYA") {
+			baseCols.push(
+				ch.accessor("id_project", {
+					header: "ID Project",
+					cell: (i) => <span className="text-xs font-mono font-semibold text-gray-500">{i.getValue() ? String(i.getValue()) : "—"}</span>,
+				}),
+				ch.accessor("tanggal", {
+					header: "Tanggal",
+					cell: (i) => <span className="text-xs text-gray-600 whitespace-nowrap">{i.getValue() ? String(i.getValue()) : "—"}</span>,
+				}),
+				ch.accessor("judul_project", {
+					header: "Judul Project",
+					cell: (i) => (
+						<div className="w-96 truncate text-xs font-semibold text-gray-900" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+			);
+		} else if (docType === "LCV_MONITORING") {
+			baseCols.push(
+				ch.accessor("namapegawai", {
+					header: "Nama Pegawai",
+					cell: (i) => (
+						<div className="w-36 truncate text-xs font-semibold text-gray-900" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("nip", {
+					header: "NIP",
+					cell: (i) => <span className="text-xs font-mono font-medium text-gray-700">{i.getValue() ? String(i.getValue()) : "—"}</span>,
+				}),
+				ch.accessor("departemen", {
+					header: "Departemen",
+					cell: (i) => <span className="text-xs text-gray-600 font-medium">{i.getValue() ? String(i.getValue()) : "—"}</span>,
+				}),
+				ch.accessor("projectchapterbudaya", {
+					header: "Budaya",
+					cell: (i) => {
+						const val = i.getValue();
+						if (!val) return <span className="text-gray-300">—</span>;
+						return (
+							<span className="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+								{String(val)}
+							</span>
+						);
+					}
+				}),
+				ch.accessor("lcv_sosialisasi_lcv", {
+					header: "Sosialisasi LCV",
+					cell: (i) => {
+						const val = i.getValue();
+						if (!val) return <span className="text-gray-300">—</span>;
+						const s = String(val).toLowerCase();
+						let badgeCls = "bg-gray-100 text-gray-700 border-gray-200";
+						if (s.includes("hadir")) {
+							badgeCls = "bg-green-100 text-green-700 border-green-200";
+						} else if (s.includes("tidak")) {
+							badgeCls = "bg-red-100 text-red-700 border-red-200";
+						}
+						return (
+							<span className={clsxm("px-2 py-0.5 rounded-full text-[10px] font-bold border", badgeCls)}>
+								{String(val)}
+							</span>
+						);
+					}
+				}),
+				ch.accessor("tahun", {
+					header: "Tahun",
+					cell: (i) => <span className="text-xs text-gray-500 font-medium">{i.getValue() ? String(i.getValue()) : "—"}</span>,
+				}),
+			);
 		} else {
+
+
+
+
 			DOC_TYPE_CONFIG[docType].glanceCols.forEach((col) => {
 				baseCols.push(
 					ch.accessor(col, {
@@ -216,7 +495,7 @@ export default function DataGatheringTable({
 									"border-b border-gray-100 cursor-pointer transition-colors group",
 									!row.original._isValid
 										? "bg-red-50 hover:bg-red-100/60"
-										: "bg-white hover:bg-blue-50/40"
+										: "bg-white hover:bg-green-50/40"
 								)}
 							>
 								{row.getVisibleCells().map((cell, ci) => (
@@ -230,7 +509,7 @@ export default function DataGatheringTable({
 											ci === 2 && "left-[4rem]",
 											!row.original._isValid
 												? "bg-red-50 group-hover:bg-red-100/60"
-												: "bg-white group-hover:bg-blue-50/40"
+												: "bg-white group-hover:bg-green-50/40"
 										)}
 									>
 										{flexRender(cell.column.columnDef.cell, cell.getContext())}

@@ -1,9 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 
-import { post } from "@/services/api/main/call";
+import axiosInstance from "@/services/api/main/interceptor";
 import { MAIN_ENDPOINT } from "@/services/api/main/endpoint";
-import type { ApiResponse } from "@/types/api";
 
 interface UseMonitoringBatchMutationProps {
 	docType: string;
@@ -17,25 +16,34 @@ export const useMonitoringBatchMutation = ({ docType, onSuccess }: UseMonitoring
 			if (docType === "HAZID") endpoint = MAIN_ENDPOINT.Hazid.BatchCreate;
 			if (docType === "HAZOP") endpoint = MAIN_ENDPOINT.Hazop.BatchCreate;
 			if (docType === "LOPA") endpoint = MAIN_ENDPOINT.Lopa.BatchCreate;
-
-			const { Kind, OK } = await post<ApiResponse<{ upload_batch_id: string }>>(
-				endpoint,
-				data as unknown as Record<string, unknown>,
-			);
-
-			if (!OK) {
-				const errorData = Kind as any;
-				const errorMessage = errorData?.err || errorData?.message || errorData?.Message || `Telah terjadi kesalahan saat upload data ${docType}`;
-				throw new Error(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
+			if (docType === "MOC") endpoint = MAIN_ENDPOINT.Moc.BatchCreate;
+			if (docType === "HSSE") endpoint = MAIN_ENDPOINT.Hsse.BatchCreate;
+			if (docType === "AIRMS") endpoint = MAIN_ENDPOINT.Airms.BatchCreate;
+			if (docType === "I2AIMS") endpoint = MAIN_ENDPOINT.I2aims.BatchCreate;
+			if (docType === "LCV_PROJECT_CHARTER_BUDAYA" || docType === "LCV_MONITORING") {
+				endpoint = MAIN_ENDPOINT.Lcv.BatchCreate;
 			}
 
-			const response = Kind as ApiResponse<{ upload_batch_id: string }>;
-			
-			if (!response.data) {
+
+
+
+
+			const response = await axiosInstance.post(endpoint, data);
+
+			if (!response.data?.success) {
+				const errMsg =
+					response.data?.err ||
+					response.data?.message ||
+					`Telah terjadi kesalahan saat upload data ${docType}`;
+				throw new Error(typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg));
+			}
+
+			const uploadData = response.data?.data;
+			if (!uploadData) {
 				throw new Error("Data response is empty");
 			}
 
-			return response.data;
+			return uploadData as { upload_batch_id: string };
 		},
 		onSuccess: (data) => {
 			toast.success(`Berhasil mengunggah data ${docType}`);

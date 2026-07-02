@@ -34,6 +34,40 @@ export const MAIN_ENDPOINT = {
 		GetAll: "/lopa",
 		History: "/lopa/history",
 	},
+	Moc: {
+		BatchCreate: "/moc/batch",
+		CheckPeriod: "/moc/check-period",
+		GetAll: "/moc",
+		History: "/moc/history",
+	},
+	Hsse: {
+		BatchCreate: "/hsse/batch",
+		CheckPeriod: "/hsse/check-period",
+		GetAll: "/hsse",
+		History: "/hsse/history",
+	},
+	Airms: {
+		BatchCreate: "/airms/batch",
+		CheckPeriod: "/airms/check-period",
+		GetAll: "/airms",
+		History: "/airms/history",
+	},
+	I2aims: {
+		BatchCreate: "/i2aims/batch",
+		CheckPeriod: "/i2aims/check-period",
+		GetAll: "/i2aims",
+		History: "/i2aims/history",
+	},
+	Lcv: {
+		BatchCreate: "/lcv/batch",
+		CheckPeriod: "/lcv/check-period",
+		GetAll: "/lcv",
+		History: "/lcv/history",
+	},
+
+
+
+
 	Produksi: {
 		Upload: "/produksi/upload-excel",
 		CheckPeriod: "/produksi/check-period",
@@ -42,5 +76,17 @@ export const MAIN_ENDPOINT = {
 	},
 	Locations: {
 		GetAll: "/locations",
+	},
+	ZonaIndicator: {
+		BatchCreate: "/zona-indicator/batch",
+		CheckPeriod: "/zona-indicator/check-period",
+		GetAll: "/zona-indicator",
+		History: "/zona-indicator/history",
+	},
+	ZonaPseList: {
+		BatchCreate: "/zona-pse-list/batch",
+		CheckPeriod: "/zona-pse-list/check-period",
+		GetAll: "/zona-pse-list",
+		History: "/zona-pse-list/history",
 	},
 };

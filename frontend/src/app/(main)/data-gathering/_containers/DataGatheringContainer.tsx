@@ -3,6 +3,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import * as XLSX from "xlsx";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
@@ -15,20 +16,25 @@ import {
 	Loader2,
 	FileSpreadsheet,
 } from "lucide-react";
+import Select from "react-select";
 import clsxm from "@/lib/clsxm";
 
 import { useMonitoringBatchMutation } from "../_hooks/useMonitoringBatchMutation";
 import { useProduksiBatchMutation } from "../_hooks/useProduksiBatchMutation";
+import { usePsaimsBatchMutation } from "../_hooks/usePsaimsBatchMutation";
 import { useLocationsQuery } from "../_hooks/useLocationsQuery";
 import { useExcelProcessor } from "../_hooks/useExcelProcessor";
 import { checkMonitoringPeriodExists } from "../_hooks/useMonitoringCheckPeriod";
 import {
 	DOC_TYPE_CONFIG,
 	DOCUMENT_OPTIONS,
+	PSAIMS_OPTIONS,
+	LCV_OPTIONS,
 	FIELD_OPTIONS,
 	MONTH_OPTIONS,
 	QUARTER_OPTIONS,
 	YEAR_OPTIONS,
+	SELECT_STYLES,
 	type DocTypeValue,
 } from "../_constants/dataGathering.constants";
 import type { DocumentOption, ExcelRow, ExtraColumnsState } from "../_types";
@@ -197,13 +203,25 @@ export default function DataGatheringContainer() {
 	const [detailDocType, setDetailDocType] = useState<DocTypeValue>("PRODUKSI");
 	const [produksiExtraCols, setProduksiExtraCols] = useState<ExtraColumnsState>({});
 
+	// PSAIMS state
+	const [psaimsSubType, setPsaimsSubType] = useState<DocumentOption<DocTypeValue>>(PSAIMS_OPTIONS[0]);
+	const [psaimsZona, setPsaimsZona] = useState<string>("");
+
 	const [docType, setDocType] = useState<DocumentOption<DocTypeValue>>(DOCUMENT_OPTIONS[0]);
 	const [field, setField] = useState<DocumentOption>(FIELD_OPTIONS[0]);
 	const [quarter, setQuarter] = useState<DocumentOption>(QUARTER_OPTIONS[0]);
 	const [month, setMonth] = useState<DocumentOption>(MONTH_OPTIONS[new Date().getMonth()]);
 	const [year, setYear] = useState<DocumentOption>(YEAR_OPTIONS[2]);
 
-	const isProduksi = docType.value === "PRODUKSI";
+   const isProduksi = docType.value === "PRODUKSI";
+	const isPsaims = (docType.value as string) === "PSAIMS" || psaimsSubType.value === "ZONA_INDICATOR" || psaimsSubType.value === "ZONA_PSE_LIST";
+	// Determine the real active doc type for PSAIMS
+	const activePsaimsDocType: DocTypeValue = psaimsSubType.value;
+
+	const [lcvSubType, setLcvSubType] = useState<DocumentOption<DocTypeValue>>(LCV_OPTIONS[0]);
+	const isLcv = (docType.value as string) === "LCV" || lcvSubType.value === "LCV_PROJECT_CHARTER_BUDAYA" || lcvSubType.value === "LCV_MONITORING";
+	// Determine the real active doc type for LCV
+	const activeLcvDocType: DocTypeValue = lcvSubType.value;
 
 	const { data: locationsData } = useLocationsQuery();
 
@@ -235,18 +253,40 @@ export default function DataGatheringContainer() {
 		setProduksiTargetRows([]);
 		setProduksiTotalRows(0);
 		setProduksiExtraCols({});
+		setExtraCols({});
+	};
+
+	const handlePsaimsSubTypeChange = (option: DocumentOption<DocTypeValue>) => {
+		setPsaimsSubType(option);
+		setData([]);
+		setExtraCols({});
+	};
+
+	const handleLcvSubTypeChange = (option: DocumentOption<DocTypeValue>) => {
+		setLcvSubType(option);
+		setData([]);
+		setExtraCols({});
 	};
 
 	const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 	const [isCheckingPeriod, setIsCheckingPeriod] = useState(false);
 	const [isDataExists, setIsDataExists] = useState(false);
-	const docConfig = DOC_TYPE_CONFIG[docType.value];
+	// For PSAIMS & LCV, use activeDocType to look up config; otherwise use docType
+	const isPsaimsActive = (docType.value as string) === "PSAIMS" || docType.value === "ZONA_INDICATOR" || docType.value === "ZONA_PSE_LIST";
+	const isLcvActive = (docType.value as string) === "LCV" || docType.value === "LCV_PROJECT_CHARTER_BUDAYA" || docType.value === "LCV_MONITORING";
+
+	const docConfig = isPsaimsActive
+		? DOC_TYPE_CONFIG[activePsaimsDocType]
+		: isLcvActive
+		? DOC_TYPE_CONFIG[activeLcvDocType]
+		: DOC_TYPE_CONFIG[docType.value];
+
 
 	const router = useRouter();
 
-	// Mutation untuk MIT / HAZID / HAZOP / LOPA (JSON batch)
+	// Mutation untuk MIT / HAZID / HAZOP / LOPA / I2AIMS / LCV (JSON batch)
 	const { mutate: uploadBatch, isPending: isUploading } = useMonitoringBatchMutation({
-		docType: docType.value,
+		docType: isPsaimsActive ? activePsaimsDocType : isLcvActive ? activeLcvDocType : docType.value,
 		onSuccess: (res) => {
 			setData([]);
 		},
@@ -260,6 +300,15 @@ export default function DataGatheringContainer() {
 			setProduksiTargetRows([]);
 			setProduksiTotalRows(0);
 			setProduksiExtraCols({});
+		},
+	});
+
+	// Mutation untuk PSAIMS (Zona Indicator / Zona PSE List)
+	const { mutate: uploadPsaims, isPending: isUploadingPsaims } = usePsaimsBatchMutation({
+		docType: activePsaimsDocType,
+		onSuccess: () => {
+			setData([]);
+			setExtraCols({});
 		},
 	});
 
@@ -279,8 +328,13 @@ export default function DataGatheringContainer() {
 
 	// Processor Excel untuk MIT/HAZID/HAZOP/LOPA (parse di frontend, preview)
 	const { processExcel } = useExcelProcessor({
-		docType: docType.value,
+		docType: (docType.value as string) === "PSAIMS" || docType.value === "ZONA_INDICATOR" || docType.value === "ZONA_PSE_LIST"
+			? activePsaimsDocType
+			: (docType.value as string) === "LCV" || docType.value === "LCV_PROJECT_CHARTER_BUDAYA" || docType.value === "LCV_MONITORING"
+			? activeLcvDocType
+			: docType.value,
 		onProcessed: (rows) => {
+
 			setData(rows);
 			setExtraCols({});
 		},
@@ -331,6 +385,8 @@ export default function DataGatheringContainer() {
 	const valid = total - errors;
 	const canSubmit = isProduksi
 		? produksiFile !== null && produksiPreview.length > 0
+		: isPsaimsActive
+		? total > 0 && errors === 0 && psaimsZona.trim().length > 0
 		: total > 0 && errors === 0;
 
 	const handleProceedUpload = (mode: "append" | "overwrite") => {
@@ -344,6 +400,42 @@ export default function DataGatheringContainer() {
 				reporting_month: parseInt(month.value, 10),
 				field: undefined,
 				mode,
+			});
+			return;
+		}
+
+		if (isPsaimsActive) {
+			const payload = data.map(({ _index, _isValid, _errors, ...rest }) => rest);
+			if (activePsaimsDocType === "ZONA_INDICATOR") {
+				uploadPsaims({
+					doc_type: "ZONA_INDICATOR",
+					reporting_year: parseInt(year.value, 10),
+					zona: psaimsZona.trim(),
+					mode,
+					items: payload,
+				});
+			} else {
+				uploadPsaims({
+					doc_type: "ZONA_PSE_LIST",
+					reporting_year: parseInt(year.value, 10),
+					reporting_month: parseInt(month.value, 10),
+					zona: psaimsZona.trim(),
+					mode,
+					items: payload,
+				});
+			}
+			return;
+		}
+
+		if (isLcvActive) {
+			const payload = data.map(({ _index, _isValid, _errors, ...rest }) => rest);
+			uploadBatch({
+				doc_type: activeLcvDocType,
+				reporting_year: parseInt(year.value, 10),
+				reporting_month: 1,
+				field: undefined,
+				mode,
+				items: payload,
 			});
 			return;
 		}
@@ -367,31 +459,52 @@ export default function DataGatheringContainer() {
 		if (!canSubmit) return;
 		setIsCheckingPeriod(true);
 		try {
-			const periodVal = docConfig.period === "quarter"
-				? parseInt(quarter.value.replace("Q", ""), 10)
-				: parseInt(month.value, 10);
-			const exists = await checkMonitoringPeriodExists(
-				docType.value,
-				parseInt(year.value, 10),
-				periodVal,
-				isProduksi ? undefined : field.value
-			);
+			let exists: boolean;
+			if (isPsaimsActive) {
+				const periodVal = activePsaimsDocType === "ZONA_INDICATOR" ? 0 : parseInt(month.value, 10);
+				exists = await checkMonitoringPeriodExists(
+					activePsaimsDocType,
+					parseInt(year.value, 10),
+					periodVal,
+					psaimsZona.trim() || undefined
+				);
+			} else if (isLcvActive) {
+				exists = await checkMonitoringPeriodExists(
+					activeLcvDocType,
+					parseInt(year.value, 10),
+					1,
+					undefined
+				);
+			} else {
+				const periodVal = docConfig.period === "quarter"
+					? parseInt(quarter.value.replace("Q", ""), 10)
+					: parseInt(month.value, 10);
+				exists = await checkMonitoringPeriodExists(
+					docType.value,
+					parseInt(year.value, 10),
+					periodVal,
+					isProduksi ? undefined : field.value
+				);
+			}
 			setIsDataExists(exists);
 			setConfirmModalOpen(true);
 		} catch (error) {
 			console.error("Failed to check period existence:", error);
-			setIsDataExists(true);
+			// Default to false (no existing data) when check fails,
+			// so the user is not falsely blocked by an "already exists" warning.
+			toast.error("Gagal mengecek data periode. Lanjutkan dengan hati-hati.");
+			setIsDataExists(false);
 			setConfirmModalOpen(true);
 		} finally {
 			setIsCheckingPeriod(false);
 		}
 	};
 
-	const isAnyUploading = isUploading || isUploadingProduksi;
+	const isAnyUploading = isUploading || isUploadingProduksi || isUploadingPsaims;
 
 	return (
 		<div className="flex flex-col gap-5 p-6 pb-20 w-full min-w-0">
-			<DataGatheringHeader docType={docType.value} />
+			<DataGatheringHeader docType={isPsaimsActive ? activePsaimsDocType : isLcvActive ? activeLcvDocType : docType.value} />
 
 			<div className="grid grid-cols-12 gap-4 items-start w-full min-w-0">
 				<DataGatheringSidebar
@@ -406,10 +519,24 @@ export default function DataGatheringContainer() {
 					onQuarterChange={setQuarter}
 					onMonthChange={setMonth}
 					onYearChange={setYear}
+					// PSAIMS-specific props
+					psaimsSubType={psaimsSubType}
+					psaimsZona={psaimsZona}
+					onPsaimsSubTypeChange={handlePsaimsSubTypeChange}
+					onPsaimsZonaChange={setPsaimsZona}
+					// LCV-specific props
+					lcvSubType={lcvSubType}
+					onLcvSubTypeChange={handleLcvSubTypeChange}
 				/>
 
 				{/* Dropzone — sama untuk semua doc type */}
 				<div className="col-span-12 md:col-span-8 flex flex-col gap-3">
+					{isPsaimsActive && psaimsZona.trim() === "" && (
+						<div className="flex items-center gap-2 text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2.5 text-sm font-medium">
+							<span>⚠️</span>
+							<span>Masukkan Nomor Zona terlebih dahulu sebelum upload file.</span>
+						</div>
+					)}
 					<DataGatheringDropzone
 						getRootProps={getRootProps}
 						getInputProps={getInputProps}
@@ -469,7 +596,7 @@ export default function DataGatheringContainer() {
 				</div>
 			)}
 
-			{/* Preview tabel hanya untuk non-Produksi */}
+			{/* Preview tabel untuk non-Produksi (termasuk PSAIMS) */}
 			{!isProduksi && data.length > 0 && (
 				<DataGatheringToolbar
 					total={total}
@@ -488,11 +615,11 @@ export default function DataGatheringContainer() {
 			{!isProduksi && data.length > 0 && (
 				<DataGatheringTable
 					data={data}
-					docType={docType.value}
+					docType={isPsaimsActive ? activePsaimsDocType : isLcvActive ? activeLcvDocType : docType.value}
 					extraHeaders={extraHeaders}
 					extraCols={extraCols}
 					onSelectRow={(row) => {
-						setDetailDocType(docType.value);
+						setDetailDocType(isPsaimsActive ? activePsaimsDocType : isLcvActive ? activeLcvDocType : docType.value);
 						setSelectedRow(row);
 					}}
 				/>
@@ -506,9 +633,13 @@ export default function DataGatheringContainer() {
 
 			<DataGatheringConfirmModal
 				open={confirmModalOpen}
-				docType={docType.value}
-				fieldLabel={field.label}
-				periodLabel={docConfig.period === "quarter" ? quarter.value : month.label}
+				docType={isPsaimsActive ? activePsaimsDocType : isLcvActive ? activeLcvDocType : docType.value}
+				fieldLabel={isPsaimsActive ? (psaimsZona ? `Zona ${psaimsZona}` : "—") : isLcvActive ? "—" : field.label}
+				periodLabel={
+					(isPsaimsActive && activePsaimsDocType === "ZONA_INDICATOR") || isLcvActive
+						? ""
+						: docConfig.period === "quarter" ? quarter.value : month.label
+				}
 				yearLabel={year.value}
 				isUploading={isAnyUploading}
 				isDataExists={isDataExists}

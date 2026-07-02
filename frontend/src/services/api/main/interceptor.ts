@@ -1,8 +1,8 @@
 import axios from "axios";
 import { ENV } from "@/configs/environment";
+import { getToken } from "@/lib/cookies";
 
 const baseURL = ENV.URI.BASE_URL;
-const isServer = typeof window === "undefined";
 
 const api = axios.create({
 	baseURL,
@@ -10,24 +10,14 @@ const api = axios.create({
 		"Content-Type": "application/json",
 	},
 });
-api.interceptors.request.use(async (config) => {
-	if (isServer) {
-		const { cookies } = await import("next/headers");
-		const token = (await cookies()).get(ENV.TOKEN_KEY)?.value;
 
-		if (token) {
-			config.headers.Authorization = `Bearer ${token}`;
-		}
-	} else {
-		const key = ENV.TOKEN_KEY;
-		const match = document.cookie.match(new RegExp(`(?:^|;\\s*)${key}\\s*=\\s*([^;]*)`));
-		const token = match ? decodeURIComponent(match[1]) : "";
-
-		if (token) {
-			config.headers.Authorization = `Bearer ${token}`;
-		}
+// Synchronous interceptor: read token using the same library (universal-cookie)
+// that was used to store it via setToken(), ensuring encoding consistency.
+api.interceptors.request.use((config) => {
+	const token = getToken();
+	if (token) {
+		config.headers.Authorization = `Bearer ${token}`;
 	}
-
 	return config;
 });
 

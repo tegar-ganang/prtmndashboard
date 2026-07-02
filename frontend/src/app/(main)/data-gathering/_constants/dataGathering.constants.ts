@@ -1,6 +1,9 @@
 import type { StylesConfig } from "react-select";
 
-export type DocTypeValue = "MIT" | "HAZID" | "HAZOP" | "LOPA" | "PRODUKSI" | "PRODUKSI_TARGET" | "PRODUKSI_REALISASI";
+export type DocTypeValue = "MIT" | "HAZID" | "HAZOP" | "LOPA" | "MOC" | "HSSE" | "AIRMS" | "I2AIMS" | "LCV_PROJECT_CHARTER_BUDAYA" | "LCV_MONITORING" | "PRODUKSI" | "PRODUKSI_TARGET" | "PRODUKSI_REALISASI" | "ZONA_INDICATOR" | "ZONA_PSE_LIST";
+
+
+
 
 export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 	label: string;
@@ -70,7 +73,62 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		requiredFields: ["FUNCTION NAME"],
 		period: "month",
 	},
+	MOC: {
+		label: "Management of Change (MOC)",
+		expectedHeaders: [
+			"MOC_NUMBER", "CHANGE_DESC", "ISSUED_DATE", "FIELD", "DONE",
+			"MOC_OWNER", "LAST_UPDATED", "ONGOING_STEP", "PIC", "STATUS",
+		],
+		glanceCols: ["MOC_NUMBER", "CHANGE_DESC", "STATUS", "PIC", "ISSUED_DATE"],
+		templateUrl: "/templates/Template MOC.xlsx",
+		requiredFields: ["MOC_NUMBER"],
+		period: "month" as const,
+	},
+	HSSE: {
+		label: "HSSE",
+
+		expectedHeaders: [
+			"ID_Izin", "Tanggal", "Bulan_Tahun", "Lokasi",
+			"Jenis_Izin_Kerja", "Job_Complete", "Jumlah_ICC",
+			"Status_Dispensasi", "Jenis_Deviasi", "Status_Deviasi",
+			"Tingkat_Resiko",
+		],
+		glanceCols: ["ID_Izin", "Tanggal", "Lokasi", "Jenis_Izin_Kerja", "Tingkat_Resiko"],
+		templateUrl: "/templates/Template Izin Kerja HSSE.xlsx",
+		requiredFields: ["ID_Izin"],
+		period: "month" as const,
+	},
+	AIRMS: {
+		label: "AIRMS",
+		expectedHeaders: [
+			"record_id", "date", "asset_id", "asset_name", "area",
+			"availability", "reliability", "mtbf", "mttr", "wo_type",
+			"wo_status", "maintenance_cost", "downtime_type", "downtime_hours",
+			"lost_boe", "health_index",
+		],
+		glanceCols: ["record_id", "date", "asset_id", "asset_name", "health_index"],
+		templateUrl: "/templates/Template AIRMS.xlsx",
+		requiredFields: ["record_id"],
+		period: "month" as const,
+	},
+	I2AIMS: {
+		label: "I2AIMS",
+		expectedHeaders: [
+			"record_id", "inspection_date", "asset_id", "asset_name", "asset_type",
+			"area", "sce_category", "integrity_status", "inspection_result",
+			"inspection_compliance", "corrosion_rate", "remaining_life", "risk_rank",
+			"anomaly_count", "process_safety_event", "barrier_health",
+			"recommendation_status", "inspection_cost",
+		],
+		glanceCols: ["record_id", "inspection_date", "asset_id", "asset_name", "integrity_status", "barrier_health"],
+		templateUrl: "/templates/Template I2AIMS.xlsx",
+		requiredFields: ["record_id"],
+		period: "month" as const,
+	},
+
+
 	PRODUKSI: {
+
 		label: "Produksi Harian (Gas)",
 		expectedHeaders: [], // Backend yang parse — tidak ada client-side header check
 		glanceCols: [],
@@ -102,14 +160,73 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		requiredFields: [],
 		period: "month" as const,
 	},
+	ZONA_INDICATOR: {
+		label: "PSAIMS — Zona Indicator",
+		expectedHeaders: [
+			"IND TYPE", "INDICATOR", "UNIT", "DESCRIPTION", "BASIS",
+			"PIC Name", "PIC Email",
+			"January", "February", "March", "April", "May", "June",
+			"July", "August", "September", "October", "November", "December",
+			"YTD", "Comment",
+		],
+		glanceCols: ["IND TYPE", "INDICATOR", "UNIT", "PIC Name", "January", "YTD"],
+		templateUrl: "/templates/Template Zona Indicator.xlsx",
+		requiredFields: ["INDICATOR"],
+		period: "month" as const, // period not used — upload per year
+	},
+	ZONA_PSE_LIST: {
+		label: "PSAIMS — Zona PSE List",
+		expectedHeaders: [
+			"NO", "ZONA", "FIELD / AREA", "LOKASI", "UNIT / DETAIL ",
+			"SHORT DESCRIPTION", "EVENT ISSUE CATEGORY", "ACTIVITY",
+			"TYPE LOCATION", "DATE START (DD/MM/YYYY)",
+		],
+		glanceCols: ["NO", "FIELD / AREA", "LOKASI", "SHORT DESCRIPTION", "PSE TIER", "DATE START (DD/MM/YYYY)"],
+		templateUrl: "/templates/Template Zona PSE List.xlsx",
+		requiredFields: ["NO"],
+		period: "month" as const,
+	},
+	LCV_PROJECT_CHARTER_BUDAYA: {
+		label: "LCV — Project Charter Budaya",
+		expectedHeaders: ["id_project", "tanggal", "judul_project"],
+		glanceCols: ["id_project", "tanggal", "judul_project"],
+		templateUrl: "/templates/Template LCV Project Charter Budaya.xlsx",
+		requiredFields: ["id_project"],
+		period: "month" as const,
+	},
+	LCV_MONITORING: {
+		label: "LCV — Monitoring",
+		expectedHeaders: [
+			"namapegawai", "nip", "departemen", "lcv_conflictofinterest",
+			"lcv_codeofconduct", "lcv_laporgratifikasi", "lcv_sosialisasi_lcv",
+			"lcv_lhkpn", "training_isec", "training_lcv",
+			"trainining_virtualdemoroomhsse", "training_stressmanagement",
+			"training_fraudawareness", "projectchapterbudaya", "tahun",
+		],
+		glanceCols: ["namapegawai", "nip", "departemen", "projectchapterbudaya", "tahun"],
+		templateUrl: "/templates/Template LCV Monitoring.xlsx",
+		requiredFields: ["nip"],
+		period: "month" as const,
+	},
 };
 
 export const DOCUMENT_OPTIONS = (Object.keys(DOC_TYPE_CONFIG) as DocTypeValue[])
-	.filter((key) => key !== "PRODUKSI_TARGET" && key !== "PRODUKSI_REALISASI")
+	.filter((key) => key !== "PRODUKSI_TARGET" && key !== "PRODUKSI_REALISASI" && key !== "ZONA_INDICATOR" && key !== "ZONA_PSE_LIST" && key !== "LCV_PROJECT_CHARTER_BUDAYA" && key !== "LCV_MONITORING")
 	.map((key) => ({
 		value: key,
 		label: DOC_TYPE_CONFIG[key].label,
 	}));
+
+export const PSAIMS_OPTIONS = [
+	{ value: "ZONA_INDICATOR" as DocTypeValue, label: "Zona Indicator" },
+	{ value: "ZONA_PSE_LIST" as DocTypeValue, label: "Zona PSE List" },
+];
+
+export const LCV_OPTIONS = [
+	{ value: "LCV_PROJECT_CHARTER_BUDAYA" as DocTypeValue, label: "Project Charter Budaya" },
+	{ value: "LCV_MONITORING" as DocTypeValue, label: "Monitoring" },
+];
+
 
 export const QUARTER_OPTIONS = [
 	{ value: "Q1", label: "Q1" },

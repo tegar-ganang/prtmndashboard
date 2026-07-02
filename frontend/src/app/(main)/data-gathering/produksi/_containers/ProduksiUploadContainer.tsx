@@ -436,16 +436,16 @@ export default function ProduksiUploadContainer() {
 					{/* Dropzone */}
 					<div
 						{...getRootProps()}
-						className={`relative border-2 border-dashed rounded-xl transition-all cursor-pointer
-							${isDragActive ? "border-blue-400 bg-blue-50" : "border-gray-200 bg-gray-50 hover:border-blue-300 hover:bg-blue-50/30"}
+						className={`relative border-2 border-dashed rounded-xl transition-all cursor-pointer group
+							${isDragActive ? "border-[#007038] bg-[#008A45]/15" : "border-[#008A45] bg-[#008A45]/5 hover:border-[#007038] hover:bg-[#008A45]/10"}
 							${file ? "py-6" : "py-14"}
 						`}
 					>
 						<input {...getInputProps()} />
 						{parsing ? (
 							<div className="flex flex-col items-center gap-3">
-								<Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
-								<p className="text-sm font-medium text-blue-600">Memproses file Excel…</p>
+								<Loader2 className="w-10 h-10 text-[#008A45] animate-spin" />
+								<p className="text-sm font-medium text-[#008A45]">Memproses file Excel…</p>
 							</div>
 						) : file ? (
 							<div className="flex items-center justify-between px-6">
@@ -475,8 +475,8 @@ export default function ProduksiUploadContainer() {
 							</div>
 						) : (
 							<div className="flex flex-col items-center gap-3 text-center px-4">
-								<div className="p-4 bg-white rounded-2xl border border-gray-200 shadow-sm">
-									<FileSpreadsheet className="w-10 h-10 text-blue-500" />
+								<div className="p-4 bg-white rounded-2xl border border-[#008A45]/20 shadow-sm transition-colors group-hover:border-[#007038]/40">
+									<FileSpreadsheet className="w-10 h-10 text-[#008A45] group-hover:text-[#007038] transition-colors" />
 								</div>
 								<div>
 									<p className="text-base font-semibold text-gray-700">
@@ -487,7 +487,7 @@ export default function ProduksiUploadContainer() {
 									</p>
 								</div>
 								<div className="flex gap-2 mt-1">
-									<span className="px-2.5 py-1 bg-blue-50 text-blue-700 text-[10px] font-bold rounded-full border border-blue-100">
+									<span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-100">
 										Sheet 1: Data Harian
 									</span>
 									<span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-100">
@@ -502,7 +502,7 @@ export default function ProduksiUploadContainer() {
 					{preview.length > 0 && (
 						<div className="grid grid-cols-3 gap-3">
 							{[
-								{ label: "Total Baris Harian", value: totalRows, icon: CalendarDays, color: "blue" },
+								{ label: "Total Baris Harian", value: totalRows, icon: CalendarDays, color: "emerald" },
 								{
 									label: "Target DMF Terpetakan",
 									value: `${targetRows.length}/12 bulan`,
@@ -513,7 +513,7 @@ export default function ProduksiUploadContainer() {
 									label: "Target Periode Ini",
 									value: currentTarget !== null ? `${currentTarget.toFixed(2)} MMSCFD` : "—",
 									icon: BarChart3,
-									color: "indigo",
+									color: "emerald",
 								},
 							].map(({ label, value, icon: Icon, color }) => (
 								<div
@@ -538,7 +538,7 @@ export default function ProduksiUploadContainer() {
 							<div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
 								<div>
 									<h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
-										<Zap className="w-4 h-4 text-blue-500" />
+										<Zap className="w-4 h-4 text-emerald-500" />
 										Preview Data Harian (Sheet 1)
 									</h3>
 									<p className="text-xs text-gray-400 mt-0.5">
@@ -549,7 +549,7 @@ export default function ProduksiUploadContainer() {
 								<button
 									onClick={handleSubmit}
 									disabled={!file || uploadMutation.isPending || parsing}
-									className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+									className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-[#008A45] text-white hover:bg-[#007038] disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm cursor-pointer"
 								>
 									{uploadMutation.isPending ? (
 										<>
@@ -597,7 +597,7 @@ export default function ProduksiUploadContainer() {
 												rowTargetDmf = currentTarget;
 											}
 											return (
-												<tr key={idx} className="hover:bg-blue-50/30 transition-colors">
+												<tr key={idx} className="hover:bg-green-50/30 transition-colors">
 													<td className="px-3 py-2.5 text-xs font-mono text-gray-700 whitespace-nowrap">
 														{row.tanggal ?? "—"}
 													</td>

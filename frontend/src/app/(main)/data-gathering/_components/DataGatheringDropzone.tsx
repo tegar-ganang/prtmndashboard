@@ -22,14 +22,14 @@ export default function DataGatheringDropzone({
 			<div
 				{...getRootProps()}
 				className={clsxm(
-					"border-2 border-dashed rounded-xl p-10 h-full flex flex-col items-center justify-center text-center transition-colors select-none min-h-[250px]",
+					"border-2 border-dashed rounded-xl p-10 h-full flex flex-col items-center justify-center text-center transition-colors select-none min-h-[250px] group",
 					isDragActive
-						? "border-blue-500 bg-blue-50 cursor-copy"
-						: "border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50 cursor-pointer"
+						? "border-[#007038] bg-[#008A45]/15 cursor-copy"
+						: "border-[#008A45] bg-[#008A45]/5 hover:border-[#007038] hover:bg-[#008A45]/10 cursor-pointer"
 				)}
 			>
 				<input {...getInputProps()} />
-				<UploadCloud className={clsxm("mx-auto h-10 w-10 mb-3", isDragActive ? "text-blue-500" : "text-gray-400")} />
+				<UploadCloud className={clsxm("mx-auto h-10 w-10 mb-3 transition-colors", isDragActive ? "text-[#007038]" : "text-[#008A45] group-hover:text-[#007038]")} />
 				{processing ? (
 					<p className="text-sm text-gray-500 animate-pulse">Memproses file…</p>
 				) : (

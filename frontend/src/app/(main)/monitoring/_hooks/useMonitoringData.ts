@@ -7,12 +7,16 @@ interface MonitoringParams {
   month?: number | null;
   quarter?: number | null;
   field?: string | null;
+  zona?: string | null;
 }
 
 // Map dari docType slug ke base endpoint path
-// Produksi pakai /produksi (beda dengan pattern /{docType} lainnya)
 const DOC_TYPE_ENDPOINT_MAP: Record<string, string> = {
   produksi: "produksi",
+  zona_indicator: "zona-indicator",
+  zona_pse_list: "zona-pse-list",
+  lcv_project_charter_budaya: "lcv",
+  lcv_monitoring: "lcv",
 };
 
 function getEndpoint(docType: string): string {
@@ -22,16 +26,21 @@ function getEndpoint(docType: string): string {
 export function useMonitoringData(docType: string, params: MonitoringParams) {
   const endpoint = getEndpoint(docType);
 
+  const docTypeUpper = docType.toUpperCase();
+  const isLcv = docTypeUpper.startsWith("LCV_");
+
   return useQuery({
     queryKey: ["monitoring", docType, params],
     queryFn: async () => {
       const { data } = await axiosInstance.get(`/${endpoint}`, {
         params: {
+          doc_type: isLcv ? docTypeUpper : undefined,
           batch_id: params.batch_id,
           year: params.year,
           month: params.month,
           quarter: params.quarter,
           field: params.field,
+          zona: params.zona,
         },
       });
       return data.data;
@@ -40,15 +49,24 @@ export function useMonitoringData(docType: string, params: MonitoringParams) {
   });
 }
 
-export function useMonitoringHistory(docType: string) {
+
+export function useMonitoringHistory(docType: string, customDocType?: string | null) {
   const endpoint = getEndpoint(docType);
 
+  const docTypeUpper = docType.toUpperCase();
+
   return useQuery({
-    queryKey: ["monitoring-history", docType],
+    queryKey: ["monitoring-history", docType, customDocType],
     queryFn: async () => {
-      const { data } = await axiosInstance.get(`/${endpoint}/history`);
+      const { data } = await axiosInstance.get(`/${endpoint}/history`, {
+        params: {
+          doc_type: customDocType?.toUpperCase() || (docTypeUpper.startsWith("LCV_") ? docTypeUpper : undefined),
+        },
+      });
       return data.data;
     },
     enabled: !!docType,
   });
 }
+
+
