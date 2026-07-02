@@ -1,6 +1,7 @@
 import type { StylesConfig } from "react-select";
 
-export type DocTypeValue = "MIT" | "HAZID" | "HAZOP" | "LOPA" | "MOC" | "HSSE" | "AIRMS" | "I2AIMS" | "PRODUKSI" | "PRODUKSI_TARGET" | "PRODUKSI_REALISASI" | "ZONA_INDICATOR" | "ZONA_PSE_LIST";
+export type DocTypeValue = "MIT" | "HAZID" | "HAZOP" | "LOPA" | "MOC" | "HSSE" | "AIRMS" | "I2AIMS" | "LCV_PROJECT_CHARTER_BUDAYA" | "LCV_MONITORING" | "PRODUKSI" | "PRODUKSI_TARGET" | "PRODUKSI_REALISASI" | "ZONA_INDICATOR" | "ZONA_PSE_LIST";
+
 
 
 
@@ -185,10 +186,32 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		requiredFields: ["NO"],
 		period: "month" as const,
 	},
+	LCV_PROJECT_CHARTER_BUDAYA: {
+		label: "LCV — Project Charter Budaya",
+		expectedHeaders: ["id_project", "tanggal", "judul_project"],
+		glanceCols: ["id_project", "tanggal", "judul_project"],
+		templateUrl: "/templates/Template LCV Project Charter Budaya.xlsx",
+		requiredFields: ["id_project"],
+		period: "month" as const,
+	},
+	LCV_MONITORING: {
+		label: "LCV — Monitoring",
+		expectedHeaders: [
+			"namapegawai", "nip", "departemen", "lcv_conflictofinterest",
+			"lcv_codeofconduct", "lcv_laporgratifikasi", "lcv_sosialisasi_lcv",
+			"lcv_lhkpn", "training_isec", "training_lcv",
+			"trainining_virtualdemoroomhsse", "training_stressmanagement",
+			"training_fraudawareness", "projectchapterbudaya", "tahun",
+		],
+		glanceCols: ["namapegawai", "nip", "departemen", "projectchapterbudaya", "tahun"],
+		templateUrl: "/templates/Template LCV Monitoring.xlsx",
+		requiredFields: ["nip"],
+		period: "month" as const,
+	},
 };
 
 export const DOCUMENT_OPTIONS = (Object.keys(DOC_TYPE_CONFIG) as DocTypeValue[])
-	.filter((key) => key !== "PRODUKSI_TARGET" && key !== "PRODUKSI_REALISASI" && key !== "ZONA_INDICATOR" && key !== "ZONA_PSE_LIST")
+	.filter((key) => key !== "PRODUKSI_TARGET" && key !== "PRODUKSI_REALISASI" && key !== "ZONA_INDICATOR" && key !== "ZONA_PSE_LIST" && key !== "LCV_PROJECT_CHARTER_BUDAYA" && key !== "LCV_MONITORING")
 	.map((key) => ({
 		value: key,
 		label: DOC_TYPE_CONFIG[key].label,
@@ -198,6 +221,12 @@ export const PSAIMS_OPTIONS = [
 	{ value: "ZONA_INDICATOR" as DocTypeValue, label: "Zona Indicator" },
 	{ value: "ZONA_PSE_LIST" as DocTypeValue, label: "Zona PSE List" },
 ];
+
+export const LCV_OPTIONS = [
+	{ value: "LCV_PROJECT_CHARTER_BUDAYA" as DocTypeValue, label: "Project Charter Budaya" },
+	{ value: "LCV_MONITORING" as DocTypeValue, label: "Monitoring" },
+];
+
 
 export const QUARTER_OPTIONS = [
 	{ value: "Q1", label: "Q1" },

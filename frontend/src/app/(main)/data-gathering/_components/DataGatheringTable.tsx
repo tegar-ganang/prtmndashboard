@@ -326,7 +326,82 @@ export default function DataGatheringTable({
 					}
 				}),
 			);
+
+		} else if (docType === "LCV_PROJECT_CHARTER_BUDAYA") {
+			baseCols.push(
+				ch.accessor("id_project", {
+					header: "ID Project",
+					cell: (i) => <span className="text-xs font-mono font-semibold text-gray-500">{i.getValue() ? String(i.getValue()) : "—"}</span>,
+				}),
+				ch.accessor("tanggal", {
+					header: "Tanggal",
+					cell: (i) => <span className="text-xs text-gray-600 whitespace-nowrap">{i.getValue() ? String(i.getValue()) : "—"}</span>,
+				}),
+				ch.accessor("judul_project", {
+					header: "Judul Project",
+					cell: (i) => (
+						<div className="w-96 truncate text-xs font-semibold text-gray-900" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+			);
+		} else if (docType === "LCV_MONITORING") {
+			baseCols.push(
+				ch.accessor("namapegawai", {
+					header: "Nama Pegawai",
+					cell: (i) => (
+						<div className="w-36 truncate text-xs font-semibold text-gray-900" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("nip", {
+					header: "NIP",
+					cell: (i) => <span className="text-xs font-mono font-medium text-gray-700">{i.getValue() ? String(i.getValue()) : "—"}</span>,
+				}),
+				ch.accessor("departemen", {
+					header: "Departemen",
+					cell: (i) => <span className="text-xs text-gray-600 font-medium">{i.getValue() ? String(i.getValue()) : "—"}</span>,
+				}),
+				ch.accessor("projectchapterbudaya", {
+					header: "Budaya",
+					cell: (i) => {
+						const val = i.getValue();
+						if (!val) return <span className="text-gray-300">—</span>;
+						return (
+							<span className="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+								{String(val)}
+							</span>
+						);
+					}
+				}),
+				ch.accessor("lcv_sosialisasi_lcv", {
+					header: "Sosialisasi LCV",
+					cell: (i) => {
+						const val = i.getValue();
+						if (!val) return <span className="text-gray-300">—</span>;
+						const s = String(val).toLowerCase();
+						let badgeCls = "bg-gray-100 text-gray-700 border-gray-200";
+						if (s.includes("hadir")) {
+							badgeCls = "bg-green-100 text-green-700 border-green-200";
+						} else if (s.includes("tidak")) {
+							badgeCls = "bg-red-100 text-red-700 border-red-200";
+						}
+						return (
+							<span className={clsxm("px-2 py-0.5 rounded-full text-[10px] font-bold border", badgeCls)}>
+								{String(val)}
+							</span>
+						);
+					}
+				}),
+				ch.accessor("tahun", {
+					header: "Tahun",
+					cell: (i) => <span className="text-xs text-gray-500 font-medium">{i.getValue() ? String(i.getValue()) : "—"}</span>,
+				}),
+			);
 		} else {
+
 
 
 

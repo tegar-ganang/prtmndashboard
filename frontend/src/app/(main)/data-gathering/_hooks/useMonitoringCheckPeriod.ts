@@ -51,6 +51,10 @@ export const checkMonitoringPeriodExists = async (
 			url = MAIN_ENDPOINT.I2aims.CheckPeriod;
 			params = { year, month: period };
 			if (field) params.field = field;
+		} else if (docType === "LCV_PROJECT_CHARTER_BUDAYA" || docType === "LCV_MONITORING") {
+			url = MAIN_ENDPOINT.Lcv.CheckPeriod;
+			params = { doc_type: docType, year, month: period };
+
 
 
 		} else if (docType === "PRODUKSI") {

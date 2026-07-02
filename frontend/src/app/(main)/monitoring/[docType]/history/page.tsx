@@ -11,6 +11,7 @@ import {
 import { format } from "date-fns";
 import { ChevronLeft, Calendar, FileSpreadsheet, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 
+import { useSearchParams } from "next/navigation";
 import Button from "@/components/button/Button";
 import { useMonitoringHistory } from "../../_hooks/useMonitoringData";
 import { MONITORING_CONFIGS } from "../../_configs/monitoringConfig";
@@ -23,9 +24,12 @@ const MONTH_NAMES = [
 export default function DynamicHistoryPage({ params }: { params: Promise<{ docType: string }> }) {
 	const { docType: docTypeSlug } = use(params);
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const customDocType = searchParams.get("doc_type");
 	
-	const config = MONITORING_CONFIGS[docTypeSlug.toLowerCase()];
-	const { data = [], isLoading } = useMonitoringHistory(docTypeSlug);
+	const activeConfigKey = customDocType ? customDocType.toLowerCase() : docTypeSlug.toLowerCase();
+	const config = MONITORING_CONFIGS[activeConfigKey];
+	const { data = [], isLoading } = useMonitoringHistory(docTypeSlug, customDocType);
 
 	const ch = createColumnHelper<any>();
 	const columns = useMemo(() => [
@@ -74,14 +78,14 @@ export default function DynamicHistoryPage({ params }: { params: Promise<{ docTy
 			header: "",
 			cell: i => (
 				<button 
-					onClick={() => router.push(`/monitoring/${docTypeSlug}?batch_id=${i.row.original.upload_batch_id}`)}
+					onClick={() => router.push(`/monitoring/${docTypeSlug}?batch_id=${i.row.original.upload_batch_id}${customDocType ? `&doc_type=${customDocType}` : ""}`)}
 					className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-blue-600 hover:bg-blue-50 hover:border-blue-200 transition-all shadow-sm"
 				>
 					Lihat Data <ArrowRight className="w-3 h-3" />
 				</button>
 			)
 		})
-	], [docTypeSlug, router, config]);
+	], [docTypeSlug, router, config, customDocType]);
 
 	const table = useReactTable({
 		data,
@@ -102,13 +106,13 @@ export default function DynamicHistoryPage({ params }: { params: Promise<{ docTy
 		<div className="flex flex-col gap-6 p-6 w-full max-w-5xl mx-auto">
 			<div className="flex items-center gap-4">
 				<button 
-					onClick={() => router.push(`/monitoring/${docTypeSlug}`)}
+					onClick={() => router.push(`/monitoring/${docTypeSlug}${customDocType ? `?doc_type=${customDocType}` : ""}`)}
 					className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
 				>
 					<ChevronLeft className="w-5 h-5 text-gray-600" />
 				</button>
 				<div>
-					<h1 className="text-2xl font-bold text-gray-900">History Upload {docTypeSlug.toUpperCase()}</h1>
+					<h1 className="text-2xl font-bold text-gray-900">History Upload {customDocType ? customDocType.toUpperCase() : docTypeSlug.toUpperCase()}</h1>
 					<p className="text-sm text-gray-500">Daftar riwayat pembaharuan data {config.title}</p>
 				</div>
 			</div>

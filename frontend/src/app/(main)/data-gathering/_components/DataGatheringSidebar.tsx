@@ -7,6 +7,7 @@ import {
 	DOC_TYPE_CONFIG,
 	DOCUMENT_OPTIONS,
 	PSAIMS_OPTIONS,
+	LCV_OPTIONS,
 	MONTH_OPTIONS,
 	QUARTER_OPTIONS,
 	SELECT_STYLES,
@@ -33,12 +34,16 @@ interface DataGatheringSidebarProps {
 	psaimsZona?: string;
 	onPsaimsSubTypeChange?: (option: DocumentOption<DocTypeValue>) => void;
 	onPsaimsZonaChange?: (zona: string) => void;
+	// LCV
+	lcvSubType?: DocumentOption<DocTypeValue>;
+	onLcvSubTypeChange?: (option: DocumentOption<DocTypeValue>) => void;
 }
 
-// Document options including PSAIMS as a top-level choice
+// Document options including PSAIMS and LCV as top-level choices
 const DOCUMENT_OPTIONS_WITH_PSAIMS = [
 	...DOCUMENT_OPTIONS,
 	{ value: "PSAIMS" as DocTypeValue, label: "PSAIMS" },
+	{ value: "LCV" as DocTypeValue, label: "LCV" },
 ];
 
 export default function DataGatheringSidebar({
@@ -57,6 +62,8 @@ export default function DataGatheringSidebar({
 	psaimsZona,
 	onPsaimsSubTypeChange,
 	onPsaimsZonaChange,
+	lcvSubType,
+	onLcvSubTypeChange,
 }: DataGatheringSidebarProps) {
 	const isPsaims =
 		(docType.value as string) === "PSAIMS" ||
@@ -64,17 +71,29 @@ export default function DataGatheringSidebar({
 		docType.value === "ZONA_PSE_LIST";
 	const activePsaimsType = (psaimsSubType?.value ?? "ZONA_INDICATOR") as DocTypeValue;
 
+	const isLcv =
+		(docType.value as string) === "LCV" ||
+		docType.value === "LCV_PROJECT_CHARTER_BUDAYA" ||
+		docType.value === "LCV_MONITORING";
+	const activeLcvType = (lcvSubType?.value ?? "LCV_PROJECT_CHARTER_BUDAYA") as DocTypeValue;
+
 	const docConfig = isPsaims
 		? DOC_TYPE_CONFIG[activePsaimsType]
+		: isLcv
+		? DOC_TYPE_CONFIG[activeLcvType]
 		: DOC_TYPE_CONFIG[docType.value];
 
 	const currentTemplateUrl = isPsaims
 		? DOC_TYPE_CONFIG[activePsaimsType].templateUrl
+		: isLcv
+		? DOC_TYPE_CONFIG[activeLcvType].templateUrl
 		: docConfig.templateUrl;
 
 	// The displayed value in the main dropdown
 	const displayDocType = isPsaims
 		? ({ value: "PSAIMS" as DocTypeValue, label: "PSAIMS" })
+		: isLcv
+		? ({ value: "LCV" as DocTypeValue, label: "LCV" })
 		: docType;
 
 	return (
@@ -107,6 +126,23 @@ export default function DataGatheringSidebar({
 					</div>
 				)}
 
+				{/* LCV: Sub-type selector */}
+				{isLcv && onLcvSubTypeChange && (
+					<div className="mt-4">
+						<label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
+							Tipe LCV
+						</label>
+						<Select
+							options={LCV_OPTIONS}
+							value={lcvSubType ?? LCV_OPTIONS[0]}
+							onChange={(v) => v && onLcvSubTypeChange(v as DocumentOption<DocTypeValue>)}
+							className="text-sm"
+							styles={SELECT_STYLES}
+						/>
+					</div>
+				)}
+
+
 				{/* PSAIMS: Zona input */}
 				{isPsaims && onPsaimsZonaChange && (
 					<div className="mt-4">
@@ -123,8 +159,8 @@ export default function DataGatheringSidebar({
 					</div>
 				)}
 
-				{/* Lokasi / Field — tidak ditampilkan untuk PSAIMS */}
-				{!isPsaims && docType.value !== "PRODUKSI" && (
+				{/* Lokasi / Field — tidak ditampilkan untuk PSAIMS & LCV */}
+				{!isPsaims && !isLcv && docType.value !== "PRODUKSI" && (
 					<div className="mt-4">
 						<label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
 							Lokasi / Field
@@ -140,8 +176,8 @@ export default function DataGatheringSidebar({
 				)}
 
 				<div className="mt-4 grid grid-cols-2 gap-2">
-					{/* Zona Indicator: hanya butuh Tahun */}
-					{isPsaims && activePsaimsType === "ZONA_INDICATOR" ? (
+					{/* Zona Indicator & LCV: hanya butuh Tahun */}
+					{(isPsaims && activePsaimsType === "ZONA_INDICATOR") || isLcv ? (
 						<div className="col-span-2">
 							<label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
 								Tahun
@@ -155,6 +191,7 @@ export default function DataGatheringSidebar({
 							/>
 						</div>
 					) : (
+
 						<>
 							{docConfig.period === "quarter" ? (
 								<div>

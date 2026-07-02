@@ -58,6 +58,13 @@ export const MAIN_ENDPOINT = {
 		GetAll: "/i2aims",
 		History: "/i2aims/history",
 	},
+	Lcv: {
+		BatchCreate: "/lcv/batch",
+		CheckPeriod: "/lcv/check-period",
+		GetAll: "/lcv",
+		History: "/lcv/history",
+	},
+
 
 
 

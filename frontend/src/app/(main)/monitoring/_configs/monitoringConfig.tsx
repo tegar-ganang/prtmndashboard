@@ -564,6 +564,67 @@ export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
       }),
     ]
   },
+  lcv_project_charter_budaya: {
+    title: "LCV — Project Charter Budaya",
+    periodType: "year",
+    getColumns: (ch) => [
+      ch.accessor("id_project", {
+        header: "ID Project",
+        cell: i => <span className="text-sm font-mono font-semibold text-gray-700">{i.getValue() || "—"}</span>
+      }),
+      ch.accessor("judul_project", {
+        header: "Judul Project",
+        cell: i => <span className="text-sm font-semibold text-gray-900 leading-snug">{i.getValue() || "—"}</span>
+      }),
+      ch.accessor("tanggal", { header: "Tanggal", cell: i => renderDateCell(i.getValue()) }),
+    ]
+  },
+  lcv_monitoring: {
+    title: "LCV — Monitoring",
+    periodType: "year",
+    getColumns: (ch) => [
+      ch.accessor("namapegawai", {
+        header: "Nama Pegawai",
+        cell: info => {
+          const row = info.row.original;
+          return (
+            <div className="flex flex-col gap-0.5 py-0.5">
+              <span className="text-sm font-semibold text-gray-900">{row.namapegawai || "—"}</span>
+              <span className="text-xs text-gray-400 font-mono font-semibold uppercase">{row.nip || "—"}</span>
+            </div>
+          );
+        }
+      }),
+      ch.accessor("departemen", { header: "Departemen", cell: i => <span className="text-sm text-gray-700 font-medium">{i.getValue() || "—"}</span> }),
+      ch.accessor("lcv_conflictofinterest", { header: "Conflict of Interest", cell: i => renderLcvStatus(i.getValue()) }),
+      ch.accessor("lcv_codeofconduct", { header: "Code of Conduct", cell: i => renderLcvStatus(i.getValue()) }),
+      ch.accessor("lcv_laporgratifikasi", { header: "Lapor Gratifikasi", cell: i => renderLcvStatus(i.getValue()) }),
+      ch.accessor("lcv_sosialisasi_lcv", { header: "Sosialisasi LCV", cell: i => renderLcvStatus(i.getValue()) }),
+      ch.accessor("lcv_lhkpn", { header: "LHKPN", cell: i => renderLcvStatus(i.getValue()) }),
+      ch.accessor("training_lcv", { header: "Training LCV", cell: i => renderLcvStatus(i.getValue()) }),
+      ch.accessor("projectchapterbudaya", { header: "Budaya Kerja", cell: i => renderLcvStatus(i.getValue()) }),
+      ch.accessor("tahun", { header: "Tahun", cell: i => <span className="text-sm text-gray-500 font-semibold">{i.getValue() || "—"}</span> }),
+    ]
+  },
 };
+
+const renderLcvStatus = (val: any) => {
+  if (!val) return <span className="text-gray-300">—</span>;
+  const s = String(val).toLowerCase();
+  let bg = "bg-gray-50 text-gray-700 border-gray-200";
+  if (s === "selesai" || s === "nihil" || s === "dilaporkan" || s === "hadir" || s === "amanah" || s === "kompeten" || s === "harmonis" || s === "loyal" || s === "adaptif" || s === "kolaboratif") {
+    bg = "bg-green-50 text-green-700 border-green-200";
+  } else if (s === "belum" || s === "tidak hadir" || s === "belum lapor" || s === "ada laporan") {
+    bg = "bg-red-50 text-red-700 border-red-200";
+  } else if (s === "tidak wajib") {
+    bg = "bg-blue-50 text-blue-700 border-blue-200";
+  }
+  return (
+    <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-bold border ${bg}`}>
+      {val}
+    </span>
+  );
+};
+
 
 

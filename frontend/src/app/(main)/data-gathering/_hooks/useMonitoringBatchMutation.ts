@@ -20,6 +20,10 @@ export const useMonitoringBatchMutation = ({ docType, onSuccess }: UseMonitoring
 			if (docType === "HSSE") endpoint = MAIN_ENDPOINT.Hsse.BatchCreate;
 			if (docType === "AIRMS") endpoint = MAIN_ENDPOINT.Airms.BatchCreate;
 			if (docType === "I2AIMS") endpoint = MAIN_ENDPOINT.I2aims.BatchCreate;
+			if (docType === "LCV_PROJECT_CHARTER_BUDAYA" || docType === "LCV_MONITORING") {
+				endpoint = MAIN_ENDPOINT.Lcv.BatchCreate;
+			}
+
 
 
 
