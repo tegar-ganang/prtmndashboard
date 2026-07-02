@@ -40,6 +40,13 @@ export const MAIN_ENDPOINT = {
 		GetAll: "/moc",
 		History: "/moc/history",
 	},
+	Hsse: {
+		BatchCreate: "/hsse/batch",
+		CheckPeriod: "/hsse/check-period",
+		GetAll: "/hsse",
+		History: "/hsse/history",
+	},
+
 	Produksi: {
 		Upload: "/produksi/upload-excel",
 		CheckPeriod: "/produksi/check-period",

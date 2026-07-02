@@ -203,11 +203,12 @@ export default function DataGatheringSidebar({
 			<div className="bg-green-50 rounded-xl border border-green-100 p-4">
 				<h3 className="text-sm font-semibold text-green-900 mb-1">Butuh template?</h3>
 				<p className="text-xs text-green-700 mb-3">Gunakan template resmi agar kolom sesuai database.</p>
-				<a href={currentTemplateUrl} download>
+				<a href={currentTemplateUrl} download={currentTemplateUrl.split("/").pop() ?? "template.xlsx"}>
 					<Button variant="green" size="sm" className="w-full justify-center gap-2">
 						<Download className="w-4 h-4" /> Download Template
 					</Button>
 				</a>
+
 			</div>
 		</div>
 	);

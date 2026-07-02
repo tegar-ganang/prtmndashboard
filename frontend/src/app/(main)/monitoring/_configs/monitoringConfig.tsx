@@ -259,7 +259,36 @@ export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
       ch.accessor("last_updated", { header: "Last Updated", cell: i => renderDateCell(i.getValue()) }),
     ]
   },
+  hsse: {
+    title: "HSSE",
+    periodType: "month",
+
+    getColumns: (ch) => [
+      ch.accessor("id_izin", {
+        header: "ID Izin",
+        cell: info => {
+          const row = info.row.original;
+          return (
+            <div className="flex flex-col gap-1 py-1">
+              <span className="text-sm font-mono font-semibold text-gray-900 leading-snug">{row.id_izin || "—"}</span>
+              <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">{row.field || "—"} • {row.lokasi || "—"}</span>
+            </div>
+          );
+        }
+      }),
+      ch.accessor("jenis_izin_kerja", {
+        header: "Jenis Izin Kerja",
+        cell: i => <span className="text-sm text-gray-800 font-medium">{i.getValue() || "—"}</span>
+      }),
+      ch.accessor("tingkat_resiko", { header: "Tingkat Risiko", cell: i => renderRiskBadge(i.getValue()) }),
+      ch.accessor("status_dispensasi", { header: "Status Dispensasi", cell: i => <span className="text-sm text-gray-600 font-medium">{i.getValue() || "—"}</span> }),
+      ch.accessor("status_deviasi", { header: "Status Deviasi", cell: i => renderStatusBadge(i.getValue()) }),
+      ch.accessor("jumlah_icc", { header: "Jumlah ICC", cell: i => <span className="text-sm font-semibold text-gray-800">{i.getValue() ?? "—"}</span> }),
+      ch.accessor("tanggal", { header: "Tanggal", cell: i => renderDateCell(i.getValue()) }),
+    ]
+  },
   zona_indicator: {
+
     title: "PSAIMS — Zona Indicator",
     periodType: "year",
     getColumns: (ch) => [

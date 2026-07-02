@@ -1,6 +1,6 @@
 import type { StylesConfig } from "react-select";
 
-export type DocTypeValue = "MIT" | "HAZID" | "HAZOP" | "LOPA" | "MOC" | "PRODUKSI" | "PRODUKSI_TARGET" | "PRODUKSI_REALISASI" | "ZONA_INDICATOR" | "ZONA_PSE_LIST";
+export type DocTypeValue = "MIT" | "HAZID" | "HAZOP" | "LOPA" | "MOC" | "HSSE" | "PRODUKSI" | "PRODUKSI_TARGET" | "PRODUKSI_REALISASI" | "ZONA_INDICATOR" | "ZONA_PSE_LIST";
 
 export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 	label: string;
@@ -81,7 +81,22 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		requiredFields: ["MOC_NUMBER"],
 		period: "month" as const,
 	},
+	HSSE: {
+		label: "HSSE",
+
+		expectedHeaders: [
+			"ID_Izin", "Tanggal", "Bulan_Tahun", "Lokasi",
+			"Jenis_Izin_Kerja", "Job_Complete", "Jumlah_ICC",
+			"Status_Dispensasi", "Jenis_Deviasi", "Status_Deviasi",
+			"Tingkat_Resiko",
+		],
+		glanceCols: ["ID_Izin", "Tanggal", "Lokasi", "Jenis_Izin_Kerja", "Tingkat_Resiko"],
+		templateUrl: "/templates/Template Izin Kerja HSSE.xlsx",
+		requiredFields: ["ID_Izin"],
+		period: "month" as const,
+	},
 	PRODUKSI: {
+
 		label: "Produksi Harian (Gas)",
 		expectedHeaders: [], // Backend yang parse — tidak ada client-side header check
 		glanceCols: [],

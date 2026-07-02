@@ -39,7 +39,12 @@ export const checkMonitoringPeriodExists = async (
 			url = MAIN_ENDPOINT.Moc.CheckPeriod;
 			params = { year, month: period };
 			if (field) params.field = field;
+		} else if (docType === "HSSE") {
+			url = MAIN_ENDPOINT.Hsse.CheckPeriod;
+			params = { year, month: period };
+			if (field) params.field = field;
 		} else if (docType === "PRODUKSI") {
+
 			url = MAIN_ENDPOINT.Produksi.CheckPeriod;
 			params = { year, month: period };
 		} else {

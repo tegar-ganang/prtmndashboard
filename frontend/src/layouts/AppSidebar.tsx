@@ -86,7 +86,10 @@ const AppSidebar: React.FC = () => {
 							{ name: "PSAIMS", path: "/monitoring/psaims", description: "PSAIMS Monitoring" },
 							{ name: "I2AIMS", path: "/monitoring/i2aims", description: "I2AIMS Monitoring" },
 							{ name: "MIT & MOC", path: "/monitoring/mit", description: "Major Integrity Threat & Management of Change" },
+							{ name: "HSSE", path: "/monitoring/hsse", description: "HSSE Monitoring" },
+
 							{ name: "OPE", path: "/monitoring/ope", description: "Operational Performance & Excellence" },
+
 						],
 					},
 					{

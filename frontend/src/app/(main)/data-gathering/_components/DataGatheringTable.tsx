@@ -165,7 +165,43 @@ export default function DataGatheringTable({
 					cell: (i) => <span className="text-xs text-gray-600 whitespace-nowrap">{i.getValue() ? String(i.getValue()) : "—"}</span>,
 				}),
 			);
+		} else if (docType === "HSSE") {
+			baseCols.push(
+				ch.accessor("ID_Izin", {
+					header: "ID Izin",
+					cell: (i) => (
+						<div className="w-32 truncate text-xs font-mono text-gray-700" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("Tanggal", {
+					header: "Tanggal",
+					cell: (i) => <span className="text-xs text-gray-600 whitespace-nowrap">{i.getValue() ? String(i.getValue()) : "—"}</span>,
+				}),
+				ch.accessor("Lokasi", {
+					header: "Lokasi",
+					cell: (i) => (
+						<div className="w-32 truncate text-xs font-medium text-gray-900" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("Jenis_Izin_Kerja", {
+					header: "Jenis Izin Kerja",
+					cell: (i) => (
+						<div className="w-48 truncate text-xs text-gray-600" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("Tingkat_Resiko", {
+					header: "Tingkat Risiko",
+					cell: (i) => badge(i.getValue() as string, "risk"),
+				}),
+			);
 		} else {
+
 			DOC_TYPE_CONFIG[docType].glanceCols.forEach((col) => {
 				baseCols.push(
 					ch.accessor(col, {

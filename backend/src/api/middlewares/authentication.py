@@ -29,7 +29,9 @@ class JWTAuthenticationMiddleware(BaseHTTPMiddleware):
             f"{settings.API_PREFIX}/moc",
             f"{settings.API_PREFIX}/zona-indicator",
             f"{settings.API_PREFIX}/zona-pse-list",
+            f"{settings.API_PREFIX}/hsse",
         )
+
 
     def _is_protected_path(self, path: str) -> bool:
         return path.startswith(self.protected_paths)
