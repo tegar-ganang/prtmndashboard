@@ -368,7 +368,113 @@ export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
       ch.accessor("date", { header: "Date", cell: i => renderDateCell(i.getValue()) }),
     ]
   },
+  i2aims: {
+    title: "I2AIMS",
+    periodType: "month",
+    getColumns: (ch) => [
+      ch.accessor("asset_id", {
+        header: "Asset ID",
+        cell: info => {
+          const row = info.row.original;
+          return (
+            <div className="flex flex-col gap-1 py-1">
+              <span className="text-sm font-mono font-semibold text-gray-900 leading-snug">{row.asset_id || "—"}</span>
+              <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">{row.field || "—"} • {row.area || "—"}</span>
+            </div>
+          );
+        }
+      }),
+      ch.accessor("asset_name", {
+        header: "Asset Name",
+        cell: info => {
+          const row = info.row.original;
+          return (
+            <div className="flex flex-col gap-0.5">
+              <span className="text-sm font-semibold text-gray-900 leading-snug">{row.asset_name || "—"}</span>
+              <span className="text-xs text-gray-400 font-medium">{row.asset_type || "—"} • {row.sce_category || "—"}</span>
+            </div>
+          );
+        }
+      }),
+      ch.accessor("integrity_status", {
+        header: "Integrity Status",
+        cell: i => {
+          const val = i.getValue();
+          if (!val) return <span className="text-gray-300">—</span>;
+          const s = String(val).toLowerCase();
+          let badgeCls = "bg-gray-50 text-gray-700 border-gray-200";
+          if (s.includes("good")) {
+            badgeCls = "bg-green-50 text-green-700 border-green-100";
+          } else if (s.includes("fair")) {
+            badgeCls = "bg-blue-50 text-blue-700 border-blue-100";
+          } else if (s.includes("monitor")) {
+            badgeCls = "bg-yellow-50 text-yellow-700 border-yellow-100";
+          }
+          return (
+            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-bold border whitespace-nowrap ${badgeCls}`}>
+              {val}
+            </span>
+          );
+        }
+      }),
+      ch.accessor("inspection_compliance", {
+        header: "Compliance",
+        cell: i => {
+          const val = i.getValue();
+          if (!val) return <span className="text-gray-300">—</span>;
+          return <span className="text-sm font-bold text-gray-800">{val}%</span>;
+        }
+      }),
+      ch.accessor("barrier_health", {
+        header: "Barrier Health",
+        cell: i => {
+          const val = i.getValue();
+          if (!val) return <span className="text-gray-300">—</span>;
+          const num = parseFloat(String(val));
+          let bg = "bg-gray-50 text-gray-700 border-gray-200";
+          if (!isNaN(num)) {
+            if (num >= 90) bg = "bg-green-50 text-green-700 border-green-200";
+            else if (num >= 75) bg = "bg-yellow-50 text-yellow-700 border-yellow-200";
+            else bg = "bg-red-50 text-red-700 border-red-200";
+          }
+          return (
+            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-extrabold border ${bg}`}>
+              {val}%
+            </span>
+          );
+        }
+      }),
+      ch.accessor("recommendation_status", {
+        header: "Rec. Status",
+        cell: i => {
+          const val = i.getValue();
+          if (!val) return <span className="text-gray-300">—</span>;
+          const s = String(val).toLowerCase();
+          let dotCls = "bg-gray-400";
+          let badgeCls = "bg-gray-50 text-gray-700 border-gray-200";
+          if (s.includes("close")) {
+            dotCls = "bg-green-500";
+            badgeCls = "bg-green-50 text-green-700 border-green-100";
+          } else if (s.includes("open")) {
+            dotCls = "bg-yellow-500";
+            badgeCls = "bg-yellow-50 text-yellow-700 border-yellow-100";
+          } else if (s.includes("progress")) {
+            dotCls = "bg-blue-500";
+            badgeCls = "bg-blue-50 text-blue-700 border-blue-100";
+          }
+          return (
+            <div className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border uppercase whitespace-nowrap ${badgeCls}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${dotCls}`}></span>
+              {val}
+            </div>
+          );
+        }
+      }),
+      ch.accessor("inspection_date", { header: "Inspection Date", cell: i => renderDateCell(i.getValue()) }),
+    ]
+  },
   zona_indicator: {
+
 
 
     title: "PSAIMS — Zona Indicator",

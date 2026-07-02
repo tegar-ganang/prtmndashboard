@@ -47,6 +47,11 @@ export const checkMonitoringPeriodExists = async (
 			url = MAIN_ENDPOINT.Airms.CheckPeriod;
 			params = { year, month: period };
 			if (field) params.field = field;
+		} else if (docType === "I2AIMS") {
+			url = MAIN_ENDPOINT.I2aims.CheckPeriod;
+			params = { year, month: period };
+			if (field) params.field = field;
+
 
 		} else if (docType === "PRODUKSI") {
 

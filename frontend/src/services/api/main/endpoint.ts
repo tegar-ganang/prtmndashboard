@@ -52,6 +52,13 @@ export const MAIN_ENDPOINT = {
 		GetAll: "/airms",
 		History: "/airms/history",
 	},
+	I2aims: {
+		BatchCreate: "/i2aims/batch",
+		CheckPeriod: "/i2aims/check-period",
+		GetAll: "/i2aims",
+		History: "/i2aims/history",
+	},
+
 
 
 	Produksi: {

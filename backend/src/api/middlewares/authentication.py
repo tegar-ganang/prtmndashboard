@@ -31,7 +31,9 @@ class JWTAuthenticationMiddleware(BaseHTTPMiddleware):
             f"{settings.API_PREFIX}/zona-pse-list",
             f"{settings.API_PREFIX}/hsse",
             f"{settings.API_PREFIX}/airms",
+            f"{settings.API_PREFIX}/i2aims",
         )
+
 
 
 

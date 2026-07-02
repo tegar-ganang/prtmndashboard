@@ -15,5 +15,7 @@ from .zona_indicator import ZonaIndicator
 from .zona_pse_list import ZonaPseList
 from .hsse import HSSE
 from .airms import AIRMS
+from .i2aims import I2AIMS
+
 
 

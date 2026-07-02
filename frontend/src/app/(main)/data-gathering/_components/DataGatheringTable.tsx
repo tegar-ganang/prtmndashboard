@@ -255,7 +255,79 @@ export default function DataGatheringTable({
 
 				}),
 			);
+		} else if (docType === "I2AIMS") {
+			baseCols.push(
+				ch.accessor("record_id", {
+					header: "Record ID",
+					cell: (i) => (
+						<div className="w-16 truncate text-xs font-mono text-gray-500" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("inspection_date", {
+					header: "Inspection Date",
+					cell: (i) => <span className="text-xs text-gray-600 whitespace-nowrap">{i.getValue() ? String(i.getValue()) : "—"}</span>,
+				}),
+				ch.accessor("asset_id", {
+					header: "Asset ID",
+					cell: (i) => (
+						<div className="w-24 truncate text-xs font-mono font-medium text-gray-700" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("asset_name", {
+					header: "Asset Name",
+					cell: (i) => (
+						<div className="w-48 truncate text-xs font-semibold text-gray-900" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("integrity_status", {
+					header: "Integrity Status",
+					cell: (i) => {
+						const val = i.getValue();
+						if (!val) return <span className="text-gray-300">—</span>;
+						const s = String(val).toLowerCase();
+						let badgeCls = "bg-gray-100 text-gray-700 border-gray-200";
+						if (s.includes("good")) {
+							badgeCls = "bg-green-100 text-green-700 border-green-200";
+						} else if (s.includes("fair")) {
+							badgeCls = "bg-blue-100 text-blue-700 border-blue-200";
+						} else if (s.includes("monitor")) {
+							badgeCls = "bg-yellow-100 text-yellow-700 border-yellow-200";
+						}
+						return (
+							<span className={clsxm("px-2 py-0.5 rounded-full text-xs font-semibold border whitespace-nowrap", badgeCls)}>
+								{String(val)}
+							</span>
+						);
+					}
+				}),
+				ch.accessor("barrier_health", {
+					header: "Barrier Health",
+					cell: (i) => {
+						const val = i.getValue();
+						if (!val) return <span className="text-gray-300">—</span>;
+						const num = parseFloat(String(val));
+						let colorClass = "text-gray-900 bg-gray-50 border-gray-200";
+						if (!isNaN(num)) {
+							if (num >= 90) colorClass = "text-green-700 bg-green-50 border-green-200";
+							else if (num >= 75) colorClass = "text-yellow-700 bg-yellow-50 border-yellow-200";
+							else colorClass = "text-red-700 bg-red-50 border-red-200";
+						}
+						return (
+							<span className={clsxm("px-2.5 py-0.5 rounded-full text-xs font-bold border", colorClass)}>
+								{String(val)}%
+							</span>
+						);
+					}
+				}),
+			);
 		} else {
+
 
 
 			DOC_TYPE_CONFIG[docType].glanceCols.forEach((col) => {

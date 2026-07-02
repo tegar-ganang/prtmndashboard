@@ -19,6 +19,8 @@ export const useMonitoringBatchMutation = ({ docType, onSuccess }: UseMonitoring
 			if (docType === "MOC") endpoint = MAIN_ENDPOINT.Moc.BatchCreate;
 			if (docType === "HSSE") endpoint = MAIN_ENDPOINT.Hsse.BatchCreate;
 			if (docType === "AIRMS") endpoint = MAIN_ENDPOINT.Airms.BatchCreate;
+			if (docType === "I2AIMS") endpoint = MAIN_ENDPOINT.I2aims.BatchCreate;
+
 
 
 

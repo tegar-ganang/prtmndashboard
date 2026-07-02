@@ -1,6 +1,7 @@
 import type { StylesConfig } from "react-select";
 
-export type DocTypeValue = "MIT" | "HAZID" | "HAZOP" | "LOPA" | "MOC" | "HSSE" | "AIRMS" | "PRODUKSI" | "PRODUKSI_TARGET" | "PRODUKSI_REALISASI" | "ZONA_INDICATOR" | "ZONA_PSE_LIST";
+export type DocTypeValue = "MIT" | "HAZID" | "HAZOP" | "LOPA" | "MOC" | "HSSE" | "AIRMS" | "I2AIMS" | "PRODUKSI" | "PRODUKSI_TARGET" | "PRODUKSI_REALISASI" | "ZONA_INDICATOR" | "ZONA_PSE_LIST";
+
 
 
 export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
@@ -109,6 +110,21 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		requiredFields: ["record_id"],
 		period: "month" as const,
 	},
+	I2AIMS: {
+		label: "I2AIMS",
+		expectedHeaders: [
+			"record_id", "inspection_date", "asset_id", "asset_name", "asset_type",
+			"area", "sce_category", "integrity_status", "inspection_result",
+			"inspection_compliance", "corrosion_rate", "remaining_life", "risk_rank",
+			"anomaly_count", "process_safety_event", "barrier_health",
+			"recommendation_status", "inspection_cost",
+		],
+		glanceCols: ["record_id", "inspection_date", "asset_id", "asset_name", "integrity_status", "barrier_health"],
+		templateUrl: "/templates/Template I2AIMS.xlsx",
+		requiredFields: ["record_id"],
+		period: "month" as const,
+	},
+
 
 	PRODUKSI: {
 
