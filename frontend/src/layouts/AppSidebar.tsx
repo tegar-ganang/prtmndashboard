@@ -10,6 +10,7 @@ import {
 	Settings,
 	UploadCloud,
 	Shield,
+	User,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -413,13 +414,10 @@ const AppSidebar: React.FC = () => {
 					}}
 					aria-label="Profile"
 				>
-					<Image
-						src="/profile.png"
-						alt="Profile"
-						width={40}
-						height={40}
-						className="h-10 w-10 rounded-full object-cover"
-					/>
+					<div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+						<User className="w-5 h-5 text-white" />
+					</div>
+
 					{(isExpanded || isHovered || isMobileOpen) && (
 						<div className="min-w-0 flex-1">
 							<p className="truncate text-sm font-semibold text-white">
