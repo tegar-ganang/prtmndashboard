@@ -43,6 +43,11 @@ export const checkMonitoringPeriodExists = async (
 			url = MAIN_ENDPOINT.Hsse.CheckPeriod;
 			params = { year, month: period };
 			if (field) params.field = field;
+		} else if (docType === "AIRMS") {
+			url = MAIN_ENDPOINT.Airms.CheckPeriod;
+			params = { year, month: period };
+			if (field) params.field = field;
+
 		} else if (docType === "PRODUKSI") {
 
 			url = MAIN_ENDPOINT.Produksi.CheckPeriod;

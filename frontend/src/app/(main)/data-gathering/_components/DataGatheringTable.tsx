@@ -200,7 +200,63 @@ export default function DataGatheringTable({
 					cell: (i) => badge(i.getValue() as string, "risk"),
 				}),
 			);
+		} else if (docType === "AIRMS") {
+			baseCols.push(
+				ch.accessor("record_id", {
+					header: "Record ID",
+					cell: (i) => (
+						<div className="w-16 truncate text-xs font-mono text-gray-500" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("date", {
+					header: "Date",
+					cell: (i) => <span className="text-xs text-gray-600 whitespace-nowrap">{i.getValue() ? String(i.getValue()) : "—"}</span>,
+				}),
+				ch.accessor("asset_id", {
+					header: "Asset ID",
+					cell: (i) => (
+						<div className="w-24 truncate text-xs font-mono font-medium text-gray-700" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("asset_name", {
+					header: "Asset Name",
+					cell: (i) => (
+						<div className="w-48 truncate text-xs font-semibold text-gray-900" title={i.getValue() as string}>
+							{i.getValue() ? String(i.getValue()) : "—"}
+						</div>
+					),
+				}),
+				ch.accessor("area", {
+					header: "Area",
+					cell: (i) => <span className="text-xs text-gray-600 font-medium">{i.getValue() ? String(i.getValue()) : "—"}</span>,
+				}),
+				ch.accessor("health_index", {
+					header: "Health Index",
+					cell: (i) => {
+						const val = i.getValue();
+						if (!val) return <span className="text-gray-300">—</span>;
+						const num = parseFloat(String(val));
+						let colorClass = "text-gray-900 bg-gray-50 border-gray-200";
+						if (!isNaN(num)) {
+							if (num >= 90) colorClass = "text-green-700 bg-green-50 border-green-200";
+							else if (num >= 75) colorClass = "text-yellow-700 bg-yellow-50 border-yellow-200";
+							else colorClass = "text-red-700 bg-red-50 border-red-200";
+						}
+						return (
+							<span className={clsxm("px-2.5 py-0.5 rounded-full text-xs font-bold border", colorClass)}>
+								{String(val)}%
+							</span>
+						);
+					}
+
+				}),
+			);
 		} else {
+
 
 			DOC_TYPE_CONFIG[docType].glanceCols.forEach((col) => {
 				baseCols.push(

@@ -46,6 +46,13 @@ export const MAIN_ENDPOINT = {
 		GetAll: "/hsse",
 		History: "/hsse/history",
 	},
+	Airms: {
+		BatchCreate: "/airms/batch",
+		CheckPeriod: "/airms/check-period",
+		GetAll: "/airms",
+		History: "/airms/history",
+	},
+
 
 	Produksi: {
 		Upload: "/produksi/upload-excel",

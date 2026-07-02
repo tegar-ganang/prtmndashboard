@@ -18,6 +18,8 @@ export const useMonitoringBatchMutation = ({ docType, onSuccess }: UseMonitoring
 			if (docType === "LOPA") endpoint = MAIN_ENDPOINT.Lopa.BatchCreate;
 			if (docType === "MOC") endpoint = MAIN_ENDPOINT.Moc.BatchCreate;
 			if (docType === "HSSE") endpoint = MAIN_ENDPOINT.Hsse.BatchCreate;
+			if (docType === "AIRMS") endpoint = MAIN_ENDPOINT.Airms.BatchCreate;
+
 
 
 			const response = await axiosInstance.post(endpoint, data);

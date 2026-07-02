@@ -30,7 +30,9 @@ class JWTAuthenticationMiddleware(BaseHTTPMiddleware):
             f"{settings.API_PREFIX}/zona-indicator",
             f"{settings.API_PREFIX}/zona-pse-list",
             f"{settings.API_PREFIX}/hsse",
+            f"{settings.API_PREFIX}/airms",
         )
+
 
 
     def _is_protected_path(self, path: str) -> bool:

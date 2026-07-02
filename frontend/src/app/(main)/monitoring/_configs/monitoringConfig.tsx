@@ -287,7 +287,89 @@ export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
       ch.accessor("tanggal", { header: "Tanggal", cell: i => renderDateCell(i.getValue()) }),
     ]
   },
+  airms: {
+    title: "AIRMS",
+    periodType: "month",
+    getColumns: (ch) => [
+      ch.accessor("asset_id", {
+        header: "Asset ID",
+        cell: info => {
+          const row = info.row.original;
+          return (
+            <div className="flex flex-col gap-1 py-1">
+              <span className="text-sm font-mono font-semibold text-gray-900 leading-snug">{row.asset_id || "—"}</span>
+              <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">{row.field || "—"} • {row.area || "—"}</span>
+            </div>
+          );
+        }
+      }),
+      ch.accessor("asset_name", {
+        header: "Asset Name",
+        cell: i => <span className="text-sm font-semibold text-gray-900">{i.getValue() || "—"}</span>
+      }),
+      ch.accessor("availability", {
+        header: "Availability",
+        cell: i => {
+          const val = i.getValue();
+          if (!val) return <span className="text-gray-300">—</span>;
+          return <span className="text-sm font-bold text-gray-800">{val}%</span>;
+        }
+      }),
+      ch.accessor("reliability", {
+        header: "Reliability",
+        cell: i => {
+          const val = i.getValue();
+          if (!val) return <span className="text-gray-300">—</span>;
+          return <span className="text-sm font-bold text-gray-800">{val}%</span>;
+        }
+      }),
+      ch.accessor("health_index", {
+        header: "Health Index",
+        cell: i => {
+          const val = i.getValue();
+          if (!val) return <span className="text-gray-300">—</span>;
+          const num = parseFloat(String(val));
+          let bg = "bg-gray-50 text-gray-700 border-gray-200";
+          if (!isNaN(num)) {
+            if (num >= 90) bg = "bg-green-50 text-green-700 border-green-200";
+            else if (num >= 75) bg = "bg-yellow-50 text-yellow-700 border-yellow-200";
+            else bg = "bg-red-50 text-red-700 border-red-200";
+          }
+          return (
+            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-extrabold border ${bg}`}>
+              {val}%
+            </span>
+          );
+        }
+      }),
+      ch.accessor("wo_status", {
+        header: "WO Status",
+        cell: i => {
+          const val = i.getValue();
+          if (!val) return <span className="text-gray-300">—</span>;
+          const s = String(val).toLowerCase();
+          let dotCls = "bg-gray-400";
+          let badgeCls = "bg-gray-50 text-gray-700 border-gray-200";
+          if (s.includes("complete")) {
+            dotCls = "bg-green-500";
+            badgeCls = "bg-green-50 text-green-700 border-green-100";
+          } else if (s.includes("open")) {
+            dotCls = "bg-yellow-500";
+            badgeCls = "bg-yellow-50 text-yellow-700 border-yellow-100";
+          }
+          return (
+            <div className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border uppercase whitespace-nowrap ${badgeCls}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${dotCls}`}></span>
+              {val}
+            </div>
+          );
+        }
+      }),
+      ch.accessor("date", { header: "Date", cell: i => renderDateCell(i.getValue()) }),
+    ]
+  },
   zona_indicator: {
+
 
     title: "PSAIMS — Zona Indicator",
     periodType: "year",

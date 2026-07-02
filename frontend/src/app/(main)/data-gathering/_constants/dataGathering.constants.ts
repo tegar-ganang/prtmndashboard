@@ -1,6 +1,7 @@
 import type { StylesConfig } from "react-select";
 
-export type DocTypeValue = "MIT" | "HAZID" | "HAZOP" | "LOPA" | "MOC" | "HSSE" | "PRODUKSI" | "PRODUKSI_TARGET" | "PRODUKSI_REALISASI" | "ZONA_INDICATOR" | "ZONA_PSE_LIST";
+export type DocTypeValue = "MIT" | "HAZID" | "HAZOP" | "LOPA" | "MOC" | "HSSE" | "AIRMS" | "PRODUKSI" | "PRODUKSI_TARGET" | "PRODUKSI_REALISASI" | "ZONA_INDICATOR" | "ZONA_PSE_LIST";
+
 
 export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 	label: string;
@@ -95,6 +96,20 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		requiredFields: ["ID_Izin"],
 		period: "month" as const,
 	},
+	AIRMS: {
+		label: "AIRMS",
+		expectedHeaders: [
+			"record_id", "date", "asset_id", "asset_name", "area",
+			"availability", "reliability", "mtbf", "mttr", "wo_type",
+			"wo_status", "maintenance_cost", "downtime_type", "downtime_hours",
+			"lost_boe", "health_index",
+		],
+		glanceCols: ["record_id", "date", "asset_id", "asset_name", "health_index"],
+		templateUrl: "/templates/Template AIRMS.xlsx",
+		requiredFields: ["record_id"],
+		period: "month" as const,
+	},
+
 	PRODUKSI: {
 
 		label: "Produksi Harian (Gas)",
