@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import {
 	createColumnHelper,
 	flexRender,
@@ -8,6 +8,7 @@ import {
 	useReactTable,
 	getPaginationRowModel,
 } from "@tanstack/react-table";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import Select from "react-select";
 import { History, ChevronLeft, ChevronRight, RotateCcw, Filter, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -15,6 +16,18 @@ import Button from "@/components/button/Button";
 import { useMonitoringData } from "../_hooks/useMonitoringData";
 import { MONITORING_CONFIGS } from "../_configs/monitoringConfig";
 import DataGatheringDetailModal from "../../data-gathering/_components/DataGatheringDetailModal";
+
+// Debounce hook
+function useDebounce<T>(value: T, delay: number): T {
+	const [debouncedValue, setDebouncedValue] = useState<T>(value);
+	useEffect(() => {
+		const handler = setTimeout(() => {
+			setDebouncedValue(value);
+		}, delay);
+		return () => clearTimeout(handler);
+	}, [value, delay]);
+	return debouncedValue;
+}
 
 const MONTH_OPTIONS = [
 	{ value: null, label: "Semua Bulan" },
@@ -59,6 +72,12 @@ export default function PsaimsMonitoringPage() {
 	const [queryYear, setQueryYear] = useState(YEAR_OPTIONS[0]);
 	const [queryMonth, setQueryMonth] = useState(MONTH_OPTIONS[0]);
 
+	// Debounce effect for real-time search
+	const debouncedZona = useDebounce(tempZona, 300);
+	useEffect(() => {
+		setQueryZona(debouncedZona);
+	}, [debouncedZona]);
+
 	const config = MONITORING_CONFIGS[activeType];
 
 	const isZonaIndicator = activeType === "zona_indicator";
@@ -97,6 +116,18 @@ export default function PsaimsMonitoringPage() {
 		getPaginationRowModel: getPaginationRowModel(),
 		initialState: { pagination: { pageSize: 10 } },
 	});
+
+	// Virtualization Setup
+	const parentRef = useRef<HTMLDivElement>(null);
+	const rows = table.getRowModel().rows;
+	const rowVirtualizer = useVirtualizer({
+		count: rows.length,
+		getScrollElement: () => parentRef.current,
+		estimateSize: () => 52,
+		overscan: 5,
+	});
+
+	const virtualRows = rowVirtualizer.getVirtualItems();
 
 	const pageIndex = table.getState().pagination.pageIndex;
 	const pageSize = table.getState().pagination.pageSize;
@@ -138,7 +169,7 @@ export default function PsaimsMonitoringPage() {
 				<div>
 					<h1 className="text-2xl font-bold text-gray-900">PSAIMS Monitoring</h1>
 					<p className="text-sm text-blue-600 font-medium mt-0.5">
-						Process Safety Assurance & Integrity Management System
+						Process Safety Assurance &amp; Integrity Management System
 					</p>
 				</div>
 				<Button
@@ -177,7 +208,7 @@ export default function PsaimsMonitoringPage() {
 				<div className="flex flex-wrap items-end gap-4">
 					{/* Zona input */}
 					<div className="flex-1 min-w-[130px]">
-						<label className="block text-xs font-semibold text-gray-500 mb-1.5 ml-0.5">Nomor Zona</label>
+						<label className="block text-xs font-semibold text-gray-500 mb-1.5 ml-0.5">Nomor Zona (Real-time)</label>
 						<input
 							type="text"
 							placeholder="Contoh: 13"
@@ -229,13 +260,13 @@ export default function PsaimsMonitoringPage() {
 
 			{/* Table */}
 			<div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-				<div className="overflow-x-auto">
+				<div ref={parentRef} className="overflow-auto max-h-[500px]">
 					<table className="w-full text-left border-collapse">
-						<thead className="bg-gray-50 border-b border-gray-200">
+						<thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
 							{table.getHeaderGroups().map(headerGroup => (
 								<tr key={headerGroup.id}>
 									{headerGroup.headers.map(header => (
-										<th key={header.id} className="px-4 py-3.5 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-50/70">
+										<th key={header.id} className="px-4 py-3.5 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-50">
 											{flexRender(header.column.columnDef.header, header.getContext())}
 										</th>
 									))}
@@ -251,26 +282,41 @@ export default function PsaimsMonitoringPage() {
 										))}
 									</tr>
 								))
-							) : data.length === 0 ? (
+							) : rows.length === 0 ? (
 								<tr>
 									<td colSpan={columns.length} className="px-4 py-20 text-center text-gray-400 text-sm italic">
 										Tidak ada data ditemukan.
 									</td>
 								</tr>
 							) : (
-								table.getRowModel().rows.map(row => (
-									<tr
-										key={row.id}
-										onClick={() => setSelectedRow(row.original)}
-										className="hover:bg-gray-50 transition-colors cursor-pointer"
-									>
-										{row.getVisibleCells().map(cell => (
-											<td key={cell.id} className="px-4 py-3.5 text-sm text-gray-800 align-middle">
-												{flexRender(cell.column.columnDef.cell, cell.getContext())}
-											</td>
-										))}
-									</tr>
-								))
+								<>
+									{virtualRows[0]?.start > 0 && (
+										<tr>
+											<td colSpan={columns.length} style={{ height: `${virtualRows[0].start}px` }} />
+										</tr>
+									)}
+									{virtualRows.map(virtualRow => {
+										const row = rows[virtualRow.index];
+										return (
+											<tr
+												key={row.id}
+												onClick={() => setSelectedRow(row.original)}
+												className="hover:bg-gray-50 transition-colors cursor-pointer"
+											>
+												{row.getVisibleCells().map(cell => (
+													<td key={cell.id} className="px-4 py-3.5 text-sm text-gray-800 align-middle">
+														{flexRender(cell.column.columnDef.cell, cell.getContext())}
+													</td>
+												))}
+											</tr>
+										);
+									})}
+									{rowVirtualizer.getTotalSize() - (virtualRows[virtualRows.length - 1]?.end || 0) > 0 && (
+										<tr>
+											<td colSpan={columns.length} style={{ height: `${rowVirtualizer.getTotalSize() - (virtualRows[virtualRows.length - 1]?.end || 0)}px` }} />
+										</tr>
+									)}
+								</>
 							)}
 						</tbody>
 					</table>

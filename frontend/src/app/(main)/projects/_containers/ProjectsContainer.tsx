@@ -156,7 +156,12 @@ export default function ProjectsContainer() {
         <div className="p-6 lg:p-8 space-y-8 bg-gray-50 min-h-screen">
             <div className="flex items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Projects Management</h1>
+                    <h1 className="flex items-center gap-3 text-2xl font-bold text-gray-900">
+                        Projects Management
+                        <span className="px-2.5 py-0.5 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-full animate-pulse">
+                            Dummy Data
+                        </span>
+                    </h1>
                     <p className="text-sm text-gray-600 mt-1">
                         Manage project list and open detail, update, or delete actions.
                     </p>
