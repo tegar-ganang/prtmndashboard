@@ -145,6 +145,8 @@ export default function DashboardPage() {
 			});
 			return data.data;
 		},
+		staleTime: 3 * 60 * 1000, // Data fresh for 3 minutes
+		gcTime: 10 * 60 * 1000,  // Keep cache in memory for 10 minutes
 	});
 
 	const handleApply = () => {
@@ -355,7 +357,6 @@ export default function DashboardPage() {
 						) : (
 							<>
 								<span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">I2AIMS</span>
-								<span className="text-[10px] font-extrabold text-gray-400">Hover Chart</span>
 							</>
 						)}
 					</div>

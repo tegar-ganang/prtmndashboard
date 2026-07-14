@@ -17,9 +17,11 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import useAuthStore from "@/app/stores/useAuthStore";
 import Button from "@/components/button/Button";
 import { useSidebar } from "@/context/SidebarContext";
+import axiosInstance from "@/services/api/main/interceptor";
 
 type SubSubItem = {
 	name: string;
@@ -48,6 +50,49 @@ const AppSidebar: React.FC = () => {
 	const router = useRouter();
 
 	const pathname = usePathname();
+	const queryClient = useQueryClient();
+
+	const prefetchMonitoringData = (docType: string) => {
+		const docTypeLower = docType.toLowerCase();
+		let endpoint = docTypeLower;
+		if (docTypeLower === "zona_indicator") endpoint = "zona-indicator";
+		else if (docTypeLower === "zona_pse_list") endpoint = "zona-pse-list";
+		else if (docTypeLower.startsWith("lcv_")) endpoint = "lcv";
+
+		const params = {
+			year: 2026,
+			month: null,
+			quarter: null,
+			field: null,
+			zona: null,
+			doc_type: docTypeLower.startsWith("lcv_") ? docType.toUpperCase() : undefined
+		};
+
+		queryClient.prefetchQuery({
+			queryKey: ["monitoring", docType, params],
+			queryFn: async () => {
+				const { data } = await axiosInstance.get(`/${endpoint}`, { params });
+				return data.data;
+			},
+			staleTime: 3 * 60 * 1000,
+		});
+	};
+
+	const prefetchDashboard = () => {
+		const params = {
+			year: 2026,
+			month: null,
+			field: null
+		};
+		queryClient.prefetchQuery({
+			queryKey: ["dashboard-summary", params.year, params.month, params.field],
+			queryFn: async () => {
+				const { data } = await axiosInstance.get("/dashboard/summary", { params });
+				return data.data;
+			},
+			staleTime: 3 * 60 * 1000,
+		});
+	};
 
 	const navItems: NavItem[] = useMemo(
 		() => [
@@ -234,6 +279,12 @@ const AppSidebar: React.FC = () => {
 							<Tooltip title={nav.description} placement="right" arrow>
 								<Link
 									href={nav.path}
+									onMouseEnter={() => {
+										if (nav.path === "/dashboard") prefetchDashboard();
+										else if (nav.path === "/monitoring/produksi") prefetchMonitoringData("produksi");
+										else if (nav.path === "/monitoring/hsse") prefetchMonitoringData("hsse");
+										else if (nav.path === "/monitoring/lcv") prefetchMonitoringData("lcv_monitoring");
+									}}
 									className={`relative flex items-center w-full gap-3 ${
 										(isExpanded || isHovered || isMobileOpen) && "px-3 py-2"
 									} font-medium rounded-lg text-base group transition-all ease-in-out duration-300 ${
@@ -321,6 +372,12 @@ const AppSidebar: React.FC = () => {
 																<Tooltip title={subSub.description} placement="right" arrow>
 																	<Link
 																		href={subSub.path}
+																		onMouseEnter={() => {
+																			if (subSub.name === "AIRMS") prefetchMonitoringData("airms");
+																			else if (subSub.name === "PSAIMS") prefetchMonitoringData("zona_indicator");
+																			else if (subSub.name === "I2AIMS") prefetchMonitoringData("i2aims");
+																			else if (subSub.name.startsWith("MIT")) prefetchMonitoringData("mit");
+																		}}
 																		className={`relative flex items-center gap-3 rounded-lg px-3 py-1.5 text-sm font-medium transition-all ease-in-out duration-300 ${
 																			isActive(subSub.path)
 																				? "bg-white text-[#1E3A8A] hover:bg-white/95"
@@ -357,6 +414,11 @@ const AppSidebar: React.FC = () => {
 												>
 													<Link
 														href={subItem.path}
+														onMouseEnter={() => {
+															if (subItem.name === "Production") prefetchMonitoringData("produksi");
+															else if (subItem.name === "HSSE") prefetchMonitoringData("hsse");
+															else if (subItem.name === "LCV") prefetchMonitoringData("lcv_monitoring");
+														}}
 														className={`relative flex items-center gap-3 rounded-lg px-3 py-2 text-base font-medium transition-all ease-in-out duration-300 ${
 															isActive(subItem.path)
 																? "bg-white text-[#1E3A8A] hover:bg-white/95"

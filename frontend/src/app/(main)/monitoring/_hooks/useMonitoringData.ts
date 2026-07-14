@@ -46,6 +46,8 @@ export function useMonitoringData(docType: string, params: MonitoringParams) {
       return data.data;
     },
     enabled: !!docType,
+    staleTime: 3 * 60 * 1000, // Data fresh for 3 minutes
+    gcTime: 10 * 60 * 1000,  // Keep cache in memory for 10 minutes
   });
 }
 
