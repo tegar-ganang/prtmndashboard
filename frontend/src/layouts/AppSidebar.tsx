@@ -255,15 +255,26 @@ const AppSidebar: React.FC = () => {
 										{nav.icon}
 									</span>
 									{(isExpanded || isHovered || isMobileOpen) && (
-										<span
-											className={`menu-item-text transition-all ease-in-out duration-300 ${
-												isActive(nav.path)
-													? "text-[#1E3A8A]"
-													: "group-hover:text-white"
-											}`}
-										>
-											{nav.name}
-										</span>
+										<div className="flex items-center justify-between w-full min-w-0">
+											<span
+												className={`menu-item-text transition-all ease-in-out duration-300 ${
+													isActive(nav.path)
+														? "text-[#1E3A8A]"
+														: "group-hover:text-white"
+												}`}
+											>
+												{nav.name}
+											</span>
+											{nav.name === "Projects" && (
+												<span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded uppercase border whitespace-nowrap ml-2 ${
+													isActive(nav.path)
+														? "bg-amber-100 text-amber-800 border-amber-200"
+														: "bg-amber-500/20 text-[#fbbf24] border-amber-500/30"
+												}`}>
+													Dummy
+												</span>
+											)}
+										</div>
 									)}
 								</Link>
 							</Tooltip>
@@ -316,7 +327,16 @@ const AppSidebar: React.FC = () => {
 																				: "text-white/80 hover:bg-white/10 hover:text-white"
 																		}`}
 																	>
-																		{subSub.name}
+																		<span className="flex-1">{subSub.name}</span>
+																		{(subSub.name.includes("AIRMS") || subSub.name === "I2AIMS") && (
+																			<span className={`text-[8px] font-extrabold px-1 py-0.5 rounded uppercase border whitespace-nowrap tracking-wider scale-90 ${
+																				isActive(subSub.path)
+																					? "bg-amber-100 text-amber-800 border-amber-200"
+																					: "bg-amber-500/20 text-[#fbbf24] border-amber-500/30"
+																			}`}>
+																				Dummy
+																			</span>
+																		)}
 																	</Link>
 																</Tooltip>
 															</li>
@@ -343,7 +363,16 @@ const AppSidebar: React.FC = () => {
 																: "text-white/85 hover:bg-white/10 hover:text-white"
 														}`}
 													>
-														{subItem.name}
+														<span className="flex-1">{subItem.name}</span>
+														{(subItem.name === "HSSE" || subItem.name === "LCV") && (
+															<span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded uppercase border whitespace-nowrap ml-2 ${
+																isActive(subItem.path)
+																	? "bg-amber-100 text-amber-800 border-amber-200"
+																	: "bg-amber-500/20 text-[#fbbf24] border-amber-500/30"
+															}`}>
+																Dummy
+															</span>
+														)}
 													</Link>
 												</Tooltip>
 											</li>

@@ -16,6 +16,7 @@ from src.api.routes.hsse import router as hsse_router
 from src.api.routes.airms import router as airms_router
 from src.api.routes.i2aims import router as i2aims_router
 from src.api.routes.lcv import router as lcv_router
+from src.api.routes.dashboard import router as dashboard_router
 
 router = fastapi.APIRouter()
 
@@ -35,6 +36,7 @@ router.include_router(router=hsse_router)
 router.include_router(router=airms_router)
 router.include_router(router=i2aims_router)
 router.include_router(router=lcv_router)
+router.include_router(router=dashboard_router)
 
 
 

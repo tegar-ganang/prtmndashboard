@@ -33,6 +33,7 @@ class JWTAuthenticationMiddleware(BaseHTTPMiddleware):
             f"{settings.API_PREFIX}/airms",
             f"{settings.API_PREFIX}/i2aims",
             f"{settings.API_PREFIX}/lcv",
+            f"{settings.API_PREFIX}/dashboard",
         )
 
 

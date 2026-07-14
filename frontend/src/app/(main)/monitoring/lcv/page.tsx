@@ -121,7 +121,12 @@ export default function LcvMonitoringPage() {
 			{/* Header */}
 			<div className="flex items-start justify-between">
 				<div>
-					<h1 className="text-2xl font-bold text-gray-900">LCV Monitoring</h1>
+					<h1 className="flex items-center gap-3 text-2xl font-bold text-gray-900">
+						LCV Monitoring
+						<span className="px-2.5 py-0.5 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-full animate-pulse">
+							Dummy Data
+						</span>
+					</h1>
 					<p className="text-sm text-blue-600 font-medium mt-0.5">Loss Control &amp; Verification</p>
 				</div>
 				<Button

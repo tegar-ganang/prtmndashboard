@@ -259,7 +259,14 @@ export default function MonitoringView({ docTypeSlug }: MonitoringViewProps) {
 		<div className="flex flex-col gap-5 w-full min-w-0">
 			<div className="flex items-start justify-between">
 				<div>
-					<h1 className="text-2xl font-bold text-gray-900">{config.title}</h1>
+					<h1 className="flex items-center gap-3 text-2xl font-bold text-gray-900">
+						{config.title}
+						{(docTypeSlug.toLowerCase() === "airms" || docTypeSlug.toLowerCase() === "i2aims" || docTypeSlug.toLowerCase() === "hsse") && (
+							<span className="px-2.5 py-0.5 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-full animate-pulse">
+								Dummy Data
+							</span>
+						)}
+					</h1>
 					<TypingDescription text={`Monitoring progress dan status ${docTypeSlug.toUpperCase()}`} />
 				</div>
 				<Button 
