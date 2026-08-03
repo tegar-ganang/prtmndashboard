@@ -12,6 +12,7 @@ from src.utilities.exceptions.http.exc_400 import (
     http_exc_400_credentials_bad_signin_request,
     http_exc_400_credentials_bad_signup_request,
 )
+from src.utilities.rate_limiter import enforce_rate_limit
 
 router = fastapi.APIRouter(prefix="/auth", tags=["authentication"])
 
@@ -23,9 +24,12 @@ router = fastapi.APIRouter(prefix="/auth", tags=["authentication"])
     status_code=fastapi.status.HTTP_201_CREATED,
 )
 async def signup(
+    request: fastapi.Request,
     account_create: AccountInCreate,
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
 ) -> APIResponse:
+    enforce_rate_limit(f"signup:{request.client.host if request.client else 'unknown'}", max_attempts=5, window_seconds=60)
+
     try:
         if account_create.name:
             await account_repo.is_name_taken(name=account_create.name)
@@ -64,9 +68,14 @@ async def signup(
     status_code=fastapi.status.HTTP_202_ACCEPTED,
 )
 async def signin(
+    request: fastapi.Request,
     account_login: AccountInLogin,
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
 ) -> APIResponse:
+    client_ip = request.client.host if request.client else "unknown"
+    enforce_rate_limit(f"signin:ip:{client_ip}", max_attempts=10, window_seconds=60)
+    enforce_rate_limit(f"signin:email:{account_login.email}", max_attempts=5, window_seconds=60)
+
     try:
         db_account = await account_repo.read_user_by_password_authentication(account_login=account_login)
 
