@@ -1,4 +1,5 @@
 import fastapi
+import loguru
 
 from src.api.dependencies.authentication import get_current_account
 from src.api.dependencies.repository import get_repository
@@ -48,8 +49,9 @@ async def create_batch(
         upload_batch_id = await repo.create_batch(
             batch_data=batch_data, owner_account_id=str(current_account.id)
         )
-    except Exception as e:
-        raise fastapi.HTTPException(status_code=400, detail=str(e))
+    except Exception:
+        loguru.logger.exception("Failed to create Zona Indicator batch")
+        raise fastapi.HTTPException(status_code=400, detail="Gagal menyimpan data ke database.")
     return APIResponse(
         success=True,
         message=f"Batch successfully uploaded with batch ID: {upload_batch_id}",

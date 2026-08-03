@@ -83,6 +83,9 @@ class ProduksiCRUDRepository(BaseCRUDRepository):
         if field is not None:
             stmt = stmt.where(Produksi.field == field)
 
+        # ponytail: safety cap, not real pagination — see base_monitoring.get_data.
+        stmt = stmt.limit(5000)
+
         res = await self.async_session.execute(stmt)
         return res.scalars().all()
 

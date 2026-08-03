@@ -139,5 +139,7 @@ class ZonaIndicatorCRUDRepository(BaseMonitoringRepository):
         if conditions:
             stmt = stmt.where(sqlalchemy.and_(*conditions))
         stmt = stmt.order_by(sqlalchemy.desc(self.model.created_at))
+        # ponytail: safety cap, not real pagination — see base_monitoring.get_data.
+        stmt = stmt.limit(5000)
         res = await self.async_session.execute(stmt)
         return list(res.scalars().all())

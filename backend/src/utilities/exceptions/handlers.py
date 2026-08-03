@@ -1,4 +1,5 @@
 import fastapi
+import loguru
 from fastapi.responses import JSONResponse
 
 
@@ -19,7 +20,10 @@ async def http_exception_handler(_: fastapi.Request, exc: fastapi.HTTPException)
 
 
 async def unhandled_exception_handler(_: fastapi.Request, exc: Exception) -> JSONResponse:
+    # Never echo the raw exception back to the client — it can leak internal
+    # details (table/column names, driver errors). Log it server-side instead.
+    loguru.logger.exception("Unhandled exception")
     return JSONResponse(
         status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content=_build_error_payload(message="Internal server error", err=str(exc)),
+        content=_build_error_payload(message="Internal server error", err=None),
     )
