@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      # `npm run lint` is intentionally not gated here yet: the codebase currently
+      # has ~95 pre-existing Biome errors unrelated to this workflow. Turn this on
+      # once that backlog is cleared, otherwise CI is red for unrelated reasons.
+
+  backend-unit:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      # Only the DB-free unit tests run here. security_tests/ and any future
+      # integration_tests/ hit the real staging database (see backend/.env) and
+      # need DB credentials wired in as repo secrets before they can run in CI —
+      # run those locally with `pytest tests/security_tests` until that's set up.
+      - run: pytest tests/unit_tests --cov-fail-under=0

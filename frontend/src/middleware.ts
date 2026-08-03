@@ -19,7 +19,7 @@ const apiOrigin = (() => {
 	}
 })();
 
-function buildCspHeader(nonce: string): string {
+export function buildCspHeader(nonce: string): string {
 	return [
 		"default-src 'self'",
 		`script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://www.googletagmanager.com`,

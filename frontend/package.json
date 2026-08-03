@@ -15,7 +15,8 @@
 		"check": "npx @biomejs/biome check .",
 		"check:write": "npx @biomejs/biome check --write .",
 		"prepare": "husky",
-		"typecheck": "npx tsc --noEmit"
+		"typecheck": "npx tsc --noEmit",
+		"test": "vitest run"
 	},
 	"dependencies": {
 		"@emotion/react": "^11.14.0",
@@ -52,15 +53,20 @@
 		"@commitlint/config-conventional": "19.8.1",
 		"@eslint/eslintrc": "^3",
 		"@tailwindcss/postcss": "4.1.11",
+		"@testing-library/jest-dom": "^7.0.0",
+		"@testing-library/react": "^16.3.2",
 		"@types/node": "^20",
 		"@types/react": "^19",
 		"@types/react-dom": "^19",
+		"@vitejs/plugin-react": "^6.0.5",
 		"autoprefixer": "10.4.21",
 		"eslint": "^9",
 		"eslint-config-next": "15.3.5",
 		"husky": "9.1.7",
+		"jsdom": "^29.1.1",
 		"lint-staged": "16.1.2",
 		"tailwindcss": "^4",
-		"typescript": "^5"
+		"typescript": "^5",
+		"vitest": "^4.1.10"
 	}
 }
