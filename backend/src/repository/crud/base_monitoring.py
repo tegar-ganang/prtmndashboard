@@ -144,6 +144,11 @@ class BaseMonitoringRepository(BaseCRUDRepository):
             stmt = stmt.where(sqlalchemy.and_(*conditions))
             
         stmt = stmt.order_by(sqlalchemy.desc(self.model.created_at))
-        
+
+        # ponytail: safety cap, not real pagination. Current tables have well under
+        # 200 rows each; this just stops an unbounded SELECT * once they grow.
+        # Add proper limit/offset (and a frontend "load more") once a table nears this.
+        stmt = stmt.limit(5000)
+
         res = await self.async_session.execute(stmt)
         return list(res.scalars().all())

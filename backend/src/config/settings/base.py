@@ -49,17 +49,16 @@ class BackendBaseSettings(pydantic.BaseSettings):
     JWT_ACCESS_TOKEN_EXPIRATION_TIME: int = JWT_MIN * JWT_HOUR * JWT_DAY
 
     IS_ALLOWED_CREDENTIALS: bool = decouple.config("IS_ALLOWED_CREDENTIALS", cast=bool)  # type: ignore
-    ALLOWED_ORIGINS: list[str] = [
-        "http://localhost:3000",  # React default port
-        "http://0.0.0.0:3000",
-        "http://127.0.0.1:3000",  # React docker port
-        "http://127.0.0.1:3001",
-        "http://localhost:5173",  # Qwik default port
-        "http://0.0.0.0:5173",
-        "http://127.0.0.1:5173",  # Qwik docker port
-        "http://127.0.0.1:5174",
-        "http://103.174.115.172",
-    ]
+    # Comma-separated list, e.g. "https://dashboard.example.com,https://staging.example.com".
+    # Falls back to local dev ports when unset so local development keeps working out of the box.
+    ALLOWED_ORIGINS: list[str] = decouple.config(  # type: ignore
+        "BACKEND_CORS_ORIGINS",
+        cast=lambda value: [origin.strip() for origin in value.split(",") if origin.strip()],
+        default=(
+            "http://localhost:3000,http://0.0.0.0:3000,http://127.0.0.1:3000,http://127.0.0.1:3001,"
+            "http://localhost:5173,http://0.0.0.0:5173,http://127.0.0.1:5173,http://127.0.0.1:5174,http://103.174.115.172"
+        ),
+    )
     ALLOWED_METHODS: list[str] = ["*"]
     ALLOWED_HEADERS: list[str] = ["*"]
 
@@ -81,14 +80,15 @@ class BackendBaseSettings(pydantic.BaseSettings):
         """
         Set all `FastAPI` class' attributes with the custom values defined in `BackendBaseSettings`.
         """
+        # Swagger/ReDoc/OpenAPI schema expose the full API surface; only serve them when DEBUG is on.
         return {
             "title": self.TITLE,
             "version": self.VERSION,
             "debug": self.DEBUG,
             "description": self.DESCRIPTION,
-            "docs_url": self.DOCS_URL,
-            "openapi_url": self.OPENAPI_URL,
-            "redoc_url": self.REDOC_URL,
+            "docs_url": self.DOCS_URL if self.DEBUG else None,
+            "openapi_url": self.OPENAPI_URL if self.DEBUG else None,
+            "redoc_url": self.REDOC_URL if self.DEBUG else None,
             "openapi_prefix": self.OPENAPI_PREFIX,
             "api_prefix": self.API_PREFIX,
         }

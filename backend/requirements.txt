@@ -1,7 +1,6 @@
 alembic
 asgi_lifespan
 argon2_cffi
-asyncio
 aioodbc
 bcrypt
 black
@@ -15,7 +14,6 @@ isort
 loguru
 mypy
 passlib
-pathlib
 pre-commit
 python-dotenv
 python-decouple
