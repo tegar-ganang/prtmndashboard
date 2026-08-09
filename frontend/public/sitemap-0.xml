@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-<url><loc>http://localhost:3000/sandbox/button</loc><lastmod>2026-07-14T13:20:43.942Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/data-gathering/produksi</loc><lastmod>2026-07-14T13:20:43.942Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/login</loc><lastmod>2026-07-14T13:20:43.942Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/monitoring/mit</loc><lastmod>2026-07-14T13:20:43.942Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/projects/create</loc><lastmod>2026-07-14T13:20:43.942Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/projects</loc><lastmod>2026-07-14T13:20:43.942Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/admin-users</loc><lastmod>2026-07-14T13:20:43.942Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/sandbox/table</loc><lastmod>2026-07-14T13:20:43.942Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/sandbox/form</loc><lastmod>2026-07-14T13:20:43.942Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/monitoring/lcv</loc><lastmod>2026-07-14T13:20:43.942Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/monitoring/psaims</loc><lastmod>2026-07-14T13:20:43.942Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/monitoring/ope</loc><lastmod>2026-07-14T13:20:43.942Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/dashboard</loc><lastmod>2026-07-14T13:20:43.942Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/data-gathering</loc><lastmod>2026-07-14T13:20:43.942Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>&apos;http://localhost:3000/&apos; # Site URL/sandbox/button</loc><lastmod>2026-07-15T23:41:49.352Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>&apos;http://localhost:3000/&apos; # Site URL/sandbox/form</loc><lastmod>2026-07-15T23:41:49.353Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>&apos;http://localhost:3000/&apos; # Site URL/sandbox/table</loc><lastmod>2026-07-15T23:41:49.353Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>&apos;http://localhost:3000/&apos; # Site URL/admin-users</loc><lastmod>2026-07-15T23:41:49.353Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>&apos;http://localhost:3000/&apos; # Site URL/dashboard</loc><lastmod>2026-07-15T23:41:49.353Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>&apos;http://localhost:3000/&apos; # Site URL/monitoring/lcv</loc><lastmod>2026-07-15T23:41:49.353Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>&apos;http://localhost:3000/&apos; # Site URL/monitoring/mit</loc><lastmod>2026-07-15T23:41:49.353Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>&apos;http://localhost:3000/&apos; # Site URL/monitoring/ope</loc><lastmod>2026-07-15T23:41:49.353Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>&apos;http://localhost:3000/&apos; # Site URL/monitoring/psaims</loc><lastmod>2026-07-15T23:41:49.353Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>&apos;http://localhost:3000/&apos; # Site URL/projects/create</loc><lastmod>2026-07-15T23:41:49.353Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>&apos;http://localhost:3000/&apos; # Site URL/projects</loc><lastmod>2026-07-15T23:41:49.353Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>&apos;http://localhost:3000/&apos; # Site URL/data-gathering</loc><lastmod>2026-07-15T23:41:49.353Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>&apos;http://localhost:3000/&apos; # Site URL/data-gathering/produksi</loc><lastmod>2026-07-15T23:41:49.353Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>&apos;http://localhost:3000/&apos; # Site URL/login</loc><lastmod>2026-07-15T23:41:49.353Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
 </urlset>

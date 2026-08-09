@@ -7,8 +7,7 @@ User-agent: *
 Disallow: /sandbox
 
 # Host
-Host: http://localhost:3000/
+Host: 'http://localhost:3000/' # Site URL
 
 # Sitemaps
-Sitemap: http://localhost:3000/sitemap.xml
-Sitemap: http://localhost:3000//sitemap.xml
+Sitemap: 'http://localhost:3000/' # Site URL/sitemap.xml
