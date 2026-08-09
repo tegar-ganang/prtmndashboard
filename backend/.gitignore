@@ -155,6 +155,7 @@ cov.html
 # Virtual Environment & packages
 .python-version
 .venv
+.venv_test/
 venv/
 venv.bak/
 node_modules/

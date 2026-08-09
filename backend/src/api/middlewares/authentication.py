@@ -41,7 +41,7 @@ class JWTAuthenticationMiddleware(BaseHTTPMiddleware):
 
 
     def _is_protected_path(self, path: str) -> bool:
-        return path.startswith(self.protected_paths)
+        return any(path == prefix or path.startswith(f"{prefix}/") for prefix in self.protected_paths)
 
     async def dispatch(self, request: Request, call_next) -> Response:
         if request.method == "OPTIONS":

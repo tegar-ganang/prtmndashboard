@@ -18,6 +18,7 @@ import {
 	CalendarDays,
 	Target,
 	Zap,
+	Download,
 } from "lucide-react";
 import Select from "react-select";
 import axiosInstance from "@/services/api/main/interceptor";
@@ -280,13 +281,23 @@ export default function ProduksiUploadContainer() {
 						Upload file Excel dengan 2 sheet: Sheet1 (Data Harian) + Sheet2 (Target Bulanan)
 					</p>
 				</div>
-				<button
-					onClick={() => router.push("/monitoring/produksi")}
-					className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-				>
-					<History className="w-4 h-4" />
-					Lihat Monitoring
-				</button>
+				<div className="flex items-center gap-2">
+					<a
+						href="/templates/Template - Produksi.xlsx"
+						download="Template - Produksi.xlsx"
+						className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors"
+					>
+						<Download className="w-4 h-4" />
+						Download Template
+					</a>
+					<button
+						onClick={() => router.push("/monitoring/produksi")}
+						className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+					>
+						<History className="w-4 h-4" />
+						Lihat Monitoring
+					</button>
+				</div>
 			</div>
 
 			{/* Main layout */}

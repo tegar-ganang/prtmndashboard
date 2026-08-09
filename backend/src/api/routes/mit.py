@@ -1,4 +1,5 @@
 import fastapi
+import loguru
 
 from src.api.dependencies.authentication import get_current_account
 from src.api.dependencies.repository import get_repository
@@ -44,10 +45,9 @@ async def create_batch_mit(
         upload_batch_id = await mit_repo.create_batch_mit(
             batch_data=batch_data, owner_account_id=str(current_account.id)
         )
-    except Exception as e:
-        # In a real app, you'd want to handle exceptions better, returning a 400 or 500
-        # based on the database exception type.
-        raise fastapi.HTTPException(status_code=400, detail=str(e))
+    except Exception:
+        loguru.logger.exception("Failed to create MIT batch")
+        raise fastapi.HTTPException(status_code=400, detail="Gagal menyimpan data ke database.")
 
     return APIResponse(
         success=True,

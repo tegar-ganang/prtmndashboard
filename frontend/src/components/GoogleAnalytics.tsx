@@ -1,14 +1,15 @@
 import Script from "next/script";
 
-const GoogleAnalytics = () => {
+const GoogleAnalytics = ({ nonce }: { nonce: string }) => {
 	return (
 		<>
 			<Script
 				strategy="lazyOnload"
+				nonce={nonce}
 				src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_MEASUREMENT_ID}`}
 			/>
 
-			<Script id="" strategy="lazyOnload">
+			<Script id="ga-init" strategy="lazyOnload" nonce={nonce}>
 				{`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
