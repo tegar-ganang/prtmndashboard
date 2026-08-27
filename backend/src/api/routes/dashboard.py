@@ -5,6 +5,7 @@ import datetime
 from sqlalchemy.ext.asyncio import AsyncSession as SQLAlchemyAsyncSession
 
 from src.api.dependencies.authentication import get_current_account
+from src.api.dependencies.rbac import require_menu_access
 from src.api.dependencies.session import get_async_session
 from src.models.db.account import Account
 from src.models.db.produksi import Produksi
@@ -15,7 +16,7 @@ from src.models.db.hsse import HSSE
 from src.models.db.mit import MIT
 from src.models.schemas.response import APIResponse
 
-router = fastapi.APIRouter(prefix="/dashboard", tags=["dashboard"], dependencies=[fastapi.Depends(get_current_account)])
+router = fastapi.APIRouter(prefix="/dashboard", tags=["dashboard"], dependencies=[fastapi.Depends(require_menu_access("dashboard"))])
 
 def _safe_float(val: typing.Any) -> float:
     if val is None:

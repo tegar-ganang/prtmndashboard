@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import Select from "react-select";
 import clsxm from "@/lib/clsxm";
+import AccessDeniedCard from "@/components/feedback/AccessDeniedCard";
 
 import { useMonitoringBatchMutation } from "../_hooks/useMonitoringBatchMutation";
 import { useProduksiBatchMutation } from "../_hooks/useProduksiBatchMutation";
@@ -25,11 +26,9 @@ import { usePsaimsBatchMutation } from "../_hooks/usePsaimsBatchMutation";
 import { useLocationsQuery } from "../_hooks/useLocationsQuery";
 import { useExcelProcessor } from "../_hooks/useExcelProcessor";
 import { checkMonitoringPeriodExists } from "../_hooks/useMonitoringCheckPeriod";
+import { useAllowedDocTypeOptions } from "../_hooks/useAllowedDocTypeOptions";
 import {
 	DOC_TYPE_CONFIG,
-	DOCUMENT_OPTIONS,
-	PSAIMS_OPTIONS,
-	LCV_OPTIONS,
 	FIELD_OPTIONS,
 	MONTH_OPTIONS,
 	QUARTER_OPTIONS,
@@ -203,11 +202,16 @@ export default function DataGatheringContainer() {
 	const [detailDocType, setDetailDocType] = useState<DocTypeValue>("PRODUKSI");
 	const [produksiExtraCols, setProduksiExtraCols] = useState<ExtraColumnsState>({});
 
+	// Doc types filtered to what the logged-in role is allowed to upload (RBAC)
+	const { documentOptions, psaimsOptions, lcvOptions, documentOptionsWithPsaims, hasAnyUploadAccess } =
+		useAllowedDocTypeOptions();
+	const fallbackOption: DocumentOption<DocTypeValue> = { value: "MIT", label: "—" };
+
 	// PSAIMS state
-	const [psaimsSubType, setPsaimsSubType] = useState<DocumentOption<DocTypeValue>>(PSAIMS_OPTIONS[0]);
+	const [psaimsSubType, setPsaimsSubType] = useState<DocumentOption<DocTypeValue>>(psaimsOptions[0] ?? fallbackOption);
 	const [psaimsZona, setPsaimsZona] = useState<string>("");
 
-	const [docType, setDocType] = useState<DocumentOption<DocTypeValue>>(DOCUMENT_OPTIONS[0]);
+	const [docType, setDocType] = useState<DocumentOption<DocTypeValue>>(documentOptionsWithPsaims[0] ?? fallbackOption);
 	const [field, setField] = useState<DocumentOption>(FIELD_OPTIONS[0]);
 	const [quarter, setQuarter] = useState<DocumentOption>(QUARTER_OPTIONS[0]);
 	const [month, setMonth] = useState<DocumentOption>(MONTH_OPTIONS[new Date().getMonth()]);
@@ -218,7 +222,7 @@ export default function DataGatheringContainer() {
 	// Determine the real active doc type for PSAIMS
 	const activePsaimsDocType: DocTypeValue = psaimsSubType.value;
 
-	const [lcvSubType, setLcvSubType] = useState<DocumentOption<DocTypeValue>>(LCV_OPTIONS[0]);
+	const [lcvSubType, setLcvSubType] = useState<DocumentOption<DocTypeValue>>(lcvOptions[0] ?? fallbackOption);
 	const isLcv = (docType.value as string) === "LCV" || lcvSubType.value === "LCV_PROJECT_CHARTER_BUDAYA" || lcvSubType.value === "LCV_MONITORING";
 	// Determine the real active doc type for LCV
 	const activeLcvDocType: DocTypeValue = lcvSubType.value;
@@ -502,6 +506,23 @@ export default function DataGatheringContainer() {
 
 	const isAnyUploading = isUploading || isUploadingProduksi || isUploadingPsaims;
 
+	if (!hasAnyUploadAccess) {
+		return (
+			<div className="flex flex-col gap-5 p-6 pb-20 w-full min-w-0">
+				<div>
+					<h1 className="text-2xl font-bold text-gray-900">Data Gathering</h1>
+					<p className="text-sm text-gray-500 font-medium mt-0.5">
+						Upload data menggunakan template Excel yang disediakan.
+					</p>
+				</div>
+				<AccessDeniedCard
+					title="Akses upload tidak tersedia"
+					description="Role Anda saat ini tidak memiliki izin untuk mengunggah data pada modul manapun. Hubungi administrator jika Anda merasa ini keliru."
+				/>
+			</div>
+		);
+	}
+
 	return (
 		<div className="flex flex-col gap-5 p-6 pb-20 w-full min-w-0">
 			<DataGatheringHeader docType={isPsaimsActive ? activePsaimsDocType : isLcvActive ? activeLcvDocType : docType.value} />
@@ -519,6 +540,9 @@ export default function DataGatheringContainer() {
 					onQuarterChange={setQuarter}
 					onMonthChange={setMonth}
 					onYearChange={setYear}
+					documentOptionsWithPsaims={documentOptionsWithPsaims}
+					psaimsOptions={psaimsOptions}
+					lcvOptions={lcvOptions}
 					// PSAIMS-specific props
 					psaimsSubType={psaimsSubType}
 					psaimsZona={psaimsZona}

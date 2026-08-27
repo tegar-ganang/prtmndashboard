@@ -1,13 +1,14 @@
 import fastapi
 
 from src.api.dependencies.authentication import get_current_account
+from src.api.dependencies.rbac import require_menu_access
 from src.api.dependencies.repository import get_repository
 from src.models.db.account import Account
 from src.models.schemas.hazop import DocumentMonthlyBatchCreate, HazopHistoryResponse, HazopResponse
 from src.models.schemas.response import APIResponse
 from src.repository.crud.hazop import HazopCRUDRepository
 
-router = fastapi.APIRouter(prefix="/hazop", tags=["hazop"], dependencies=[fastapi.Depends(get_current_account)])
+router = fastapi.APIRouter(prefix="/hazop", tags=["hazop"], dependencies=[fastapi.Depends(require_menu_access("hazop"))])
 
 @router.get(
     path="/check-period",
@@ -34,6 +35,7 @@ async def check_period(
     name="hazop:batch-create",
     response_model=APIResponse,
     status_code=fastapi.status.HTTP_201_CREATED,
+    dependencies=[fastapi.Depends(require_menu_access("hazop", require_upload=True))],
 )
 async def create_batch(
     batch_data: DocumentMonthlyBatchCreate,

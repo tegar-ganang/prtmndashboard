@@ -11,6 +11,18 @@ class AccountInCreate(BaseSchemaModel):
     name: str | None
 
 
+class AccountAdminCreate(BaseSchemaModel):
+    """Account creation by an admin — no self-signup flow exists yet, so this is
+    how new users are onboarded. Admin-created accounts are active/verified
+    immediately (no email-verification step exists in this app), and always get
+    the shared DEFAULT_USER_PASSWORD — admins never choose or see a user's
+    password. The user changes it themselves via the Profile page."""
+
+    email: pydantic.EmailStr
+    name: str | None
+    role_id: int | None = None
+
+
 class AccountInUpdate(BaseSchemaModel):
     email: str | None
     password: str | None
@@ -29,6 +41,8 @@ class AccountWithToken(BaseSchemaModel):
     token: str
     email: pydantic.EmailStr
     name: str | None
+    role_name: str | None = None
+    is_admin: bool = False
     is_verified: bool
     is_active: bool
     is_logged_in: bool
@@ -47,8 +61,29 @@ class AccountPublic(BaseSchemaModel):
     id: str
     email: pydantic.EmailStr
     name: str | None
+    role_id: int | None = None
+    role_name: str | None = None
+    is_admin: bool = False
     is_verified: bool
     is_active: bool
     is_logged_in: bool
     created_at: datetime.datetime
     updated_at: datetime.datetime | None
+
+
+class RoleOut(BaseSchemaModel):
+    id: int
+    role_name: str
+
+
+class AccountRoleUpdate(BaseSchemaModel):
+    role_id: int | None
+
+
+class AccountStatusUpdate(BaseSchemaModel):
+    is_active: bool
+
+
+class ChangePasswordRequest(BaseSchemaModel):
+    current_password: str
+    new_password: str

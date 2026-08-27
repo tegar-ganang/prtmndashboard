@@ -2,6 +2,7 @@ import fastapi
 import loguru
 
 from src.api.dependencies.authentication import get_current_account
+from src.api.dependencies.rbac import require_menu_access
 from src.api.dependencies.repository import get_repository
 from src.models.db.account import Account
 from src.models.schemas.psaims import (
@@ -15,7 +16,7 @@ from src.repository.crud.zona_pse_list import ZonaPseListCRUDRepository
 router = fastapi.APIRouter(
     prefix="/zona-pse-list",
     tags=["zona-pse-list"],
-    dependencies=[fastapi.Depends(get_current_account)],
+    dependencies=[fastapi.Depends(require_menu_access("zona_pse_list"))],
 )
 
 
@@ -40,6 +41,7 @@ async def check_period(
     name="zona-pse-list:batch-create",
     response_model=APIResponse,
     status_code=fastapi.status.HTTP_201_CREATED,
+    dependencies=[fastapi.Depends(require_menu_access("zona_pse_list", require_upload=True))],
 )
 async def create_batch(
     batch_data: ZonaPseListBatchCreate,

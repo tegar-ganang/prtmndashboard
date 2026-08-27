@@ -1,13 +1,14 @@
 import fastapi
 
 from src.api.dependencies.authentication import get_current_account
+from src.api.dependencies.rbac import require_menu_access
 from src.api.dependencies.repository import get_repository
 from src.models.db.account import Account
 from src.models.schemas.hsse import DocumentMonthlyBatchCreate, HSSEHistoryResponse, HSSEResponse
 from src.models.schemas.response import APIResponse
 from src.repository.crud.hsse import HSSECRUDRepository
 
-router = fastapi.APIRouter(prefix="/hsse", tags=["hsse"], dependencies=[fastapi.Depends(get_current_account)])
+router = fastapi.APIRouter(prefix="/hsse", tags=["hsse"], dependencies=[fastapi.Depends(require_menu_access("hsse"))])
 
 
 @router.get(
@@ -36,6 +37,7 @@ async def check_period(
     name="hsse:batch-create",
     response_model=APIResponse,
     status_code=fastapi.status.HTTP_201_CREATED,
+    dependencies=[fastapi.Depends(require_menu_access("hsse", require_upload=True))],
 )
 async def create_batch(
     batch_data: DocumentMonthlyBatchCreate,

@@ -8,7 +8,11 @@ from sqlalchemy.dialects.postgresql.asyncpg import AsyncAdapt_asyncpg_connection
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSessionTransaction
 from sqlalchemy.pool.base import _ConnectionRecord
 
+from sqlalchemy.ext.asyncio import AsyncSession as SQLAlchemyAsyncSession
+
 from src.repository.database import async_db
+from src.repository.seed_admin import sync_admin_emails
+from src.repository.seed_rbac import seed_rbac_data
 from src.repository.table import Base
 
 
@@ -46,6 +50,24 @@ async def initialize_db_tables(connection: AsyncConnection) -> None:
         await connection.run_sync(Base.metadata.drop_all)
 
     await connection.run_sync(Base.metadata.create_all)
+
+    # `create_all` only creates missing tables — it never ALTERs an existing one, and
+    # `account` has existed since the very first migration. Add columns introduced
+    # after that point (like `is_admin`) explicitly, guarded so it's a no-op once the
+    # column exists (whether create_all just made the table fresh, or it's an older
+    # table getting the column added for the first time).
+    await connection.execute(sqlalchemy.text("""
+        IF NOT EXISTS (
+            SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('app.account') AND name = 'is_admin'
+        )
+        BEGIN
+            ALTER TABLE app.account ADD is_admin BIT NOT NULL CONSTRAINT DF_account_is_admin DEFAULT 0;
+        END
+    """))
+
+    async with SQLAlchemyAsyncSession(bind=connection, expire_on_commit=False) as async_session:
+        await seed_rbac_data(async_session=async_session)
+        await sync_admin_emails(async_session=async_session)
 
     loguru.logger.info("Database Table Creation --- Successfully Initialized!")
 

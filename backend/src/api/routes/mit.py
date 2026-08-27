@@ -2,13 +2,14 @@ import fastapi
 import loguru
 
 from src.api.dependencies.authentication import get_current_account
+from src.api.dependencies.rbac import require_menu_access
 from src.api.dependencies.repository import get_repository
 from src.models.db.account import Account
 from src.models.schemas.mit import DocumentBatchCreate, MitHistoryResponse, MITResponse as MitDataResponse
 from src.models.schemas.response import APIResponse
 from src.repository.crud.mit import MITCRUDRepository
 
-router = fastapi.APIRouter(prefix="/mit", tags=["mit"], dependencies=[fastapi.Depends(get_current_account)])
+router = fastapi.APIRouter(prefix="/mit", tags=["mit"], dependencies=[fastapi.Depends(require_menu_access("mit"))])
 
 @router.get(
     path="/check-period",
@@ -35,6 +36,7 @@ async def check_period(
     name="mit:batch-create",
     response_model=APIResponse,
     status_code=fastapi.status.HTTP_201_CREATED,
+    dependencies=[fastapi.Depends(require_menu_access("mit", require_upload=True))],
 )
 async def create_batch_mit(
     batch_data: DocumentBatchCreate,

@@ -12,6 +12,8 @@ export interface AuthorizedAccount {
   token: string
   email: string
   name: string
+  roleName?: string | null
+  isAdmin?: boolean
   isVerified: boolean
   isActive: boolean
   isLoggedIn: boolean

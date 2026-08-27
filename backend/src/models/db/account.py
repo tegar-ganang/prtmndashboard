@@ -23,6 +23,7 @@ class Account(Base):  # type: ignore
     is_verified: SQLAlchemyMapped[bool] = sqlalchemy_mapped_column(sqlalchemy.Boolean, nullable=False, default=False)
     is_active: SQLAlchemyMapped[bool] = sqlalchemy_mapped_column(sqlalchemy.Boolean, nullable=False, default=False)
     is_logged_in: SQLAlchemyMapped[bool] = sqlalchemy_mapped_column(sqlalchemy.Boolean, nullable=False, default=False)
+    is_admin: SQLAlchemyMapped[bool] = sqlalchemy_mapped_column(sqlalchemy.Boolean, nullable=False, default=False)
     role_id: SQLAlchemyMapped[int | None] = sqlalchemy_mapped_column(sqlalchemy.Integer, sqlalchemy.ForeignKey("role.id"), nullable=True)
     role: SQLAlchemyMapped["Role"] = relationship("Role", lazy="selectin")
     created_at: SQLAlchemyMapped[datetime.datetime] = sqlalchemy_mapped_column(

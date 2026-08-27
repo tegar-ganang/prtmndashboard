@@ -20,9 +20,16 @@ const apiOrigin = (() => {
 })();
 
 export function buildCspHeader(nonce: string): string {
+	// Next.js dev mode's HMR/React-Refresh runtime evals code — only needed for `next dev`,
+	// never for a production build, so keep the strict CSP everywhere else.
+	const isDev = process.env.NODE_ENV === "development";
+	const scriptSrc = isDev
+		? `script-src 'self' 'unsafe-eval' 'nonce-${nonce}' 'strict-dynamic' https://www.googletagmanager.com`
+		: `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://www.googletagmanager.com`;
+
 	return [
 		"default-src 'self'",
-		`script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://www.googletagmanager.com`,
+		scriptSrc,
 		"style-src 'self' 'unsafe-inline'",
 		"img-src 'self' blob: data:",
 		"font-src 'self'",
