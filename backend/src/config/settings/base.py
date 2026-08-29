@@ -89,6 +89,16 @@ class BackendBaseSettings(pydantic.BaseSettings):
         env_file: str = f"{str(ROOT_DIR)}/.env"
         validate_assignment: bool = True
 
+        @classmethod
+        def parse_env_var(cls, field_name: str, raw_val: str) -> typing.Any:
+            # Our list settings are plain comma-separated strings in .env, but pydantic v1
+            # json-parses any list-typed env var and dies on them. Docker's `env_file:`
+            # puts them in os.environ, which is why this only bites in the container.
+            if field_name in ("ADMIN_EMAILS", "BACKEND_CORS_ORIGINS", "ALLOWED_METHODS", "ALLOWED_HEADERS"):
+                values = [item.strip() for item in raw_val.split(",") if item.strip()]
+                return [value.lower() for value in values] if field_name == "ADMIN_EMAILS" else values
+            return cls.json_loads(raw_val)
+
     @property
     def set_backend_app_attributes(self) -> dict[str, str | bool | None]:
         """
