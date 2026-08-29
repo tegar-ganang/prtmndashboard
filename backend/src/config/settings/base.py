@@ -55,7 +55,8 @@ class BackendBaseSettings(pydantic.BaseSettings):
         "BACKEND_CORS_ORIGINS",
         cast=lambda value: [origin.strip() for origin in value.split(",") if origin.strip()],
         default=(
-            "http://localhost:3000,http://0.0.0.0:3000,http://127.0.0.1:3000,http://127.0.0.1:3001,"
+            "http://localhost:3000,http://0.0.0.0:3000,http://127.0.0.1:3000,"
+            "http://localhost:3001,http://0.0.0.0:3001,http://127.0.0.1:3001,"
             "http://localhost:5173,http://0.0.0.0:5173,http://127.0.0.1:5173,http://127.0.0.1:5174,http://103.174.115.172"
         ),
     )
