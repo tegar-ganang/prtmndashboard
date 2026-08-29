@@ -22,17 +22,20 @@ import useAuthStore from "@/app/stores/useAuthStore";
 import Button from "@/components/button/Button";
 import { useSidebar } from "@/context/SidebarContext";
 import axiosInstance from "@/services/api/main/interceptor";
+import { canViewMenu, canUploadAnyMenu, type MenuKey } from "@/configs/rbac";
 
 type SubSubItem = {
 	name: string;
 	path: string;
 	description?: string;
+	menu?: MenuKey;
 };
 
 type SubItem = {
 	name: string;
 	path?: string;
 	description?: string;
+	menu?: MenuKey;
 	subItems?: SubSubItem[];
 };
 
@@ -41,6 +44,8 @@ type NavItem = {
 	icon: React.ReactNode;
 	path?: string;
 	description?: string;
+	menu?: MenuKey;
+	adminOnly?: boolean;
 	subItems?: SubItem[];
 };
 
@@ -101,18 +106,22 @@ const AppSidebar: React.FC = () => {
 				name: "Dashboard",
 				path: "/dashboard",
 				description: "Lihat ringkasan dan performa terbaru.",
+				menu: "dashboard",
 			},
 			{
 				icon: <Box className="w-5 h-5" />,
 				name: "Projects",
 				path: "/projects",
 				description: "Kelola proyek Anda secara efisien.",
+				menu: "project",
 			},
 			{
 				icon: <UploadCloud className="w-5 h-5" />,
 				name: "Data Gathering",
 				path: "/data-gathering",
 				description: "Upload data menggunakan template Excel yang disediakan.",
+				// Visible if the role can upload to at least one of the modules this hub covers.
+				menu: undefined,
 			},
 			{
 				icon: <Monitor className="w-5 h-5" />,
@@ -123,15 +132,16 @@ const AppSidebar: React.FC = () => {
 						name: "Production",
 						path: "/monitoring/produksi",
 						description: "Monitoring produksi gas harian Donggi-Matindok.",
+						menu: "produksi",
 					},
 					{
 						name: "OSF",
 						description: "Operational Safety Frontline Monitoring.",
 						subItems: [
-							{ name: "AIRMS", path: "/monitoring/airms", description: "AIRMS Monitoring" },
-							{ name: "PSAIMS", path: "/monitoring/psaims", description: "PSAIMS Monitoring" },
-							{ name: "I2AIMS", path: "/monitoring/i2aims", description: "I2AIMS Monitoring" },
-							{ name: "MIT & MOC", path: "/monitoring/mit", description: "Major Integrity Threat & Management of Change" },
+							{ name: "AIRMS", path: "/monitoring/airms", description: "AIRMS Monitoring", menu: "airms" },
+							{ name: "PSAIMS", path: "/monitoring/psaims", description: "PSAIMS Monitoring", menu: "zona_indicator" },
+							{ name: "I2AIMS", path: "/monitoring/i2aims", description: "I2AIMS Monitoring", menu: "i2aims" },
+							{ name: "MIT & MOC", path: "/monitoring/mit", description: "Major Integrity Threat & Management of Change", menu: "mit" },
 							{ name: "OPE", path: "/monitoring/ope", description: "Operational Performance & Excellence" },
 						],
 					},
@@ -139,24 +149,62 @@ const AppSidebar: React.FC = () => {
 						name: "HSSE",
 						path: "/monitoring/hsse",
 						description: "HSSE Monitoring.",
+						menu: "hsse",
 					},
 					{
 						name: "LCV",
 						path: "/monitoring/lcv",
 						description: "Loss Control & Verification Monitoring.",
+						menu: "lcv",
 					},
 				],
+			},
+			{
+				icon: <Settings className="w-5 h-5" />,
+				name: "User Management",
+				path: "/admin-users",
+				description: "Kelola role akses pengguna dashboard.",
+				adminOnly: true,
 			},
 		],
 		[],
 	);
 
-	const filterNavItems = () => {
-		// For admin dashboard, show all menu items
-		return navItems;
-	};
+	const roleName = user?.role_name;
+	const isAdmin = user?.is_admin ?? false;
+	const dataGatheringMenus: MenuKey[] = [
+		"produksi", "i2aims", "airms", "mit", "moc", "hazid", "hazop", "lopa",
+		"hsse", "lcv", "zona_indicator", "zona_pse_list",
+	];
 
-	const filteredNavItems = filterNavItems();
+	const filterSubItems = useCallback(
+		(items: SubItem[]): SubItem[] =>
+			items
+				.map((item) =>
+					item.subItems
+						? { ...item, subItems: item.subItems.filter((sub) => !sub.menu || canViewMenu(roleName, sub.menu)) }
+						: item,
+				)
+				.filter((item) => (item.subItems ? item.subItems.length > 0 : !item.menu || canViewMenu(roleName, item.menu))),
+		[roleName],
+	);
+
+	const filterNavItems = useCallback(
+		(items: NavItem[]): NavItem[] =>
+			items
+				.filter((item) => {
+					if (item.adminOnly) return isAdmin;
+					if (item.name === "Data Gathering") return canUploadAnyMenu(roleName, dataGatheringMenus);
+					if (item.menu) return canViewMenu(roleName, item.menu);
+					return true; // no menu tag (e.g. "Monitoring" group, "OPE") — let sub-items decide
+				})
+				.map((item) => (item.subItems ? { ...item, subItems: filterSubItems(item.subItems) } : item))
+				.filter((item) => !item.subItems || item.subItems.length > 0),
+		// biome-ignore lint/correctness/useExhaustiveDependencies: dataGatheringMenus is a stable literal
+		[roleName, isAdmin, filterSubItems],
+	);
+
+	const filteredNavItems = filterNavItems(navItems);
 
 	const [openSubmenu, setOpenSubmenu] = useState<{
 		type: "main" | "others";
@@ -500,9 +548,7 @@ const AppSidebar: React.FC = () => {
 					className={`w-full flex items-center gap-3 rounded-xl border border-white/20 bg-white/10 px-3 py-3 text-left transition-all duration-200 hover:bg-white/20 ${
 						!isExpanded && !isHovered && !isMobileOpen ? "justify-center" : ""
 					}`}
-					onClick={() => {
-						// Profile button is a placeholder for future profile page/action.
-					}}
+					onClick={() => router.push("/profile")}
 					aria-label="Profile"
 				>
 					<div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">

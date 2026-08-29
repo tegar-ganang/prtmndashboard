@@ -1,6 +1,7 @@
 import fastapi
 
 from src.api.dependencies.authentication import get_current_account
+from src.api.dependencies.rbac import require_menu_access
 from src.api.dependencies.repository import get_repository
 from src.models.db.account import Account
 from src.models.db.project import Project
@@ -9,7 +10,7 @@ from src.models.schemas.response import APIResponse
 from src.repository.crud.project import ProjectCRUDRepository
 from src.utilities.exceptions.database import EntityDoesNotExist
 
-router = fastapi.APIRouter(prefix="/projects", tags=["projects"])
+router = fastapi.APIRouter(prefix="/projects", tags=["projects"], dependencies=[fastapi.Depends(require_menu_access("project"))])
 
 
 def _project_category(project_value: float | None) -> str | None:
@@ -47,7 +48,13 @@ def _project_to_data(project: Project) -> dict:
     }
 
 
-@router.post(path="", name="projects:create", response_model=APIResponse, status_code=fastapi.status.HTTP_201_CREATED)
+@router.post(
+    path="",
+    name="projects:create",
+    response_model=APIResponse,
+    status_code=fastapi.status.HTTP_201_CREATED,
+    dependencies=[fastapi.Depends(require_menu_access("project", require_upload=True))],
+)
 async def create_project(
     project_create: ProjectInCreate,
     current_account: Account = fastapi.Depends(get_current_account),
@@ -108,6 +115,7 @@ async def get_project(
     name="projects:update-by-id",
     response_model=APIResponse,
     status_code=fastapi.status.HTTP_200_OK,
+    dependencies=[fastapi.Depends(require_menu_access("project", require_upload=True))],
 )
 async def update_project(
     project_id: str,
@@ -138,6 +146,7 @@ async def update_project(
     name="projects:delete-by-id",
     response_model=APIResponse,
     status_code=fastapi.status.HTTP_200_OK,
+    dependencies=[fastapi.Depends(require_menu_access("project", require_upload=True))],
 )
 async def delete_project(
     project_id: str,

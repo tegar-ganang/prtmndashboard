@@ -50,6 +50,8 @@ async def signup(
                 token=access_token,
                 name=new_account.name,
                 email=new_account.email,  # type: ignore
+                role_name=new_account.role_name,
+                is_admin=new_account.is_admin,
                 is_verified=new_account.is_verified,
                 is_active=new_account.is_active,
                 is_logged_in=new_account.is_logged_in,
@@ -82,6 +84,12 @@ async def signin(
     except Exception:
         raise await http_exc_400_credentials_bad_signin_request()
 
+    if not db_account.is_active:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            detail="Akun Anda telah dinonaktifkan. Hubungi administrator.",
+        )
+
     access_token = jwt_generator.generate_access_token(account=db_account)
 
     return APIResponse(
@@ -93,6 +101,8 @@ async def signin(
                 token=access_token,
                 name=db_account.name,
                 email=db_account.email,  # type: ignore
+                role_name=db_account.role_name,
+                is_admin=db_account.is_admin,
                 is_verified=db_account.is_verified,
                 is_active=db_account.is_active,
                 is_logged_in=db_account.is_logged_in,
@@ -112,6 +122,8 @@ async def get_profile(current_account: Account = fastapi.Depends(get_current_acc
             "id": current_account.id,
             "name": current_account.name,
             "email": current_account.email,
+            "role_name": current_account.role_name,
+            "is_admin": current_account.is_admin,
             "is_verified": current_account.is_verified,
             "is_active": current_account.is_active,
             "is_logged_in": current_account.is_logged_in,

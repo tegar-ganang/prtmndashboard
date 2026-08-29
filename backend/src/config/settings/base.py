@@ -62,6 +62,20 @@ class BackendBaseSettings(pydantic.BaseSettings):
     ALLOWED_METHODS: list[str] = ["*"]
     ALLOWED_HEADERS: list[str] = ["*"]
 
+    # Comma-separated list of emails to auto-promote to is_admin on every startup.
+    # Bootstraps the first admin without manual DB surgery — just sign up with this
+    # email, restart the backend, and the account gets is_admin=True.
+    ADMIN_EMAILS: list[str] = decouple.config(  # type: ignore
+        "ADMIN_EMAILS",
+        cast=lambda value: [email.strip().lower() for email in value.split(",") if email.strip()],
+        default="",
+    )
+
+    # There's no self-signup flow, so admins create accounts directly — every account
+    # they create gets this shared password. The user changes it themselves afterwards
+    # via the Profile page (which requires knowing the current password).
+    DEFAULT_USER_PASSWORD: str = decouple.config("DEFAULT_USER_PASSWORD", cast=str, default="Pertamina@2026")  # type: ignore
+
     LOGGING_LEVEL: int = logging.INFO
     LOGGERS: tuple[str, str] = ("uvicorn.asgi", "uvicorn.access")
 

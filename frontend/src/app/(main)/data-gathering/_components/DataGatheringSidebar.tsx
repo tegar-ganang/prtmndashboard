@@ -5,9 +5,6 @@ import Select from "react-select";
 import Button from "@/components/button/Button";
 import {
 	DOC_TYPE_CONFIG,
-	DOCUMENT_OPTIONS,
-	PSAIMS_OPTIONS,
-	LCV_OPTIONS,
 	MONTH_OPTIONS,
 	QUARTER_OPTIONS,
 	SELECT_STYLES,
@@ -29,6 +26,10 @@ interface DataGatheringSidebarProps {
 	onQuarterChange: (option: DocumentOption) => void;
 	onMonthChange: (option: DocumentOption) => void;
 	onYearChange: (option: DocumentOption) => void;
+	// Doc type options, pre-filtered by the caller to what the current role can upload (RBAC)
+	documentOptionsWithPsaims: DocumentOption<DocTypeValue>[];
+	psaimsOptions: DocumentOption<DocTypeValue>[];
+	lcvOptions: DocumentOption<DocTypeValue>[];
 	// PSAIMS
 	psaimsSubType?: DocumentOption<DocTypeValue>;
 	psaimsZona?: string;
@@ -38,13 +39,6 @@ interface DataGatheringSidebarProps {
 	lcvSubType?: DocumentOption<DocTypeValue>;
 	onLcvSubTypeChange?: (option: DocumentOption<DocTypeValue>) => void;
 }
-
-// Document options including PSAIMS and LCV as top-level choices
-const DOCUMENT_OPTIONS_WITH_PSAIMS = [
-	...DOCUMENT_OPTIONS,
-	{ value: "PSAIMS" as DocTypeValue, label: "PSAIMS" },
-	{ value: "LCV" as DocTypeValue, label: "LCV" },
-];
 
 export default function DataGatheringSidebar({
 	docType,
@@ -58,6 +52,9 @@ export default function DataGatheringSidebar({
 	onQuarterChange,
 	onMonthChange,
 	onYearChange,
+	documentOptionsWithPsaims,
+	psaimsOptions,
+	lcvOptions,
 	psaimsSubType,
 	psaimsZona,
 	onPsaimsSubTypeChange,
@@ -103,7 +100,7 @@ export default function DataGatheringSidebar({
 					Jenis Dokumen
 				</label>
 				<Select
-					options={DOCUMENT_OPTIONS_WITH_PSAIMS}
+					options={documentOptionsWithPsaims}
 					value={displayDocType}
 					onChange={(v) => v && onDocTypeChange(v as DocumentOption<DocTypeValue>)}
 					className="text-sm"
@@ -117,8 +114,8 @@ export default function DataGatheringSidebar({
 							Tipe PSAIMS
 						</label>
 						<Select
-							options={PSAIMS_OPTIONS}
-							value={psaimsSubType ?? PSAIMS_OPTIONS[0]}
+							options={psaimsOptions}
+							value={psaimsSubType ?? psaimsOptions[0]}
 							onChange={(v) => v && onPsaimsSubTypeChange(v as DocumentOption<DocTypeValue>)}
 							className="text-sm"
 							styles={SELECT_STYLES}
@@ -133,8 +130,8 @@ export default function DataGatheringSidebar({
 							Tipe LCV
 						</label>
 						<Select
-							options={LCV_OPTIONS}
-							value={lcvSubType ?? LCV_OPTIONS[0]}
+							options={lcvOptions}
+							value={lcvSubType ?? lcvOptions[0]}
 							onChange={(v) => v && onLcvSubTypeChange(v as DocumentOption<DocTypeValue>)}
 							className="text-sm"
 							styles={SELECT_STYLES}

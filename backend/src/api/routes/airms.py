@@ -1,13 +1,14 @@
 import fastapi
 
 from src.api.dependencies.authentication import get_current_account
+from src.api.dependencies.rbac import require_menu_access
 from src.api.dependencies.repository import get_repository
 from src.models.db.account import Account
 from src.models.schemas.airms import DocumentMonthlyBatchCreate, AIRMSHistoryResponse, AIRMSResponse
 from src.models.schemas.response import APIResponse
 from src.repository.crud.airms import AIRMSCRUDRepository
 
-router = fastapi.APIRouter(prefix="/airms", tags=["airms"], dependencies=[fastapi.Depends(get_current_account)])
+router = fastapi.APIRouter(prefix="/airms", tags=["airms"], dependencies=[fastapi.Depends(require_menu_access("airms"))])
 
 
 @router.get(
@@ -36,6 +37,7 @@ async def check_period(
     name="airms:batch-create",
     response_model=APIResponse,
     status_code=fastapi.status.HTTP_201_CREATED,
+    dependencies=[fastapi.Depends(require_menu_access("airms", require_upload=True))],
 )
 async def create_batch(
     batch_data: DocumentMonthlyBatchCreate,

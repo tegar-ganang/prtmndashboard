@@ -3,8 +3,10 @@ import typing
 import sqlalchemy
 from sqlalchemy.sql import functions as sqlalchemy_functions
 
+from src.config.manager import settings
 from src.models.db.account import Account
-from src.models.schemas.account import AccountInCreate, AccountInLogin, AccountInUpdate
+from src.models.db.role import Role
+from src.models.schemas.account import AccountAdminCreate, AccountInCreate, AccountInLogin, AccountInUpdate
 from src.repository.crud.base import BaseCRUDRepository
 from src.securities.hashing.password import pwd_generator
 from src.securities.verifications.credentials import credential_verifier
@@ -20,6 +22,29 @@ class AccountCRUDRepository(BaseCRUDRepository):
         new_account.set_hashed_password(
             hashed_password=pwd_generator.generate_hashed_password(
                 hash_salt=new_account.hash_salt, new_password=account_create.password
+            )
+        )
+
+        self.async_session.add(instance=new_account)
+        await self.async_session.commit()
+        await self.async_session.refresh(instance=new_account)
+
+        return new_account
+
+    async def create_account_as_admin(self, account_create: AccountAdminCreate) -> Account:
+        new_account = Account(
+            name=account_create.name,
+            email=account_create.email,
+            role_id=account_create.role_id,
+            is_logged_in=False,
+            is_verified=True,
+            is_active=True,
+        )
+
+        new_account.set_hash_salt(hash_salt=pwd_generator.generate_salt)
+        new_account.set_hashed_password(
+            hashed_password=pwd_generator.generate_hashed_password(
+                hash_salt=new_account.hash_salt, new_password=settings.DEFAULT_USER_PASSWORD
             )
         )
 
@@ -119,6 +144,40 @@ class AccountCRUDRepository(BaseCRUDRepository):
         await self.async_session.commit()
 
         return f"Account with id '{id}' is successfully deleted!"
+
+    async def update_account_role_by_id(self, id: str, role_id: int | None) -> Account:
+        stmt = sqlalchemy.select(Account).where(Account.id == id)
+        query = await self.async_session.execute(statement=stmt)
+        account = query.scalar()
+
+        if not account:
+            raise EntityDoesNotExist(f"Account with id `{id}` does not exist!")  # type: ignore
+
+        if role_id is not None:
+            role_stmt = sqlalchemy.select(Role).where(Role.id == role_id)
+            role_query = await self.async_session.execute(statement=role_stmt)
+            if not role_query.scalar():
+                raise EntityDoesNotExist(f"Role with id `{role_id}` does not exist!")  # type: ignore
+
+        account.role_id = role_id  # type: ignore
+        await self.async_session.commit()
+        await self.async_session.refresh(instance=account)
+
+        return account  # type: ignore
+
+    async def update_account_status_by_id(self, id: str, is_active: bool) -> Account:
+        stmt = sqlalchemy.select(Account).where(Account.id == id)
+        query = await self.async_session.execute(statement=stmt)
+        account = query.scalar()
+
+        if not account:
+            raise EntityDoesNotExist(f"Account with id `{id}` does not exist!")  # type: ignore
+
+        account.is_active = is_active  # type: ignore
+        await self.async_session.commit()
+        await self.async_session.refresh(instance=account)
+
+        return account  # type: ignore
 
     async def is_name_taken(self, name: str) -> bool:
         name_stmt = sqlalchemy.select(Account.name).select_from(Account).where(Account.name == name)

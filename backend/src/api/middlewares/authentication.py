@@ -80,6 +80,14 @@ class JWTAuthenticationMiddleware(BaseHTTPMiddleware):
                     content={"success": False, "message": "Unauthorized", "data": None, "err": "Invalid JWT token"},
                 )
 
+        if not current_account.is_active:
+            # Re-checked on every request (not just at login) so deactivating an
+            # account takes effect immediately, even with an existing valid JWT.
+            return fastapi_responses.JSONResponse(
+                status_code=fastapi.status.HTTP_401_UNAUTHORIZED,
+                content={"success": False, "message": "Unauthorized", "data": None, "err": "Account has been deactivated"},
+            )
+
         request.state.current_account = current_account
         request.state.current_account_token = token
         return await call_next(request)

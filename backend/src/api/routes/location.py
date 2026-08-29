@@ -1,12 +1,13 @@
 import fastapi
 
 from src.api.dependencies.authentication import get_current_account
+from src.api.dependencies.rbac import require_menu_access
 from src.api.dependencies.repository import get_repository
 from src.models.schemas.location import FieldLocationResponse
 from src.models.schemas.response import APIResponse
 from src.repository.crud.location import FieldLocationCRUDRepository
 
-router = fastapi.APIRouter(prefix="/locations", tags=["locations"], dependencies=[fastapi.Depends(get_current_account)])
+router = fastapi.APIRouter(prefix="/locations", tags=["locations"], dependencies=[fastapi.Depends(require_menu_access("location"))])
 
 @router.get(
     path="",

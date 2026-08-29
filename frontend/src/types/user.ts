@@ -2,6 +2,8 @@ export type User = {
 	id: string;
 	name: string;
 	email: string;
+	role_name?: string | null;
+	is_admin?: boolean;
 	is_verified: boolean;
 	is_active: boolean;
 	is_logged_in: boolean;

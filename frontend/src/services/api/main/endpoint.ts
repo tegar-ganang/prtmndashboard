@@ -3,6 +3,17 @@ export const MAIN_ENDPOINT = {
 		Login: "/auth/signin",
 		CurrentUser: "/auth/me",
 	},
+	Accounts: {
+		GetAll: "/accounts",
+		Create: "/accounts",
+		Roles: "/accounts/roles",
+		DefaultPasswordHint: "/accounts/default-password-hint",
+		UpdateRole: (id: string) => `/accounts/${id}/role`,
+		UpdateStatus: (id: string) => `/accounts/${id}/status`,
+		Update: (id: string) => `/accounts/${id}`,
+		ChangeOwnPassword: "/accounts/me/password",
+		Delete: "/accounts",
+	},
 	Projects: {
 		GetAll: "/projects",
 		Create: "/projects",

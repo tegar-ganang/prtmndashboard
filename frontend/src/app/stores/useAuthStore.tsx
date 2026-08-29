@@ -27,9 +27,11 @@ const useAuthStoreBase = create<AuthStoreType>((set) => ({
 				state.isAuthed = true;
 				state.isLoading = false;
 				state.user = {
-					id: user.authorizedAccount.email,
+					id: user.id,
 					name: user.authorizedAccount.name,
 					email: user.authorizedAccount.email,
+					role_name: user.authorizedAccount.roleName,
+					is_admin: user.authorizedAccount.isAdmin,
 					is_verified: user.authorizedAccount.isVerified,
 					is_active: user.authorizedAccount.isActive,
 					is_logged_in: user.authorizedAccount.isLoggedIn,

@@ -1,6 +1,7 @@
 import fastapi
 
 from src.api.dependencies.authentication import get_current_account
+from src.api.dependencies.rbac import require_menu_access
 from src.api.dependencies.repository import get_repository
 from src.models.db.account import Account
 from src.models.schemas.airms import DocumentMonthlyBatchCreate
@@ -8,7 +9,7 @@ from src.models.schemas.lcv import LCVProjectCharterBudayaResponse, LCVMonitorin
 from src.models.schemas.response import APIResponse
 from src.repository.crud.lcv import LCVProjectCharterBudayaCRUDRepository, LCVMonitoringCRUDRepository
 
-router = fastapi.APIRouter(prefix="/lcv", tags=["lcv"], dependencies=[fastapi.Depends(get_current_account)])
+router = fastapi.APIRouter(prefix="/lcv", tags=["lcv"], dependencies=[fastapi.Depends(require_menu_access("lcv"))])
 
 
 @router.get(
@@ -43,6 +44,7 @@ async def check_period(
     name="lcv:batch-create",
     response_model=APIResponse,
     status_code=fastapi.status.HTTP_201_CREATED,
+    dependencies=[fastapi.Depends(require_menu_access("lcv", require_upload=True))],
 )
 async def create_batch(
     batch_data: DocumentMonthlyBatchCreate,
