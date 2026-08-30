@@ -10,6 +10,7 @@ class ProjectInCreate(BaseSchemaModel):
     operational_start_date: datetime.date
     estimated_completion_date: datetime.date
     project_name: str
+    pic: str | None = None
     project_location: str
     project_value: float | None = None
     project_priority: pydantic.constr(to_lower=True, regex="^(high|mid|low)$")  # type: ignore
@@ -26,6 +27,7 @@ class ProjectInUpdate(BaseSchemaModel):
     operational_start_date: datetime.date | None = None
     estimated_completion_date: datetime.date | None = None
     project_name: str | None = None
+    pic: str | None = None
     project_location: str | None = None
     project_value: float | None = None
     project_priority: pydantic.constr(to_lower=True, regex="^(high|mid|low)$") | None = None  # type: ignore

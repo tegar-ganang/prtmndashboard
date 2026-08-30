@@ -21,3 +21,5 @@ async def sync_admin_emails(async_session: SQLAlchemyAsyncSession) -> None:
         .values(is_admin=True)
     )
     await async_session.flush()
+
+

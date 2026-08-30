@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { getApiErrorMessage } from "@/lib/apiError";
 import { del } from "@/services/api/main/call";
 import { MAIN_ENDPOINT } from "@/services/api/main/endpoint";
 import type { DeleteProjectResponse } from "@/types/project";
@@ -10,12 +11,12 @@ export const useDeleteProjectMutation = () => {
 
 	return useMutation({
 		mutationFn: async (id: string) => {
-			const { OK, Kind } = await del<DeleteProjectResponse>(
+			const { OK, Kind, StatusCode } = await del<DeleteProjectResponse>(
 				MAIN_ENDPOINT.Projects.Delete(id),
 			);
 
 			if (!OK) {
-				throw new Error("Failed to delete project.");
+				throw new Error(getApiErrorMessage(StatusCode, Kind, "Failed to delete project."));
 			}
 
 			const response = Kind as DeleteProjectResponse;

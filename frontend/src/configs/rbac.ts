@@ -55,6 +55,7 @@ export const ROLE_MENU_ACCESS: Record<string, Partial<Record<MenuKey, MenuAccess
 	"Project Manager": {
 		dashboard: view,
 		project: edit,
+		location: view,
 	},
 	"HSSE & Admin": {
 		dashboard: view,

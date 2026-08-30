@@ -38,6 +38,7 @@ def _project_to_data(project: Project) -> dict:
             "operational_start_date": project.operational_start_date,
             "estimated_completion_date": project.estimated_completion_date,
             "project_name": project.project_name,
+            "pic": project.pic,
             "project_location": project.project_location,
             "project_value": project.project_value,
             "project_priority": project.project_priority,

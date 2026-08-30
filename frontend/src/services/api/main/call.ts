@@ -1,5 +1,7 @@
-"use server";
-
+// Deliberately NOT "use server" — these run client-side so the request interceptor's
+// getToken() (reads document.cookie) actually has a browser to read from. As a Server
+// Action this would execute in Node, where getToken() always returns undefined and every
+// call silently goes out unauthenticated.
 import type { AxiosError, AxiosResponse } from "axios";
 import { removeToken } from "@/lib/cookies";
 import api from "./interceptor";

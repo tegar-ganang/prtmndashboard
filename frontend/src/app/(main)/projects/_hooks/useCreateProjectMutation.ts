@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { getApiErrorMessage } from "@/lib/apiError";
 import { post } from "@/services/api/main/call";
 import { MAIN_ENDPOINT } from "@/services/api/main/endpoint";
 import type {
@@ -14,13 +15,13 @@ export const useCreateProjectMutation = () => {
 
 	return useMutation({
 		mutationFn: async (data: CreateProjectRequest) => {
-			const { OK, Kind } = await post<CreateProjectResponse>(
+			const { OK, Kind, StatusCode } = await post<CreateProjectResponse>(
 				MAIN_ENDPOINT.Projects.Create,
 				toProjectPayload(data) as unknown as Record<string, unknown>,
 			);
 
 			if (!OK) {
-				throw new Error("Failed to create project.");
+				throw new Error(getApiErrorMessage(StatusCode, Kind, "Failed to create project."));
 			}
 
 			const response = Kind as CreateProjectResponse;

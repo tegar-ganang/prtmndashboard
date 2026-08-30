@@ -3,8 +3,12 @@
 import { type SubmitHandler } from "react-hook-form";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import useAuthStore from "@/app/stores/useAuthStore";
 import ButtonLink from "@/components/links/ButtonLink";
+import { canUploadMenu } from "@/configs/rbac";
 import type { CreateProjectRequest } from "@/types/project";
+import ProjectAccessDenied from "../_components/ProjectAccessDenied";
 import ProjectForm from "../_components/ProjectForm";
 import { projectToFormValues } from "../_lib/projectTransform";
 import { useProjectDetailQuery } from "../_hooks/useProjectDetailQuery";
@@ -14,10 +18,15 @@ export default function EditProjectContainer({ id }: { id: string }) {
 	const router = useRouter();
 	const { data: project, isLoading } = useProjectDetailQuery(id);
 	const { mutate: updateProject, isPending } = useUpdateProjectMutation(id);
+	const user = useAuthStore.useUser();
 	const defaultValues = useMemo(
 		() => (project ? projectToFormValues(project) : null),
 		[project],
 	);
+
+	if (!canUploadMenu(user?.role_name, "project")) {
+		return <ProjectAccessDenied />;
+	}
 
 	const onSubmit: SubmitHandler<CreateProjectRequest> = (data) => {
 		updateProject(data, {
@@ -36,12 +45,12 @@ export default function EditProjectContainer({ id }: { id: string }) {
 						Update the selected project data.
 					</p>
 				</div>
-				<ButtonLink href="/projects" variant="outline">
+				<ButtonLink href="/projects" variant="outline" leftIcon={ArrowLeft}>
 					Back to Projects
 				</ButtonLink>
 			</div>
 
-			<section className="rounded-xl bg-white shadow-sm ring-1 ring-gray-200 p-5 lg:p-6">
+			<section className="rounded-xl bg-white shadow-sm ring-1 ring-gray-200 p-6 lg:p-8">
 				{isLoading || !defaultValues ? (
 					<p className="text-sm text-gray-500">Loading project data...</p>
 				) : (

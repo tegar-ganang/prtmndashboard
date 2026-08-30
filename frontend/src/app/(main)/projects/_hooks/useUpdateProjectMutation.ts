@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { getApiErrorMessage } from "@/lib/apiError";
 import { patch } from "@/services/api/main/call";
 import { MAIN_ENDPOINT } from "@/services/api/main/endpoint";
 import type { CreateProjectRequest, UpdateProjectResponse } from "@/types/project";
@@ -12,13 +13,13 @@ export const useUpdateProjectMutation = (id: string) => {
 
 	return useMutation({
 		mutationFn: async (data: CreateProjectRequest) => {
-			const { OK, Kind } = await patch<UpdateProjectResponse>(
+			const { OK, Kind, StatusCode } = await patch<UpdateProjectResponse>(
 				MAIN_ENDPOINT.Projects.Update(id),
 				toProjectPayload(data) as unknown as Record<string, unknown>,
 			);
 
 			if (!OK) {
-				throw new Error("Failed to update project.");
+				throw new Error(getApiErrorMessage(StatusCode, Kind, "Failed to update project."));
 			}
 
 			const response = Kind as UpdateProjectResponse;

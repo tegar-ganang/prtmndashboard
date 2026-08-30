@@ -3,11 +3,13 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
+import useAuthStore from "@/app/stores/useAuthStore";
 import IconButton from "@/components/button/IconButton";
 import ConfirmationDialog from "@/components/dialog/ConfirmationDialog";
 import ButtonLink from "@/components/links/ButtonLink";
 import IconLink from "@/components/links/IconLink";
 import Table from "@/components/table/Table";
+import { canUploadMenu } from "@/configs/rbac";
 import type { ProjectItem } from "@/types/project";
 import { formatProjectCurrency, formatProjectDate } from "../_lib/projectTransform";
 import { useDeleteProjectMutation } from "../_hooks/useDeleteProjectMutation";
@@ -47,6 +49,8 @@ export default function ProjectsContainer() {
     const { mutate: deleteProject, isPending: isDeleting } =
         useDeleteProjectMutation();
     const { data: projects = [], isLoading } = useProjectsQuery();
+    const user = useAuthStore.useUser();
+    const canManageProjects = canUploadMenu(user?.role_name, "project");
 
     const columns = useMemo<ColumnDef<ProjectRow>[]>(
         () => [
@@ -112,28 +116,32 @@ export default function ProjectsContainer() {
                             title="Detail project"
                             aria-label="Detail project"
                         />
-                        <IconLink
-                            href={`/projects/${row.original.id}/edit`}
-                            variant="yellow"
-                            size="sm"
-                            icon={Pencil}
-                            title="Update project"
-                            aria-label="Update project"
-                        />
-                        <IconButton
-                            type="button"
-                            variant="red"
-                            size="sm"
-                            icon={Trash2}
-                            title="Delete project"
-                            aria-label="Delete project"
-                            onClick={() => setSelectedDeleteId(row.original.id)}
-                        />
+                        {canManageProjects && (
+                            <>
+                                <IconLink
+                                    href={`/projects/${row.original.id}/edit`}
+                                    variant="yellow"
+                                    size="sm"
+                                    icon={Pencil}
+                                    title="Update project"
+                                    aria-label="Update project"
+                                />
+                                <IconButton
+                                    type="button"
+                                    variant="red"
+                                    size="sm"
+                                    icon={Trash2}
+                                    title="Delete project"
+                                    aria-label="Delete project"
+                                    onClick={() => setSelectedDeleteId(row.original.id)}
+                                />
+                            </>
+                        )}
                     </div>
                 ),
             },
         ],
-        [],
+        [canManageProjects],
     );
 
     const projectRows = useMemo(() => {
@@ -166,9 +174,11 @@ export default function ProjectsContainer() {
                         Manage project list and open detail, update, or delete actions.
                     </p>
                 </div>
-                <ButtonLink href="/projects/create" variant="blue">
-                    Create New Project
-                </ButtonLink>
+                {canManageProjects && (
+                    <ButtonLink href="/projects/create" variant="blue">
+                        Create New Project
+                    </ButtonLink>
+                )}
             </div>
 
             <section className="rounded-xl bg-white shadow-sm ring-1 ring-gray-200 p-5 lg:p-6">

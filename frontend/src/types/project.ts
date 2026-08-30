@@ -5,6 +5,7 @@ export type CreateProjectRequest = {
 	operationalStartDate: string;
 	estimatedCompletionDate: string;
 	projectName: string;
+	pic: string;
 	projectLocation: string;
 	projectValue: number;
 	projectPriority: ProjectPriority;
@@ -21,6 +22,7 @@ export type ProjectDocument = {
 	operational_start_date: string;
 	estimated_completion_date: string;
 	project_name: string;
+	pic: string | null;
 	project_location: string;
 	project_value: number;
 	project_priority: ProjectPriority;

@@ -65,6 +65,15 @@ async def initialize_db_tables(connection: AsyncConnection) -> None:
         END
     """))
 
+    await connection.execute(sqlalchemy.text("""
+        IF NOT EXISTS (
+            SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('app.project') AND name = 'pic'
+        )
+        BEGIN
+            ALTER TABLE app.project ADD pic NVARCHAR(150) NULL;
+        END
+    """))
+
     async with SQLAlchemyAsyncSession(bind=connection, expire_on_commit=False) as async_session:
         await seed_rbac_data(async_session=async_session)
         await sync_admin_emails(async_session=async_session)
