@@ -47,6 +47,9 @@ celerybeat-schedule
 *.db
 postgres-data
 
+# Uploaded S-curve files (stored on local disk, not in git)
+/uploads/
+
 # Distributions package
 .Python
 build/

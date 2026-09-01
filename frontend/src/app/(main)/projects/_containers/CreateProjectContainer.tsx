@@ -2,8 +2,12 @@
 
 import { type SubmitHandler } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import useAuthStore from "@/app/stores/useAuthStore";
 import ButtonLink from "@/components/links/ButtonLink";
+import { canUploadMenu } from "@/configs/rbac";
 import type { CreateProjectRequest } from "@/types/project";
+import ProjectAccessDenied from "../_components/ProjectAccessDenied";
 import ProjectForm from "../_components/ProjectForm";
 import { defaultProjectFormValues } from "../_lib/projectTransform";
 import { useCreateProjectMutation } from "../_hooks/useCreateProjectMutation";
@@ -11,6 +15,11 @@ import { useCreateProjectMutation } from "../_hooks/useCreateProjectMutation";
 export default function CreateProjectContainer() {
 	const router = useRouter();
 	const { mutate: createProject, isPending } = useCreateProjectMutation();
+	const user = useAuthStore.useUser();
+
+	if (!canUploadMenu(user?.role_name, "project")) {
+		return <ProjectAccessDenied />;
+	}
 
 	const onSubmit: SubmitHandler<CreateProjectRequest> = (data) => {
 		createProject(data, {
@@ -26,15 +35,15 @@ export default function CreateProjectContainer() {
 				<div>
 					<h1 className="text-2xl font-bold text-gray-900">Create Project</h1>
 					<p className="text-sm text-gray-600 mt-1">
-						Fill the project form to create a new entry.
+						Fill in the project details to create a new entry.
 					</p>
 				</div>
-				<ButtonLink href="/projects" variant="outline">
+				<ButtonLink href="/projects" variant="outline" leftIcon={ArrowLeft}>
 					Back to Projects
 				</ButtonLink>
 			</div>
 
-			<section className="rounded-xl bg-white shadow-sm ring-1 ring-gray-200 p-5 lg:p-6">
+			<section className="rounded-xl bg-white shadow-sm ring-1 ring-gray-200 p-6 lg:p-8">
 				<ProjectForm
 					defaultValues={defaultProjectFormValues}
 					onSubmit={onSubmit}

@@ -20,6 +20,12 @@ export const MAIN_ENDPOINT = {
 		Detail: (id: string) => `/projects/${id}`,
 		Update: (id: string) => `/projects/${id}`,
 		Delete: (id: string) => `/projects/${id}`,
+		ScurveUpload: (id: string) => `/projects/${id}/scurve/upload`,
+		ScurveProgress: (id: string) => `/projects/${id}/scurve/progress`,
+		ScurveSummary: (id: string) => `/projects/${id}/scurve/summary`,
+		ScurveUploads: (id: string) => `/projects/${id}/scurve/uploads`,
+		ScurveDownload: (id: string, uploadId: string) =>
+			`/projects/${id}/scurve/uploads/${uploadId}/download`,
 	},
 	Mit: {
 		BatchCreate: "/mit/batch",

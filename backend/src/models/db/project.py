@@ -21,6 +21,7 @@ class Project(Base):  # type: ignore
         sqlalchemy.Date, nullable=False
     )
     project_name: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(sqlalchemy.String(length=150), nullable=False)
+    pic: SQLAlchemyMapped[str | None] = sqlalchemy_mapped_column(sqlalchemy.String(length=150), nullable=True)
     project_location: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(sqlalchemy.String(length=255), nullable=False)
     project_value: SQLAlchemyMapped[float | None] = sqlalchemy_mapped_column(sqlalchemy.Float, nullable=True)
     project_priority: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(sqlalchemy.String(length=10), nullable=False)

@@ -42,6 +42,9 @@ ACCESS: dict[str, dict[str, tuple[bool, bool]]] = {
     "Project Manager": {
         "dashboard": (True, False),
         "project": (True, True),
+        # Read-only: the Create/Edit Project form picks location from this lookup
+        # instead of free-typed text, so Project Manager needs at least view access.
+        "location": (True, False),
     },
     "HSSE & Admin": {
         "dashboard": (True, False),
