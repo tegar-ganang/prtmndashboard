@@ -106,4 +106,8 @@ export const MAIN_ENDPOINT = {
 		GetAll: "/zona-pse-list",
 		History: "/zona-pse-list/history",
 	},
+	MartSync: {
+		Counts: "/admin/mart-sync/counts",
+		Run: "/admin/mart-sync/run",
+	},
 };
