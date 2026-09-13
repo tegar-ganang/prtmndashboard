@@ -69,7 +69,7 @@ const SELECT_STYLES = {
 
 function parseExcelPreview(buffer: ArrayBuffer): {
 	preview: PreviewRow[];
-	targetRows: { month: number; dmf: number }[];
+	targetRows: { month: number; dmf: number; kondensat: number | null }[];
 	totalRows: number;
 } {
 	const wb = XLSX.read(buffer, { type: "array", cellDates: true });
@@ -78,15 +78,20 @@ function parseExcelPreview(buffer: ArrayBuffer): {
 
 	// Parse Sheet2 target
 	const s2Raw = XLSX.utils.sheet_to_json<any[]>(sheet2, { header: 1 });
-	const targetRows: { month: number; dmf: number }[] = [];
+	const targetRows: { month: number; dmf: number; kondensat: number | null }[] = [];
 	for (let i = 2; i < s2Raw.length; i++) {
 		const row = s2Raw[i];
 		const bulan = row[0];
 		const dmf = row[1];
+		const kondensat = row[2];
 		if (bulan == null || dmf == null) continue;
 		const d = bulan instanceof Date ? bulan : new Date(bulan);
 		if (!isNaN(d.getTime())) {
-			targetRows.push({ month: d.getMonth() + 1, dmf: Number(dmf) });
+			targetRows.push({
+				month: d.getMonth() + 1,
+				dmf: Number(dmf),
+				kondensat: kondensat != null && !isNaN(Number(kondensat)) ? Number(kondensat) : null,
+			});
 		}
 	}
 
@@ -147,7 +152,7 @@ export default function ProduksiUploadContainer() {
 	// File + preview state
 	const [file, setFile] = useState<File | null>(null);
 	const [preview, setPreview] = useState<PreviewRow[]>([]);
-	const [targetRows, setTargetRows] = useState<{ month: number; dmf: number }[]>([]);
+	const [targetRows, setTargetRows] = useState<{ month: number; dmf: number; kondensat: number | null }[]>([]);
 	const [totalRows, setTotalRows] = useState(0);
 	const [parsing, setParsing] = useState(false);
 
@@ -422,7 +427,10 @@ export default function ProduksiUploadContainer() {
 											}`}
 										>
 											<span>{mo?.label ?? `Bulan ${t.month}`}</span>
-											<span className="font-mono font-bold">{t.dmf.toFixed(2)}</span>
+											<span className="font-mono font-bold">
+												{t.dmf.toFixed(2)} GAS
+												{t.kondensat != null && ` / ${t.kondensat.toFixed(2)} KONDENSAT`}
+											</span>
 										</div>
 									);
 								})}

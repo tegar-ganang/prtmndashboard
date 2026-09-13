@@ -14,6 +14,7 @@ class ProduksiTargetResponse(pydantic.BaseModel):
     field: typing.Optional[str]
     field_location: typing.Optional[FieldLocationResponse] = None
     target_dmf: typing.Optional[float]
+    target_kondensat: typing.Optional[float]
     created_at: datetime.datetime
     updated_at: typing.Optional[datetime.datetime]
 
