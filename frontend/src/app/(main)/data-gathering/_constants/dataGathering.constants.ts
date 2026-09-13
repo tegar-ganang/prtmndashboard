@@ -16,6 +16,7 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 	MIT: {
 		label: "Major Integrity Threat (MIT)",
 		expectedHeaders: [
+			"No Registration - Lokasi",
 			"No Registration - Jenis MIT",
 			"No Registration - Kategori", "No Registration - Tahun", "No Registration - No",
 			"MIT Declaration Date", "MIT Title / Asset", "Integrity Threats",
@@ -262,7 +263,7 @@ export const YEAR_OPTIONS = Array.from({ length: 5 }, (_, i) => {
 });
 
 export const DRAWER_SECTIONS = [
-	{ title: "Identitas & Registration", keys: ["No Registration - Jenis MIT", "No Registration - Kategori", "No Registration - Tahun", "No Registration - No"] },
+	{ title: "Identitas & Registration", keys: ["No Registration - Lokasi", "No Registration - Jenis MIT", "No Registration - Kategori", "No Registration - Tahun", "No Registration - No"] },
 	{ title: "Informasi MIT", keys: ["MIT Declaration Date", "MIT Title / Asset", "Integrity Threats", "Possible Scenario", "Consequences", "Available Safeguard/Control"] },
 	{ title: "Current Risk", keys: ["Current Risk - Likelihood", "Current Risk - Severity", "Current Risk - Risk"] },
 	{ title: "Rekomendasi", keys: ["Rec. No.", "Recommendation / Action", "PIC", "Target Closing", "Remarks"] },
