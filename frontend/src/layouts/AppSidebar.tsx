@@ -144,6 +144,8 @@ const AppSidebar: React.FC = () => {
 							{ name: "I2AIMS", path: "/monitoring/i2aims", description: "I2AIMS Monitoring", menu: "i2aims" },
 							{ name: "MIT & MOC", path: "/monitoring/mit", description: "Major Integrity Threat & Management of Change", menu: "mit" },
 							{ name: "OPE", path: "/monitoring/ope", description: "Operational Performance & Excellence" },
+							{ name: "ABI", path: "/monitoring/abi", description: "Anggaran Biaya Investasi", menu: "abi" },
+							{ name: "ABO", path: "/monitoring/abo", description: "Anggaran Biaya Operasi", menu: "abo" },
 						],
 					},
 					{
@@ -182,7 +184,7 @@ const AppSidebar: React.FC = () => {
 	const isAdmin = user?.is_admin ?? false;
 	const dataGatheringMenus: MenuKey[] = [
 		"produksi", "i2aims", "airms", "mit", "moc", "hazid", "hazop", "lopa",
-		"hsse", "lcv", "zona_indicator", "zona_pse_list",
+		"hsse", "lcv", "zona_indicator", "zona_pse_list", "abi", "abo",
 	];
 
 	const filterSubItems = useCallback(

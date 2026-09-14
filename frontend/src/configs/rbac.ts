@@ -18,13 +18,16 @@ export type MenuKey =
 	| "lopa"
 	| "location"
 	| "zona_indicator"
-	| "zona_pse_list";
+	| "zona_pse_list"
+	| "abi"
+	| "abo";
 
 type MenuAccess = { view: boolean; upload: boolean };
 
 const ALL_MENUS: MenuKey[] = [
 	"dashboard", "produksi", "project", "hsse", "lcv", "i2aims", "airms",
 	"mit", "moc", "hazid", "hazop", "lopa", "location", "zona_indicator", "zona_pse_list",
+	"abi", "abo",
 ];
 
 const view: MenuAccess = { view: true, upload: false };
@@ -51,6 +54,8 @@ export const ROLE_MENU_ACCESS: Record<string, Partial<Record<MenuKey, MenuAccess
 		zona_indicator: edit,
 		zona_pse_list: edit,
 		location: view,
+		abi: edit,
+		abo: edit,
 	},
 	"Project Manager": {
 		dashboard: view,

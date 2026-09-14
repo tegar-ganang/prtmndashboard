@@ -156,8 +156,8 @@ export default function DataGatheringSidebar({
 					</div>
 				)}
 
-				{/* Lokasi / Field — tidak ditampilkan untuk PSAIMS & LCV */}
-				{!isPsaims && !isLcv && docType.value !== "PRODUKSI" && (
+				{/* Lokasi / Field — tidak ditampilkan untuk PSAIMS, LCV, PRODUKSI, ABI & ABO */}
+				{!isPsaims && !isLcv && docType.value !== "PRODUKSI" && docType.value !== "ABI" && docType.value !== "ABO" && (
 					<div className="mt-4">
 						<label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
 							Lokasi / Field

@@ -259,6 +259,58 @@ export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
       ch.accessor("last_updated", { header: "Last Updated", cell: i => renderDateCell(i.getValue()) }),
     ]
   },
+  abi: {
+    title: "ABI (Anggaran Biaya Investasi)",
+    periodType: "month",
+    getColumns: (ch) => [
+      ch.accessor("wbs", {
+        header: "WBS",
+        cell: info => {
+          const row = info.row.original;
+          return (
+            <div className="flex flex-col gap-1 py-1">
+              <span className="text-sm font-mono font-semibold text-gray-900 leading-snug">{row.wbs || "—"}</span>
+              <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">{row.ref_wbs || "—"}</span>
+            </div>
+          );
+        }
+      }),
+      ch.accessor("nilai_usd", { header: "Nilai (USD)", cell: i => <span className="text-sm font-medium text-gray-800">{i.getValue() ?? "—"}</span> }),
+      ch.accessor("nilai_idr", { header: "Nilai (IDR)", cell: i => <span className="text-sm font-medium text-gray-800">{i.getValue() ?? "—"}</span> }),
+      ch.accessor("actual_invoice_percent", { header: "Actual Invoice (%)", cell: i => <span className="text-sm text-gray-700">{i.getValue() ?? "—"}</span> }),
+      ch.accessor("sisa_anggaran_percent_idr", { header: "Sisa Anggaran (%)", cell: i => <span className="text-sm text-gray-700">{i.getValue() ?? "—"}</span> }),
+      ch.accessor("keterangan_1", {
+        header: "Keterangan",
+        cell: i => (
+          <div className="max-w-xs truncate text-sm text-gray-600" title={String(i.getValue() ?? "")}>
+            {i.getValue() || "—"}
+          </div>
+        )
+      }),
+    ]
+  },
+  abo: {
+    title: "ABO (Anggaran Biaya Operasi)",
+    periodType: "month",
+    getColumns: (ch) => [
+      ch.accessor("no_rk", {
+        header: "No. RK",
+        cell: info => {
+          const row = info.row.original;
+          return (
+            <div className="flex flex-col gap-1 py-1">
+              <span className="text-sm font-mono font-semibold text-gray-900 leading-snug">{row.no_rk || "—"}</span>
+              <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">{row.jenis_kerangka_anggaran || "—"}</span>
+            </div>
+          );
+        }
+      }),
+      ch.accessor("anggaranwpb_osf_nilai_idr", { header: "Anggaran WPB OSF (IDR)", cell: i => <span className="text-sm font-medium text-gray-800">{i.getValue() ?? "—"}</span> }),
+      ch.accessor("actual_invoice_percent_idr", { header: "Actual Invoice (%)", cell: i => <span className="text-sm text-gray-700">{i.getValue() ?? "—"}</span> }),
+      ch.accessor("sisa_anggaran_percent_idr", { header: "Sisa Anggaran (%)", cell: i => <span className="text-sm text-gray-700">{i.getValue() ?? "—"}</span> }),
+      ch.accessor("flag", { header: "Flag", cell: i => renderStatusBadge(i.getValue()) }),
+    ]
+  },
   hsse: {
     title: "HSSE",
     periodType: "month",

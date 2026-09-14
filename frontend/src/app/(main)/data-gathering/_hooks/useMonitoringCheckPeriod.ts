@@ -57,6 +57,14 @@ export const checkMonitoringPeriodExists = async (
 
 
 
+		} else if (docType === "ABI") {
+			url = MAIN_ENDPOINT.Abi.CheckPeriod;
+			params = { year, month: period };
+			if (field) params.field = field;
+		} else if (docType === "ABO") {
+			url = MAIN_ENDPOINT.Abo.CheckPeriod;
+			params = { year, month: period };
+			if (field) params.field = field;
 		} else if (docType === "PRODUKSI") {
 
 			url = MAIN_ENDPOINT.Produksi.CheckPeriod;

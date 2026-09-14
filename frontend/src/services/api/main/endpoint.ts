@@ -106,6 +106,18 @@ export const MAIN_ENDPOINT = {
 		GetAll: "/zona-pse-list",
 		History: "/zona-pse-list/history",
 	},
+	Abi: {
+		BatchCreate: "/abi/batch",
+		CheckPeriod: "/abi/check-period",
+		GetAll: "/abi",
+		History: "/abi/history",
+	},
+	Abo: {
+		BatchCreate: "/abo/batch",
+		CheckPeriod: "/abo/check-period",
+		GetAll: "/abo",
+		History: "/abo/history",
+	},
 	MartSync: {
 		Counts: "/admin/mart-sync/counts",
 		Run: "/admin/mart-sync/run",
