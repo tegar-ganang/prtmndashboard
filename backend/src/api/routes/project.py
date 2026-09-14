@@ -73,10 +73,9 @@ async def create_project(
 
 @router.get(path="", name="projects:read-all", response_model=APIResponse, status_code=fastapi.status.HTTP_200_OK)
 async def get_projects(
-    current_account: Account = fastapi.Depends(get_current_account),
     project_repo: ProjectCRUDRepository = fastapi.Depends(get_repository(repo_type=ProjectCRUDRepository)),
 ) -> APIResponse:
-    db_projects = await project_repo.read_projects(owner_account_id=current_account.id)
+    db_projects = await project_repo.read_projects()
 
     return APIResponse(
         success=True,
@@ -94,11 +93,10 @@ async def get_projects(
 )
 async def get_project(
     project_id: str,
-    current_account: Account = fastapi.Depends(get_current_account),
     project_repo: ProjectCRUDRepository = fastapi.Depends(get_repository(repo_type=ProjectCRUDRepository)),
 ) -> APIResponse:
     try:
-        db_project = await project_repo.read_project_by_id(project_id=project_id, owner_account_id=current_account.id)
+        db_project = await project_repo.read_project_by_id(project_id=project_id)
 
     except EntityDoesNotExist:
         raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="Project not found")

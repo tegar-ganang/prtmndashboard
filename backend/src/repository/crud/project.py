@@ -18,13 +18,22 @@ class ProjectCRUDRepository(BaseCRUDRepository):
 
         return new_project
 
-    async def read_projects(self, owner_account_id: str) -> typing.Sequence[Project]:
-        stmt = sqlalchemy.select(Project).where(Project.owner_account_id == owner_account_id).order_by(Project.id)
+    async def read_projects(self, owner_account_id: str | None = None) -> typing.Sequence[Project]:
+        # owner_account_id is optional: viewing the project list is an RBAC "project"
+        # menu permission (anyone with view access sees every project, same as every
+        # other monitoring module), not scoped to whoever happened to create each row.
+        # Only the mutating paths (update/delete) still scope by owner.
+        stmt = sqlalchemy.select(Project).order_by(Project.id)
+        if owner_account_id is not None:
+            stmt = stmt.where(Project.owner_account_id == owner_account_id)
         query = await self.async_session.execute(statement=stmt)
         return query.scalars().all()
 
-    async def read_project_by_id(self, project_id: str, owner_account_id: str) -> Project:
-        stmt = sqlalchemy.select(Project).where(Project.id == project_id, Project.owner_account_id == owner_account_id)
+    async def read_project_by_id(self, project_id: str, owner_account_id: str | None = None) -> Project:
+        conditions = [Project.id == project_id]
+        if owner_account_id is not None:
+            conditions.append(Project.owner_account_id == owner_account_id)
+        stmt = sqlalchemy.select(Project).where(*conditions)
         query = await self.async_session.execute(statement=stmt)
         db_project = query.scalar()
 
