@@ -443,7 +443,7 @@ const AppSidebar: React.FC = () => {
 																		}`}
 																	>
 																		<span className="flex-1">{subSub.name}</span>
-																		{(subSub.name.includes("AIRMS") || subSub.name === "I2AIMS") && (
+																		{(subSub.name.includes("AIRMS") || subSub.name === "I2AIMS" || subSub.name === "ABI" || subSub.name === "ABO") && (
 																			<span className={`text-[8px] font-extrabold px-1 py-0.5 rounded uppercase border whitespace-nowrap tracking-wider scale-90 ${
 																				isActive(subSub.path)
 																					? "bg-amber-100 text-amber-800 border-amber-200"
