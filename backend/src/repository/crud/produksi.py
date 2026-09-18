@@ -262,8 +262,7 @@ class ProduksiCRUDRepository(BaseCRUDRepository):
             "BBLS - DONGGI MATINDOK FIELD|Processed & Produced Water": "bbls_processed_water",
             "BBLS - DONGGI MATINDOK FIELD|Water Injection":             "bbls_water_injection",
             "BBLS - DONGGI MATINDOK FIELD|Closing Stock":               "bbls_closing_stock",
-            "SAFE MAN HOURS|ACTL":                        "safe_man_hours_actl",
-            "SAFE MAN HOURS |ACTL":                        "safe_man_hours_actl",
+            "BBLS - DONGGI MATINDOK FIELD|ACTL":                        "bbls_actl",
             "SAFE MAN HOURS|DONGGI MATINDOK FIELD":        "safe_man_hours_dmf",
             "SAFE MAN HOURS |DONGGI MATINDOK FIELD":       "safe_man_hours_dmf",
         }
@@ -275,9 +274,6 @@ class ProduksiCRUDRepository(BaseCRUDRepository):
             db_col = normalized_header_map.get(combined.strip())
             if db_col:
                 col_index_map[idx] = db_col
-
-        if 26 not in col_index_map and "safe_man_hours_actl" not in col_index_map.values():
-            col_index_map[26] = "safe_man_hours_actl"
 
         records: list[Produksi] = []
         data_rows = df_raw.iloc[2:].values.tolist()

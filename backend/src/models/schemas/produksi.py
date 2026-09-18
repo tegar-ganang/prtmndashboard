@@ -74,6 +74,7 @@ class ProduksiResponse(pydantic.BaseModel):
     bbls_processed_water: typing.Optional[float]
     bbls_water_injection: typing.Optional[float]
     bbls_closing_stock:   typing.Optional[float]
+    bbls_actl:            typing.Optional[float]
 
     # Safe Man Hours
     safe_man_hours_actl: typing.Optional[float]

@@ -77,6 +77,7 @@ class Produksi(Base):
     bbls_processed_water:  SQLAlchemyMapped[float | None] = sqlalchemy_mapped_column(sqlalchemy.Numeric(15, 4), nullable=True)
     bbls_water_injection:  SQLAlchemyMapped[float | None] = sqlalchemy_mapped_column(sqlalchemy.Numeric(15, 4), nullable=True)
     bbls_closing_stock:    SQLAlchemyMapped[float | None] = sqlalchemy_mapped_column(sqlalchemy.Numeric(15, 4), nullable=True)
+    bbls_actl:             SQLAlchemyMapped[float | None] = sqlalchemy_mapped_column(sqlalchemy.Numeric(15, 4), nullable=True)
 
     # ── Sheet 1: SAFE MAN HOURS ───────────────────────────────────────────────
     safe_man_hours_actl: SQLAlchemyMapped[float | None] = sqlalchemy_mapped_column(sqlalchemy.Numeric(15, 4), nullable=True)

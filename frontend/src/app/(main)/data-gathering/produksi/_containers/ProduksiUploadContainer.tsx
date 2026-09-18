@@ -34,7 +34,7 @@ interface PreviewRow {
 	op_real: number | null;
 	donggi_prod: number | null;
 	matindok_prod: number | null;
-	safe_man_hours_actl: number | null;
+	bbls_actl: number | null;
 }
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -102,13 +102,13 @@ function parseExcelPreview(buffer: ArrayBuffer): {
 
 	// Column indices (0-based) based on known template structure
 	// Col 0: Tanggal, Col 2: PUPO/SOT Real, Col 6: Op Real,
-	// Col 9: Donggi Prod, Col 16: Matindok Prod, Col 26: Safe Man Hours ACTL
+	// Col 9: Donggi Prod, Col 16: Matindok Prod, Col 26: BBLS ACTL (X1:AA1 merge, last of 4 BBLS cols)
 	const COL_TANGGAL = 0;
 	const COL_PUPO_SOT_REAL = 2;
 	const COL_OP_REAL = 6;
 	const COL_DONGGI_PROD = 9;
 	const COL_MATINDOK_PROD = 16;
-	const COL_SAFE_MAN_HOURS_ACTL = 26;
+	const COL_BBLS_ACTL = 26;
 
 	const preview: PreviewRow[] = dataRows
 		.filter((r) => r[COL_TANGGAL] != null)
@@ -132,7 +132,7 @@ function parseExcelPreview(buffer: ArrayBuffer): {
 				op_real: safeNum(r[COL_OP_REAL]),
 				donggi_prod: safeNum(r[COL_DONGGI_PROD]),
 				matindok_prod: safeNum(r[COL_MATINDOK_PROD]),
-				safe_man_hours_actl: safeNum(r[COL_SAFE_MAN_HOURS_ACTL]),
+				bbls_actl: safeNum(r[COL_BBLS_ACTL]),
 			};
 		});
 
@@ -594,7 +594,7 @@ export default function ProduksiUploadContainer() {
 												"Op Real (BOPD)",
 												"Donggi Prod (MMSCFD)",
 												"Matindok Prod (MMSCFD)",
-												"Safe Man Hours",
+												"BBLS ACTL",
 												"Target DMF",
 											].map((h) => (
 												<th
@@ -633,8 +633,8 @@ export default function ProduksiUploadContainer() {
 														{row.matindok_prod != null ? row.matindok_prod.toFixed(2) : "—"}
 													</td>
 													<td className="px-3 py-2.5 text-xs text-gray-500">
-														{row.safe_man_hours_actl != null
-															? row.safe_man_hours_actl.toLocaleString()
+														{row.bbls_actl != null
+															? row.bbls_actl.toLocaleString()
 															: "—"}
 													</td>
 													<td className="px-3 py-2.5 text-xs font-bold text-emerald-700">
