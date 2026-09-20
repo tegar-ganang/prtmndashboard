@@ -17,6 +17,10 @@ function CountCell({ count, error }: { count: number | null; error: string | nul
 	return <span className="font-mono">{count.toLocaleString("id-ID")}</span>;
 }
 
+function isTransformed(row: MartSyncCountRow) {
+	return row.expectedMartCount !== null && row.expectedMartCount !== row.appCount;
+}
+
 function StatusBadge({ row }: { row: MartSyncCountRow }) {
 	if (row.martError) {
 		return (
@@ -65,16 +69,29 @@ export default function LogDataContainer() {
 				id: "mart",
 				header: "Mart (mart_pertamina.*)",
 				cell: ({ row }) => (
-					<div className="flex flex-col">
+					<div className="flex flex-col items-center">
 						<span className="text-xs text-gray-400 font-mono">{row.original.martTable}</span>
 						<CountCell count={row.original.martCount} error={row.original.martError} />
+						{isTransformed(row.original) && !row.original.martError && (
+							<span
+								className={`mt-1 inline-flex w-fit items-center px-2 py-0.5 rounded-full text-xs font-semibold ${
+									row.original.expectedMartCount === row.original.martCount
+										? "bg-green-100 text-green-700"
+										: "bg-red-100 text-red-700"
+								}`}
+							>
+								expected: {row.original.expectedMartCount?.toLocaleString("id-ID")}
+							</span>
+						)}
 					</div>
 				),
 			},
 			{
 				id: "status",
 				header: "Status",
-				cell: ({ row }) => <StatusBadge row={row.original} />,
+				cell: ({ row }) => (
+					<StatusBadge row={row.original} />
+				),
 			},
 		],
 		[],
@@ -112,7 +129,12 @@ export default function LogDataContainer() {
 			</div>
 
 			<section className="rounded-xl bg-white shadow-sm ring-1 ring-gray-200 p-5 lg:p-6">
-				<h2 className="text-lg font-semibold text-gray-900 mb-4">Perbandingan Jumlah Baris</h2>
+				<h2 className="text-lg font-semibold text-gray-900">Perbandingan Jumlah Baris</h2>
+				<p className="text-xs text-gray-500 mt-1 mb-4">
+					Sebagian data diolah saat masuk ke mart (misalnya dipecah per metrik atau per field), sehingga jumlah baris mart
+					bisa lebih banyak dari app. Untuk tabel seperti itu, status dibandingkan dengan jumlah yang <em>diharapkan</em>,
+					bukan jumlah baris app.
+				</p>
 				<Table className="text-black" data={rows} columns={columns} withEntries isLoading={isLoading} />
 			</section>
 
