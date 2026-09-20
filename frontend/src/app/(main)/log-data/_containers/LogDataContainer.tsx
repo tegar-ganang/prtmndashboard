@@ -25,14 +25,15 @@ function StatusBadge({ row }: { row: MartSyncCountRow }) {
 			</span>
 		);
 	}
-	if (row.appCount !== null && row.martCount !== null && row.appCount === row.martCount) {
+	const expected = row.expectedMartCount ?? row.appCount;
+	if (expected !== null && row.martCount !== null && expected === row.martCount) {
 		return (
 			<span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
 				Sesuai
 			</span>
 		);
 	}
-	const diff = (row.appCount ?? 0) - (row.martCount ?? 0);
+	const diff = (expected ?? 0) - (row.martCount ?? 0);
 	return (
 		<span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
 			Selisih {Math.abs(diff)} baris

@@ -9,6 +9,7 @@ class MartSyncCountRow(BaseSchemaModel):
     app_table: str
     app_count: typing.Optional[int]
     app_error: typing.Optional[str]
+    expected_mart_count: typing.Optional[int]
     mart_table: str
     mart_count: typing.Optional[int]
     mart_error: typing.Optional[str]

@@ -39,18 +39,29 @@ class MartSyncCRUDRepository(BaseCRUDRepository):
         except Exception:
             return None, "Tabel tidak ditemukan"
 
+    async def _expected_count(self, sql: str | None) -> int | None:
+        if not sql:
+            return None
+        try:
+            async with SQLAlchemyAsyncSession(async_db.async_engine) as session:
+                return (await session.execute(sqlalchemy.text(sql))).scalar_one()
+        except Exception:
+            return None
+
     async def get_table_counts(self) -> list[dict[str, typing.Any]]:
         jobs = await self.get_jobs()
         rows: list[dict[str, typing.Any]] = []
         for job in jobs:
             app_count, app_error = await self._count_rows("app", job.app_table)
             mart_count, mart_error = await self._count_rows("mart_pertamina", job.mart_table)
+            expected = await self._expected_count(job.expected_mart_count_sql)
             rows.append({
                 "id": job.id,
                 "name": job.name,
                 "app_table": job.app_table,
                 "app_count": app_count,
                 "app_error": app_error,
+                "expected_mart_count": expected,
                 "mart_table": job.mart_table,
                 "mart_count": mart_count,
                 "mart_error": mart_error,

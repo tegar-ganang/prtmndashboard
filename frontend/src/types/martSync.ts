@@ -4,6 +4,7 @@ export type MartSyncCountRow = {
 	appTable: string;
 	appCount: number | null;
 	appError: string | null;
+	expectedMartCount: number | null;
 	martTable: string;
 	martCount: number | null;
 	martError: string | null;

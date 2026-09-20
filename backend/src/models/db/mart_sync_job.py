@@ -30,6 +30,7 @@ class MartSyncJob(Base):
     app_table: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(sqlalchemy.String(length=128), nullable=False)
     mart_table: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(sqlalchemy.String(length=128), nullable=False)
     sync_script: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(sqlalchemy.String(length=None), nullable=False)
+    expected_mart_count_sql: SQLAlchemyMapped[str | None] = sqlalchemy_mapped_column(sqlalchemy.Text, nullable=True)
     sort_order: SQLAlchemyMapped[int] = sqlalchemy_mapped_column(sqlalchemy.Integer, nullable=False, default=0)
     is_active: SQLAlchemyMapped[bool] = sqlalchemy_mapped_column(sqlalchemy.Boolean, nullable=False, default=True)
 
