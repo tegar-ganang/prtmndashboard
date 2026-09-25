@@ -5,6 +5,7 @@ import {
 	Barrel,
 	Box,
 	ChevronDown,
+	ClipboardList,
 	LayoutDashboard,
 	Monitor,
 	Settings,
@@ -143,6 +144,8 @@ const AppSidebar: React.FC = () => {
 							{ name: "I2AIMS", path: "/monitoring/i2aims", description: "I2AIMS Monitoring", menu: "i2aims" },
 							{ name: "MIT & MOC", path: "/monitoring/mit", description: "Major Integrity Threat & Management of Change", menu: "mit" },
 							{ name: "OPE", path: "/monitoring/ope", description: "Operational Performance & Excellence" },
+							{ name: "ABI", path: "/monitoring/abi", description: "Anggaran Biaya Investasi", menu: "abi" },
+							{ name: "ABO", path: "/monitoring/abo", description: "Anggaran Biaya Operasi", menu: "abo" },
 						],
 					},
 					{
@@ -166,6 +169,13 @@ const AppSidebar: React.FC = () => {
 				description: "Kelola role akses pengguna dashboard.",
 				adminOnly: true,
 			},
+			{
+				icon: <ClipboardList className="w-5 h-5" />,
+				name: "Log Data",
+				path: "/log-data",
+				description: "Cek status sinkronisasi data ke mart_pertamina.",
+				adminOnly: true,
+			},
 		],
 		[],
 	);
@@ -174,7 +184,7 @@ const AppSidebar: React.FC = () => {
 	const isAdmin = user?.is_admin ?? false;
 	const dataGatheringMenus: MenuKey[] = [
 		"produksi", "i2aims", "airms", "mit", "moc", "hazid", "hazop", "lopa",
-		"hsse", "lcv", "zona_indicator", "zona_pse_list",
+		"hsse", "lcv", "zona_indicator", "zona_pse_list", "abi", "abo",
 	];
 
 	const filterSubItems = useCallback(
@@ -433,7 +443,7 @@ const AppSidebar: React.FC = () => {
 																		}`}
 																	>
 																		<span className="flex-1">{subSub.name}</span>
-																		{(subSub.name.includes("AIRMS") || subSub.name === "I2AIMS") && (
+																		{(subSub.name.includes("AIRMS") || subSub.name === "I2AIMS" || subSub.name === "ABI" || subSub.name === "ABO") && (
 																			<span className={`text-[8px] font-extrabold px-1 py-0.5 rounded uppercase border whitespace-nowrap tracking-wider scale-90 ${
 																				isActive(subSub.path)
 																					? "bg-amber-100 text-amber-800 border-amber-200"

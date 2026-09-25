@@ -11,6 +11,7 @@ from src.models.db.role_menu_access import RoleMenuAccess
 MENUS = [
     "dashboard", "produksi", "project", "hsse", "lcv", "i2aims", "airms",
     "mit", "moc", "hazid", "hazop", "lopa", "location", "zona_indicator", "zona_pse_list",
+    "abi", "abo",
 ]
 
 ROLES = ["Executive", "Production Manager", "OSF Engineer", "Project Manager", "HSSE & Admin"]
@@ -38,6 +39,8 @@ ACCESS: dict[str, dict[str, tuple[bool, bool]]] = {
         "zona_indicator": (True, True),
         "zona_pse_list": (True, True),
         "location": (True, False),
+        "abi": (True, True),
+        "abo": (True, True),
     },
     "Project Manager": {
         "dashboard": (True, False),

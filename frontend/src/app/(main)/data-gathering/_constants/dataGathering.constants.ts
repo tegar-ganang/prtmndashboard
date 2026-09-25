@@ -1,6 +1,6 @@
 import type { StylesConfig } from "react-select";
 
-export type DocTypeValue = "MIT" | "HAZID" | "HAZOP" | "LOPA" | "MOC" | "HSSE" | "AIRMS" | "I2AIMS" | "LCV_PROJECT_CHARTER_BUDAYA" | "LCV_MONITORING" | "PRODUKSI" | "PRODUKSI_TARGET" | "PRODUKSI_REALISASI" | "ZONA_INDICATOR" | "ZONA_PSE_LIST";
+export type DocTypeValue = "MIT" | "HAZID" | "HAZOP" | "LOPA" | "MOC" | "HSSE" | "AIRMS" | "I2AIMS" | "LCV_PROJECT_CHARTER_BUDAYA" | "LCV_MONITORING" | "PRODUKSI" | "PRODUKSI_TARGET" | "PRODUKSI_REALISASI" | "ZONA_INDICATOR" | "ZONA_PSE_LIST" | "ABI" | "ABO";
 
 
 
@@ -16,6 +16,7 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 	MIT: {
 		label: "Major Integrity Threat (MIT)",
 		expectedHeaders: [
+			"No Registration - Lokasi",
 			"No Registration - Jenis MIT",
 			"No Registration - Kategori", "No Registration - Tahun", "No Registration - No",
 			"MIT Declaration Date", "MIT Title / Asset", "Integrity Threats",
@@ -82,6 +83,40 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		glanceCols: ["MOC_NUMBER", "CHANGE_DESC", "STATUS", "PIC", "ISSUED_DATE"],
 		templateUrl: "/templates/Template MOC.xlsx",
 		requiredFields: ["MOC_NUMBER"],
+		period: "month" as const,
+	},
+	ABI: {
+		label: "ABI (Anggaran Biaya Investasi)",
+		expectedHeaders: [
+			"REF_WBS", "WBS", "NILAI_USD", "NILAI_IDR", "NILAI_PERCENT",
+			"COMMITMENT_NILAI_IDR", "COMMITMENT_PERCENT_IDR",
+			"SA_APPROVED_PPN_IDR", "SA_APPROVED_PPN_PERCENT",
+			"ACTUAL_INVOICE_NILAI_IDR", "ACTUAL_INVOICE_PERCENT",
+			"SISA_ANGGARAN_NILAI_IDR", "SISA_ANGGARAN_PERCENT_IDR",
+			"NILAI_TOTAL_ABI", "KETERANGAN_1", "KETERANGAN_2",
+		],
+		glanceCols: ["WBS", "NILAI_USD", "NILAI_IDR", "ACTUAL_INVOICE_PERCENT", "SISA_ANGGARAN_PERCENT_IDR"],
+		templateUrl: "/templates/Template ABI.xlsx",
+		requiredFields: ["WBS"],
+		period: "month" as const,
+	},
+	ABO: {
+		label: "ABO (Anggaran Biaya Operasi)",
+		expectedHeaders: [
+			"NO_RK", "JENIS_KERANGKA_ANGGARAN",
+			"ANGGARANWPB_OSF_NILAI_USD", "ANGGARANWPB_OSF_NILAI_IDR", "ANGGARANWPB_OSF_PERCENT",
+			"COMMITMENT_SPK_PPN_NILAI_IDR", "COMMITMENT_SPK_PPN_PERCENT",
+			"SA_APPROVED_PPN_NILAI_USD", "SA_APPROVED_PPN_PERCENT_USD",
+			"SA_APPROVED_PPN_NILAI_IDR", "SA_APPROVED_PPN_PERCENT_IDR",
+			"ACTUAL_INVOICE_NILAI_USD", "ACTUAL_INVOICE_PERCENT_USD",
+			"ACTUAL_INVOICE_NILAI_IDR", "ACTUAL_INVOICE_PERCENT_IDR",
+			"SISA_ANGGARAN_NILAI_USD", "SISA_ANGGARAN_PERCENT_USD",
+			"SISA_ANGGARAN_NILAI_IDR", "SISA_ANGGARAN_PERCENT_IDR",
+			"FLAG",
+		],
+		glanceCols: ["NO_RK", "JENIS_KERANGKA_ANGGARAN", "ANGGARANWPB_OSF_NILAI_IDR", "ACTUAL_INVOICE_PERCENT_IDR", "FLAG"],
+		templateUrl: "/templates/Template ABO.xlsx",
+		requiredFields: ["NO_RK"],
 		period: "month" as const,
 	},
 	HSSE: {
@@ -262,7 +297,7 @@ export const YEAR_OPTIONS = Array.from({ length: 5 }, (_, i) => {
 });
 
 export const DRAWER_SECTIONS = [
-	{ title: "Identitas & Registration", keys: ["No Registration - Jenis MIT", "No Registration - Kategori", "No Registration - Tahun", "No Registration - No"] },
+	{ title: "Identitas & Registration", keys: ["No Registration - Lokasi", "No Registration - Jenis MIT", "No Registration - Kategori", "No Registration - Tahun", "No Registration - No"] },
 	{ title: "Informasi MIT", keys: ["MIT Declaration Date", "MIT Title / Asset", "Integrity Threats", "Possible Scenario", "Consequences", "Available Safeguard/Control"] },
 	{ title: "Current Risk", keys: ["Current Risk - Likelihood", "Current Risk - Severity", "Current Risk - Risk"] },
 	{ title: "Rekomendasi", keys: ["Rec. No.", "Recommendation / Action", "PIC", "Target Closing", "Remarks"] },

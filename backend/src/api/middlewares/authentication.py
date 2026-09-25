@@ -34,6 +34,9 @@ class JWTAuthenticationMiddleware(BaseHTTPMiddleware):
             f"{settings.API_PREFIX}/i2aims",
             f"{settings.API_PREFIX}/lcv",
             f"{settings.API_PREFIX}/dashboard",
+            f"{settings.API_PREFIX}/admin/mart-sync",
+            f"{settings.API_PREFIX}/abi",
+            f"{settings.API_PREFIX}/abo",
         )
 
 

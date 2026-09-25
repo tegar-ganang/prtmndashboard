@@ -46,8 +46,12 @@ class ProduksiTarget(Base):
         nullable=True,
     )
 
-    # Target MMSCFD DMF (Donggi-Matindok Field)
+    # Target MMSCFD DMF (Donggi-Matindok Field) — GAS
     target_dmf: SQLAlchemyMapped[float | None] = sqlalchemy_mapped_column(
+        sqlalchemy.Numeric(15, 4), nullable=True
+    )
+    # Target KONDENSAT
+    target_kondensat: SQLAlchemyMapped[float | None] = sqlalchemy_mapped_column(
         sqlalchemy.Numeric(15, 4), nullable=True
     )
 

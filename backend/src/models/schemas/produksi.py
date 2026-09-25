@@ -14,6 +14,7 @@ class ProduksiTargetResponse(pydantic.BaseModel):
     field: typing.Optional[str]
     field_location: typing.Optional[FieldLocationResponse] = None
     target_dmf: typing.Optional[float]
+    target_kondensat: typing.Optional[float]
     created_at: datetime.datetime
     updated_at: typing.Optional[datetime.datetime]
 
@@ -73,6 +74,7 @@ class ProduksiResponse(pydantic.BaseModel):
     bbls_processed_water: typing.Optional[float]
     bbls_water_injection: typing.Optional[float]
     bbls_closing_stock:   typing.Optional[float]
+    bbls_actl:            typing.Optional[float]
 
     # Safe Man Hours
     safe_man_hours_actl: typing.Optional[float]

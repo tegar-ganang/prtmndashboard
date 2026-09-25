@@ -44,6 +44,11 @@ const mapProjectToRow = (project: ProjectItem): ProjectRow => ({
     raw: project,
 });
 
+// Hidden per review feedback (2026-09-14) — not editable in the current form,
+// keep the column definition below and just flip this back on if Pertamina
+// asks for it. Don't delete the column itself.
+const SHOW_CATEGORY_COLUMN = false;
+
 export default function ProjectsContainer() {
     const [selectedDeleteId, setSelectedDeleteId] = useState<string | null>(null);
     const { mutate: deleteProject, isPending: isDeleting } =
@@ -71,11 +76,15 @@ export default function ProjectsContainer() {
                     <span className="uppercase font-medium">{`${props.getValue()}`}</span>
                 ),
             },
-            {
-                accessorKey: "kategoriProyek",
-                header: "Category",
-                cell: (props) => <span>{`${props.getValue()}`}</span>,
-            },
+            ...(SHOW_CATEGORY_COLUMN
+                ? [
+                    {
+                        accessorKey: "kategoriProyek",
+                        header: "Category",
+                        cell: (props: { getValue: () => unknown }) => <span>{`${props.getValue()}`}</span>,
+                    } satisfies ColumnDef<ProjectRow>,
+                ]
+                : []),
             {
                 accessorKey: "projectValue",
                 header: "Project Value",

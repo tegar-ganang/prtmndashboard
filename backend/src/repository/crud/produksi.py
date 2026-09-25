@@ -151,8 +151,8 @@ class ProduksiCRUDRepository(BaseCRUDRepository):
         #
         # Format Sheet 2:
         #   Row 0: "TARGET MMSCFD" label
-        #   Row 1: "BULAN", "DMF", ...
-        #   Row 2+: data rows (tanggal bulan, nilai target DMF)
+        #   Row 1: "BULAN", "DMF", "KONDENSAT"
+        #   Row 2+: data rows (tanggal bulan, nilai target DMF, nilai target KONDENSAT)
         df_target_raw = pd.read_excel(xls, sheet_name=1, header=None)
 
         # dict: month_int → ProduksiTarget (ORM object) yang sudah dibuat
@@ -162,6 +162,7 @@ class ProduksiCRUDRepository(BaseCRUDRepository):
         for _, row in df_target_raw.iloc[2:].iterrows():
             bulan_val = row.iloc[0]
             dmf_val = row.iloc[1]
+            kondensat_val = row.iloc[2] if len(row) > 2 else None
             if pd.isna(bulan_val) or pd.isna(dmf_val):
                 continue
             month_date = _parse_date(bulan_val)
@@ -177,6 +178,7 @@ class ProduksiCRUDRepository(BaseCRUDRepository):
                     reporting_month=target_month,
                     field=field,
                     target_dmf=_safe_float(dmf_val),
+                    target_kondensat=_safe_float(kondensat_val),
                 )
                 target_objects.append(target_obj)
                 target_by_month[target_month] = target_obj
@@ -260,8 +262,7 @@ class ProduksiCRUDRepository(BaseCRUDRepository):
             "BBLS - DONGGI MATINDOK FIELD|Processed & Produced Water": "bbls_processed_water",
             "BBLS - DONGGI MATINDOK FIELD|Water Injection":             "bbls_water_injection",
             "BBLS - DONGGI MATINDOK FIELD|Closing Stock":               "bbls_closing_stock",
-            "SAFE MAN HOURS|ACTL":                        "safe_man_hours_actl",
-            "SAFE MAN HOURS |ACTL":                        "safe_man_hours_actl",
+            "BBLS - DONGGI MATINDOK FIELD|ACTL":                        "bbls_actl",
             "SAFE MAN HOURS|DONGGI MATINDOK FIELD":        "safe_man_hours_dmf",
             "SAFE MAN HOURS |DONGGI MATINDOK FIELD":       "safe_man_hours_dmf",
         }
@@ -273,9 +274,6 @@ class ProduksiCRUDRepository(BaseCRUDRepository):
             db_col = normalized_header_map.get(combined.strip())
             if db_col:
                 col_index_map[idx] = db_col
-
-        if 26 not in col_index_map and "safe_man_hours_actl" not in col_index_map.values():
-            col_index_map[26] = "safe_man_hours_actl"
 
         records: list[Produksi] = []
         data_rows = df_raw.iloc[2:].values.tolist()

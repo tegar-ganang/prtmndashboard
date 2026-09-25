@@ -29,18 +29,22 @@ class FieldLocation(Base):
         sqlalchemy.DateTime(timezone=True), nullable=True, onupdate=sqlalchemy_functions.now()
     )
 
+    # lazy="select" (the default): nothing in the codebase reads these
+    # collections, but the reverse side (e.g. MIT.field_location) uses
+    # back_populates and needs a target to populate. selectin here used to
+    # eagerly pull every row of 5 unrelated tables on every /locations call.
     mit_monitorings: SQLAlchemyMapped[list["MIT"]] = relationship(
-        "MIT", back_populates="field_location", lazy="selectin"
+        "MIT", back_populates="field_location"
     )
     hazid_monitorings: SQLAlchemyMapped[list["Hazid"]] = relationship(
-        "Hazid", back_populates="field_location", lazy="selectin"
+        "Hazid", back_populates="field_location"
     )
     hazop_monitorings: SQLAlchemyMapped[list["Hazop"]] = relationship(
-        "Hazop", back_populates="field_location", lazy="selectin"
+        "Hazop", back_populates="field_location"
     )
     lopa_monitorings: SQLAlchemyMapped[list["Lopa"]] = relationship(
-        "Lopa", back_populates="field_location", lazy="selectin"
+        "Lopa", back_populates="field_location"
     )
     produksi_monitorings: SQLAlchemyMapped[list["Produksi"]] = relationship(
-        "Produksi", back_populates="field_location", lazy="selectin"
+        "Produksi", back_populates="field_location"
     )

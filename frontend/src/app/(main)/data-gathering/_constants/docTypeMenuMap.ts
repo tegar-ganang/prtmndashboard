@@ -18,4 +18,6 @@ export const DOC_TYPE_MENU: Record<DocTypeValue, MenuKey> = {
 	PRODUKSI_REALISASI: "produksi",
 	ZONA_INDICATOR: "zona_indicator",
 	ZONA_PSE_LIST: "zona_pse_list",
+	ABI: "abi",
+	ABO: "abo",
 };

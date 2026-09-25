@@ -3,6 +3,7 @@ import sqlalchemy
 import typing
 import datetime
 from sqlalchemy.ext.asyncio import AsyncSession as SQLAlchemyAsyncSession
+from sqlalchemy.orm import noload
 
 from src.api.dependencies.authentication import get_current_account
 from src.api.dependencies.rbac import require_menu_access
@@ -51,8 +52,12 @@ async def get_summary(
         year = res_max_year.scalar() or datetime.datetime.now().year
 
     # 1a. Produksi & Target
-    stmt_prod = sqlalchemy.select(Produksi).where(Produksi.reporting_year == year)
-    stmt_target = sqlalchemy.select(ProduksiTarget).where(ProduksiTarget.reporting_year == year)
+    # noload("*"): this endpoint only reads scalar columns below, never the
+    # owner/field_location/target/realisasi_rows relationships — those are
+    # lazy="selectin" on the model (needed by other endpoints), so without
+    # this override every row here pays for eager-loading data nobody reads.
+    stmt_prod = sqlalchemy.select(Produksi).options(noload("*")).where(Produksi.reporting_year == year)
+    stmt_target = sqlalchemy.select(ProduksiTarget).options(noload("*")).where(ProduksiTarget.reporting_year == year)
     
     if month is not None:
         stmt_prod = stmt_prod.where(Produksi.reporting_month == month)
@@ -68,7 +73,7 @@ async def get_summary(
     target_rows = res_target.scalars().all()
 
     # 1b. AIRMS
-    stmt_airms = sqlalchemy.select(AIRMS).where(AIRMS.reporting_year == year)
+    stmt_airms = sqlalchemy.select(AIRMS).options(noload("*")).where(AIRMS.reporting_year == year)
     if month is not None:
         stmt_airms = stmt_airms.where(AIRMS.reporting_month == month)
     if field is not None and field != "":
@@ -77,7 +82,7 @@ async def get_summary(
     airms_rows = res_airms.scalars().all()
 
     # 1c. I2AIMS
-    stmt_i2aims = sqlalchemy.select(I2AIMS).where(I2AIMS.reporting_year == year)
+    stmt_i2aims = sqlalchemy.select(I2AIMS).options(noload("*")).where(I2AIMS.reporting_year == year)
     if month is not None:
         stmt_i2aims = stmt_i2aims.where(I2AIMS.reporting_month == month)
     if field is not None and field != "":
@@ -86,7 +91,7 @@ async def get_summary(
     i2aims_rows = res_i2aims.scalars().all()
 
     # 1d. HSSE
-    stmt_hsse = sqlalchemy.select(HSSE).where(HSSE.reporting_year == year)
+    stmt_hsse = sqlalchemy.select(HSSE).options(noload("*")).where(HSSE.reporting_year == year)
     if month is not None:
         stmt_hsse = stmt_hsse.where(HSSE.reporting_month == month)
     if field is not None and field != "":
@@ -95,7 +100,7 @@ async def get_summary(
     hsse_rows = res_hsse.scalars().all()
 
     # 1e. MIT (for alerts context)
-    stmt_mit = sqlalchemy.select(MIT).where(MIT.reporting_year == year)
+    stmt_mit = sqlalchemy.select(MIT).options(noload("*")).where(MIT.reporting_year == year)
     if field is not None and field != "":
         stmt_mit = stmt_mit.where(MIT.field == field)
     res_mit = await db.execute(stmt_mit)

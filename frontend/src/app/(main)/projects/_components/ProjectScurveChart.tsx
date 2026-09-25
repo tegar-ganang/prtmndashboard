@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { Table2, TrendingUp } from "lucide-react";
 import type { ProjectProgressSummaryItem } from "@/types/projectScurve";
 
@@ -26,6 +26,14 @@ export default function ProjectScurveChart({ data }: { data: ProjectProgressSumm
 	const [view, setView] = useState<"chart" | "table">("chart");
 	const [hoverIndex, setHoverIndex] = useState<number | null>(null);
 	const [selectedIndex, setSelectedIndex] = useState(data.length - 1);
+
+	// `useState(data.length - 1)` only seeds the initial value — it doesn't
+	// re-run when `data` grows after a re-upload (react-query refetches the
+	// same mounted component, no remount). Without this, the crosshair and
+	// "Tanggal Terpilih" stats stay frozen on the previous latest week.
+	useEffect(() => {
+		setSelectedIndex(data.length - 1);
+	}, [data.length]);
 
 	const n = data.length;
 	const xAt = (i: number) => PAD.left + (n <= 1 ? PLOT_W / 2 : (i / (n - 1)) * PLOT_W);
