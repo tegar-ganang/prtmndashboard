@@ -37,6 +37,7 @@ import {
 	type DocTypeValue,
 } from "../_constants/dataGathering.constants";
 import type { DocumentOption, ExcelRow, ExtraColumnsState } from "../_types";
+import { parseTargetSheet } from "../_utils/parseTargetSheet";
 import {
 	DataGatheringConfirmModal,
 	DataGatheringDetailModal,
@@ -56,32 +57,24 @@ function parseProduksiExcelPreview(buffer: ArrayBuffer, selectedMonthVal: number
 	const sheet1 = wb.Sheets[wb.SheetNames[0]];
 	const sheet2 = wb.Sheets[wb.SheetNames[1]];
 
-	// Parse Sheet2 target
-	const s2Raw = XLSX.utils.sheet_to_json<any[]>(sheet2, { header: 1 });
+	// Parse Sheet2 target (kolom dibaca lewat nama header, lihat parseTargetSheet)
 	const targetRows: ExcelRow[] = [];
 	const targetMap: Record<number, number> = {};
+	// Bulatkan untuk tampilan: 94.40000000000002 -> 94.4
+	const round = (v: number | null) => (v == null ? null : Math.round(v * 1e4) / 1e4);
 
-	for (let i = 2; i < s2Raw.length; i++) {
-		const row = s2Raw[i];
-		if (!row) continue;
-		const bulan = row[0];
-		const dmf = row[1];
-		if (bulan == null || dmf == null) continue;
-		const d = bulan instanceof Date ? bulan : new Date(bulan);
-		if (!isNaN(d.getTime())) {
-			const mIndex = d.getMonth() + 1;
-			const targetVal = Number(dmf);
-			targetMap[mIndex] = targetVal;
-
-			const monthLabel = d.toLocaleString("id-ID", { month: "long", year: "numeric" });
-			targetRows.push({
-				_index: targetRows.length + 1,
-				_isValid: true,
-				_errors: [],
-				"Bulan": monthLabel,
-				"Target DMF (MMSCFD)": targetVal,
-			});
-		}
+	for (const t of parseTargetSheet(sheet2)) {
+		targetMap[t.date.getMonth() + 1] = t.dmf;
+		targetRows.push({
+			_index: targetRows.length + 1,
+			_isValid: true,
+			_errors: [],
+			"Bulan": t.date.toLocaleString("id-ID", { month: "long", year: "numeric" }),
+			"Target DMF (MMSCFD)": round(t.dmf),
+			"Target Gas WP&B (MMSCFD)": round(t.gasWpb),
+			"Target Kondensat RKAP": round(t.kondensatRkap),
+			"Target Kondensat WP&B": round(t.kondensatWpb),
+		});
 	}
 
 	// Parse Sheet1 — raw rows (header at row 0+1, data from row 2)

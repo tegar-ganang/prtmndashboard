@@ -2,14 +2,26 @@ import typing
 import uuid
 import pandas as pd
 from io import BytesIO
-from datetime import datetime
+from datetime import datetime, timezone
 
 import sqlalchemy
+from sqlalchemy.orm import noload
 from sqlalchemy.sql import functions as sqlalchemy_functions
 
 from src.models.db.produksi import Produksi
 from src.models.db.produksi_target import ProduksiTarget
 from src.repository.crud.base import BaseCRUDRepository
+
+
+# Header Sheet 2 (uppercase, spasi dirapikan) → kolom ProduksiTarget.
+# "KONDENSAT" polos = format lama sebelum RKAP/WP&B dipisah; tetap ke kolom lamanya.
+_TARGET_HEADERS = {
+    "DMF": "target_dmf",
+    "GAS WP&B": "target_gas_wpb",
+    "KONDENSAT": "target_kondensat",
+    "KONDENSAT RKAP": "target_kondensat_rkap",
+    "KONDENSAT WP&B": "target_kondensat_wpb",
+}
 
 
 def _safe_float(val: typing.Any) -> float | None:
@@ -151,37 +163,35 @@ class ProduksiCRUDRepository(BaseCRUDRepository):
         #
         # Format Sheet 2:
         #   Row 0: "TARGET MMSCFD" label
-        #   Row 1: "BULAN", "DMF", "KONDENSAT"
-        #   Row 2+: data rows (tanggal bulan, nilai target DMF, nilai target KONDENSAT)
+        #   Row 1: "BULAN", "DMF", "GAS WP&B", "KONDENSAT RKAP", "KONDENSAT WP&B"
+        #   Row 2+: data rows (tanggal bulan, lalu nilai target per kolom)
+        # Kolom dicocokkan lewat nama header (bukan posisi) supaya urutan kolom bebas.
         df_target_raw = pd.read_excel(xls, sheet_name=1, header=None)
+        target_cols = {
+            _TARGET_HEADERS[h]: i
+            for i, h in enumerate(" ".join(str(v).upper().split()) for v in df_target_raw.iloc[1:2].values.flatten())
+            if h in _TARGET_HEADERS
+        }
+        if "target_dmf" not in target_cols:
+            raise ValueError(
+                "Sheet 2 (Target Bulanan) harus punya header kolom 'DMF' di baris ke-2. "
+                "Kolom lain yang dikenali: GAS WP&B, KONDENSAT RKAP, KONDENSAT WP&B."
+            )
 
-        # dict: month_int → ProduksiTarget (ORM object) yang sudah dibuat
-        target_by_month: dict[int, ProduksiTarget] = {}
-        target_objects: list[ProduksiTarget] = []
+        # (tahun, bulan) → nilai kolom target; bulan yang dobel di sheet: baris terakhir menang
+        parsed_targets: dict[tuple[int, int], dict[str, float | None]] = {}
 
         for _, row in df_target_raw.iloc[2:].iterrows():
             bulan_val = row.iloc[0]
-            dmf_val = row.iloc[1]
-            kondensat_val = row.iloc[2] if len(row) > 2 else None
+            dmf_val = row.iloc[target_cols["target_dmf"]]
             if pd.isna(bulan_val) or pd.isna(dmf_val):
                 continue
             month_date = _parse_date(bulan_val)
             if month_date is not None:
-                target_month = month_date.month
                 target_year = month_date.year if month_date.year > 2000 else reporting_year
-
-                target_obj = ProduksiTarget(
-                    id=uuid.uuid4(),
-                    upload_batch_id=upload_batch_uuid,
-                    owner_account_id=owner_account_uuid,
-                    reporting_year=target_year,
-                    reporting_month=target_month,
-                    field=field,
-                    target_dmf=_safe_float(dmf_val),
-                    target_kondensat=_safe_float(kondensat_val),
-                )
-                target_objects.append(target_obj)
-                target_by_month[target_month] = target_obj
+                parsed_targets[(target_year, month_date.month)] = {
+                    attr: _safe_float(row.iloc[i]) for attr, i in target_cols.items()
+                }
 
         if mode == "overwrite":
             # Hapus realisasi dulu (FK dependency)
@@ -192,21 +202,59 @@ class ProduksiCRUDRepository(BaseCRUDRepository):
             if field is not None:
                 conditions_realisasi.append(Produksi.field == field)
             await self.async_session.execute(sqlalchemy.delete(Produksi).where(*conditions_realisasi))
-
-            # Hapus target lama
-            conditions_target = [
-                ProduksiTarget.reporting_year == reporting_year,
-                ProduksiTarget.reporting_month == reporting_month,
-            ]
-            if field is not None:
-                conditions_target.append(ProduksiTarget.field == field)
-            await self.async_session.execute(sqlalchemy.delete(ProduksiTarget).where(*conditions_target))
-
             await self.async_session.flush()
+            # Target tidak dihapus di sini: di-upsert di bawah (baris target dirujuk realisasi bulan lain via FK).
 
-        if target_objects:
-            self.async_session.add_all(target_objects)
-            await self.async_session.flush()  # flush agar id target_objects terisi
+        # ── Upsert target, key = (reporting_year, reporting_month) ────────────
+        # Baris yang sudah ada di-update di tempat (id tetap → FK realisasi lama tidak putus),
+        # insert hanya untuk bulan yang belum ada. Duplikat lama untuk bulan yang sama dirapikan:
+        # realisasinya dialihkan ke baris terbaru, lalu duplikatnya dihapus.
+        # ponytail: tanpa unique index di DB, dua upload bersamaan masih bisa dobel; tambah
+        # UNIQUE (reporting_year, reporting_month) setelah data lama bersih kalau itu jadi masalah.
+        existing: dict[tuple[int, int], ProduksiTarget] = {}
+        duplicates: list[tuple[ProduksiTarget, ProduksiTarget]] = []  # (duplikat, yang dipertahankan)
+        if parsed_targets:
+            res = await self.async_session.execute(
+                sqlalchemy.select(ProduksiTarget)
+                .options(noload(ProduksiTarget.realisasi_rows))
+                .where(ProduksiTarget.reporting_year.in_({year for year, _ in parsed_targets}))
+                .order_by(ProduksiTarget.created_at.desc())
+            )
+            for t in res.scalars().all():  # terbaru dulu
+                key = (t.reporting_year, t.reporting_month)
+                if key not in parsed_targets:
+                    continue
+                if key in existing:
+                    duplicates.append((t, existing[key]))
+                else:
+                    existing[key] = t
+
+        # dict: month_int → ProduksiTarget (ORM object) yang di-upsert
+        target_by_month: dict[int, ProduksiTarget] = {}
+        new_targets: list[ProduksiTarget] = []
+        for (target_year, target_month), values in parsed_targets.items():
+            target_obj = existing.get((target_year, target_month))
+            if target_obj is None:
+                target_obj = ProduksiTarget(id=uuid.uuid4(), reporting_year=target_year, reporting_month=target_month)
+                new_targets.append(target_obj)
+            else:
+                target_obj.updated_at = datetime.now(timezone.utc)
+            target_obj.upload_batch_id = upload_batch_uuid
+            target_obj.owner_account_id = owner_account_uuid
+            target_obj.field = field
+            for attr, val in values.items():  # hanya kolom yang ada di sheet, kolom lain tidak ditimpa
+                setattr(target_obj, attr, val)
+            target_by_month[target_month] = target_obj
+
+        for dup, keep in duplicates:
+            await self.async_session.execute(
+                sqlalchemy.update(Produksi).where(Produksi.target_id == dup.id).values(target_id=keep.id)
+            )
+            await self.async_session.execute(sqlalchemy.delete(ProduksiTarget).where(ProduksiTarget.id == dup.id))
+
+        if new_targets:
+            self.async_session.add_all(new_targets)
+        await self.async_session.flush()  # flush agar id target baru terisi
 
         df_raw = pd.read_excel(xls, sheet_name=0, header=None)
 
@@ -317,7 +365,7 @@ class ProduksiCRUDRepository(BaseCRUDRepository):
         if records:
             self.async_session.add_all(records)
             await self.async_session.commit()
-        elif target_objects:
+        elif target_by_month:
             # Commit target meski tidak ada realisasi (edge case)
             await self.async_session.commit()
 

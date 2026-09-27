@@ -25,6 +25,7 @@ import axiosInstance from "@/services/api/main/interceptor";
 import { MAIN_ENDPOINT } from "@/services/api/main/endpoint";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
+import { parseTargetSheet } from "../../_utils/parseTargetSheet";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -67,33 +68,36 @@ const SELECT_STYLES = {
 
 // ── Helper: parse Excel client-side for preview ───────────────────────────────
 
+type TargetRow = {
+	month: number;
+	dmf: number;
+	gasWpb: number | null;
+	kondensatRkap: number | null;
+	kondensatWpb: number | null;
+};
+
+// Kolom Sheet 2 yang ditampilkan di pratinjau (urut seperti di Excel)
+const TARGET_COLS = [
+	{ key: "dmf", label: "DMF" },
+	{ key: "gasWpb", label: "Gas WP&B" },
+	{ key: "kondensatRkap", label: "Kond. RKAP" },
+	{ key: "kondensatWpb", label: "Kond. WP&B" },
+] as const;
+
 function parseExcelPreview(buffer: ArrayBuffer): {
 	preview: PreviewRow[];
-	targetRows: { month: number; dmf: number; kondensat: number | null }[];
+	targetRows: TargetRow[];
 	totalRows: number;
 } {
 	const wb = XLSX.read(buffer, { type: "array", cellDates: true });
 	const sheet1 = wb.Sheets[wb.SheetNames[0]];
 	const sheet2 = wb.Sheets[wb.SheetNames[1]];
 
-	// Parse Sheet2 target
-	const s2Raw = XLSX.utils.sheet_to_json<any[]>(sheet2, { header: 1 });
-	const targetRows: { month: number; dmf: number; kondensat: number | null }[] = [];
-	for (let i = 2; i < s2Raw.length; i++) {
-		const row = s2Raw[i];
-		const bulan = row[0];
-		const dmf = row[1];
-		const kondensat = row[2];
-		if (bulan == null || dmf == null) continue;
-		const d = bulan instanceof Date ? bulan : new Date(bulan);
-		if (!isNaN(d.getTime())) {
-			targetRows.push({
-				month: d.getMonth() + 1,
-				dmf: Number(dmf),
-				kondensat: kondensat != null && !isNaN(Number(kondensat)) ? Number(kondensat) : null,
-			});
-		}
-	}
+	// Parse Sheet2 target (kolom dibaca lewat nama header, lihat parseTargetSheet)
+	const targetRows: TargetRow[] = parseTargetSheet(sheet2).map(({ date, ...values }) => ({
+		month: date.getMonth() + 1,
+		...values,
+	}));
 
 	// Parse Sheet1 — raw rows (header at row 0+1, data from row 2)
 	const s1Raw = XLSX.utils.sheet_to_json<any[]>(sheet1, { header: 1 });
@@ -152,7 +156,7 @@ export default function ProduksiUploadContainer() {
 	// File + preview state
 	const [file, setFile] = useState<File | null>(null);
 	const [preview, setPreview] = useState<PreviewRow[]>([]);
-	const [targetRows, setTargetRows] = useState<{ month: number; dmf: number; kondensat: number | null }[]>([]);
+	const [targetRows, setTargetRows] = useState<TargetRow[]>([]);
 	const [totalRows, setTotalRows] = useState(0);
 	const [parsing, setParsing] = useState(false);
 
@@ -413,24 +417,28 @@ export default function ProduksiUploadContainer() {
 								<Target className="w-3.5 h-3.5" />
 								Target Bulanan (Sheet 2)
 							</h2>
-							<div className="space-y-1 max-h-60 overflow-y-auto pr-1">
+							<div className="space-y-1 max-h-96 overflow-y-auto pr-1">
 								{targetRows.map((t) => {
 									const mo = MONTH_OPTIONS.find((m) => m.value === t.month);
 									const isActive = t.month === selectedMonth.value;
 									return (
 										<div
 											key={t.month}
-											className={`flex justify-between items-center px-2.5 py-1.5 rounded-lg text-xs ${
+											className={`px-2.5 py-1.5 rounded-lg text-xs ${
 												isActive
 													? "bg-emerald-50 border border-emerald-200 font-semibold text-emerald-800"
 													: "text-gray-600"
 											}`}
 										>
-											<span>{mo?.label ?? `Bulan ${t.month}`}</span>
-											<span className="font-mono font-bold">
-												{t.dmf.toFixed(2)} GAS
-												{t.kondensat != null && ` / ${t.kondensat.toFixed(2)} KONDENSAT`}
-											</span>
+											<div className="mb-0.5">{mo?.label ?? `Bulan ${t.month}`}</div>
+											<div className="grid grid-cols-2 gap-x-3 gap-y-0.5 font-mono text-[11px]">
+												{TARGET_COLS.map((c) => (
+													<span key={c.key} className="flex justify-between gap-1">
+														<span className="font-sans font-normal text-gray-400">{c.label}</span>
+														<span className="font-bold">{t[c.key] != null ? t[c.key]!.toFixed(2) : "-"}</span>
+													</span>
+												))}
+											</div>
 										</div>
 									);
 								})}
@@ -523,7 +531,7 @@ export default function ProduksiUploadContainer() {
 							{[
 								{ label: "Total Baris Harian", value: totalRows, icon: CalendarDays, color: "emerald" },
 								{
-									label: "Target DMF Terpetakan",
+									label: "Target Bulanan Terbaca",
 									value: `${targetRows.length}/12 bulan`,
 									icon: Target,
 									color: "emerald",
