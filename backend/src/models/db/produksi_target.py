@@ -46,12 +46,24 @@ class ProduksiTarget(Base):
         nullable=True,
     )
 
-    # Target MMSCFD DMF (Donggi-Matindok Field) — GAS
+    # Target MMSCFD DMF (Donggi-Matindok Field) — GAS RKAP
     target_dmf: SQLAlchemyMapped[float | None] = sqlalchemy_mapped_column(
         sqlalchemy.Numeric(15, 4), nullable=True
     )
-    # Target KONDENSAT
+    # Target GAS WP&B
+    target_gas_wpb: SQLAlchemyMapped[float | None] = sqlalchemy_mapped_column(
+        sqlalchemy.Numeric(15, 4), nullable=True
+    )
+    # Target KONDENSAT (format Excel lama, satu kolom "KONDENSAT"; tidak dipakai lagi oleh sync mart)
     target_kondensat: SQLAlchemyMapped[float | None] = sqlalchemy_mapped_column(
+        sqlalchemy.Numeric(15, 4), nullable=True
+    )
+    # Target KONDENSAT RKAP
+    target_kondensat_rkap: SQLAlchemyMapped[float | None] = sqlalchemy_mapped_column(
+        sqlalchemy.Numeric(15, 4), nullable=True
+    )
+    # Target KONDENSAT WP&B
+    target_kondensat_wpb: SQLAlchemyMapped[float | None] = sqlalchemy_mapped_column(
         sqlalchemy.Numeric(15, 4), nullable=True
     )
 

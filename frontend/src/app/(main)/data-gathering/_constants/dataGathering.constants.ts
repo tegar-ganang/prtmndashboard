@@ -174,7 +174,7 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 	PRODUKSI_TARGET: {
 		label: "Target Bulanan (Gas)",
 		expectedHeaders: [],
-		glanceCols: ["Bulan", "Target DMF (MMSCFD)"],
+		glanceCols: ["Bulan", "Target DMF (MMSCFD)", "Target Gas WP&B (MMSCFD)", "Target Kondensat RKAP", "Target Kondensat WP&B"],
 		templateUrl: "/templates/Template - Produksi.xlsx",
 		requiredFields: [],
 		period: "month" as const,
