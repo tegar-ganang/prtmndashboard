@@ -26,6 +26,7 @@ def _job(name, app_table, mart_table, sync_script, sort_order=0):
     return types.SimpleNamespace(
         id=name, name=name, app_table=app_table, mart_table=mart_table,
         sync_script=sync_script, sort_order=sort_order, is_active=True,
+        expected_mart_count_sql=None,
     )
 
 
