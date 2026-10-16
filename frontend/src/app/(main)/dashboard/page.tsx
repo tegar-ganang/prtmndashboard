@@ -656,8 +656,8 @@ export default function DashboardPage() {
 					{/* KPI Card 1: Daily Production */}
 					<div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col justify-between hover:shadow-md transition-all">
 						<div className="flex items-start justify-between">
-							<div className="flex flex-col">
-								<span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider leading-snug">
+							<div className="flex flex-col min-w-0">
+								<span className="text-xs font-extrabold text-[#1E3A8A] uppercase tracking-wider leading-snug">
 									Produksi Harian Rata-rata (MMSCFD)
 								</span>
 								<div className="flex items-baseline gap-1.5 mt-2">
@@ -668,7 +668,7 @@ export default function DashboardPage() {
 									<span className="text-sm font-extrabold text-gray-700">{data?.production.average_target.toFixed(2)}</span>
 								</div>
 							</div>
-							<div className="p-2 bg-blue-50 rounded-lg text-blue-600">
+							<div className="p-2 bg-blue-50 rounded-lg text-blue-600 shrink-0">
 								<TrendingUp className="w-4 h-4" />
 							</div>
 						</div>
@@ -678,13 +678,13 @@ export default function DashboardPage() {
 					{/* KPI Card 2: AIRMS Availability */}
 					<div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col justify-between hover:shadow-md transition-all">
 						<div className="flex items-start justify-between">
-							<div className="flex flex-col">
-								<span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider leading-snug">
+							<div className="flex flex-col min-w-0">
+								<span className="text-xs font-extrabold text-[#1E3A8A] uppercase tracking-wider leading-snug">
 									Rata-rata Ketersediaan AIRMS
 								</span>
 								<span className="text-2xl font-black text-gray-900 mt-2">{data?.airms.average_availability.toFixed(1)}%</span>
 							</div>
-							<div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">
+							<div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 shrink-0">
 								<Activity className="w-4 h-4" />
 							</div>
 						</div>
@@ -694,13 +694,13 @@ export default function DashboardPage() {
 					{/* KPI Card 3: I2AIMS status Monitor */}
 					<div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col justify-between hover:shadow-md transition-all">
 						<div className="flex items-start justify-between">
-							<div className="flex flex-col">
-								<span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider leading-snug">
+							<div className="flex flex-col min-w-0">
+								<span className="text-xs font-extrabold text-[#1E3A8A] uppercase tracking-wider leading-snug">
 									Aset I2AIMS Status "Monitor"
 								</span>
 								<span className="text-2xl font-black text-gray-900 mt-2">{data?.i2aims.monitor_assets_count} Aset</span>
 							</div>
-							<div className="p-2 bg-sky-50 rounded-lg text-sky-600">
+							<div className="p-2 bg-sky-50 rounded-lg text-sky-600 shrink-0">
 								<ShieldCheck className="w-4 h-4" />
 							</div>
 						</div>
@@ -714,13 +714,13 @@ export default function DashboardPage() {
 					{/* KPI Card 4: HSSE critical open */}
 					<div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col justify-between hover:shadow-md transition-all">
 						<div className="flex items-start justify-between">
-							<div className="flex flex-col">
-								<span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider leading-snug">
+							<div className="flex flex-col min-w-0">
+								<span className="text-xs font-extrabold text-[#1E3A8A] uppercase tracking-wider leading-snug">
 									Izin Tugas Kritis Terbuka
 								</span>
 								<span className="text-2xl font-black text-gray-900 mt-2">{data?.hsse.open_permits_count} Izin</span>
 							</div>
-							<div className="p-2 bg-amber-50 rounded-lg text-amber-600">
+							<div className="p-2 bg-amber-50 rounded-lg text-amber-600 shrink-0">
 								<AlertCircle className="w-4 h-4" />
 							</div>
 						</div>
