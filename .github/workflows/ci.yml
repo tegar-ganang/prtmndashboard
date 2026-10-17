@@ -36,6 +36,10 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install -r requirements.txt
+      # The settings module reads required values via decouple at import time,
+      # so the unit tests need a .env file to import against (it's gitignored).
+      # The example file ships safe dummy values for every required setting.
+      - run: cp .env.example .env
       # Only the DB-free unit tests run here. security_tests/ and any future
       # integration_tests/ hit the real staging database (see backend/.env) and
       # need DB credentials wired in as repo secrets before they can run in CI —
