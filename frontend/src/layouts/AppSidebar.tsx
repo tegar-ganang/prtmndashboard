@@ -25,19 +25,40 @@ import { useSidebar } from "@/context/SidebarContext";
 import axiosInstance from "@/services/api/main/interceptor";
 import { canViewMenu, canUploadAnyMenu, type MenuKey } from "@/configs/rbac";
 
-type SubSubItem = {
-	name: string;
-	path: string;
-	description?: string;
-	menu?: MenuKey;
-};
-
+// Recursive: level 2..4 of the sidebar all use this shape.
 type SubItem = {
 	name: string;
 	path?: string;
 	description?: string;
 	menu?: MenuKey;
-	subItems?: SubSubItem[];
+	subItems?: SubItem[];
+};
+
+const DUMMY_ITEMS = new Set(["HSSE", "Project Charter Budaya", "LCV Monitoring", "AIRMS", "I2AIMS", "ABI", "ABO"]);
+const PREFETCH_DOC: Record<string, string> = {
+	Production: "produksi",
+	HSSE: "hsse",
+	"Project Charter Budaya": "lcv_project_charter_budaya",
+	"LCV Monitoring": "lcv_monitoring",
+	AIRMS: "airms",
+	"Zona Indicator": "zona_indicator",
+	"Zona PSE List": "zona_pse_list",
+	I2AIMS: "i2aims",
+	MIT: "mit",
+	MOC: "moc",
+};
+
+// Keys of every group on the way to the item whose path is active.
+const findActiveGroupKeys = (items: SubItem[], prefix: string, isActive: (p: string) => boolean): string[] | null => {
+	for (const item of items) {
+		const key = prefix ? `${prefix}-${item.name}` : item.name;
+		if (item.path && isActive(item.path)) return [];
+		if (item.subItems) {
+			const found = findActiveGroupKeys(item.subItems, key, isActive);
+			if (found) return [key, ...found];
+		}
+	}
+	return null;
 };
 
 type NavItem = {
@@ -140,12 +161,34 @@ const AppSidebar: React.FC = () => {
 						description: "Operational Safety Frontline Monitoring.",
 						subItems: [
 							{ name: "AIRMS", path: "/monitoring/airms", description: "AIRMS Monitoring", menu: "airms" },
-							{ name: "PSAIMS", path: "/monitoring/psaims", description: "PSAIMS Monitoring", menu: "zona_indicator" },
+							{
+								name: "PSAIMS",
+								description: "PSAIMS Monitoring",
+								subItems: [
+									{ name: "Zona Indicator", path: "/monitoring/zona_indicator", menu: "zona_indicator" },
+									{ name: "Zona PSE List", path: "/monitoring/zona_pse_list", menu: "zona_pse_list" },
+								],
+							},
 							{ name: "I2AIMS", path: "/monitoring/i2aims", description: "I2AIMS Monitoring", menu: "i2aims" },
-							{ name: "MIT & MOC", path: "/monitoring/mit", description: "Major Integrity Threat & Management of Change", menu: "mit" },
-							{ name: "OPE", path: "/monitoring/ope", description: "Operational Performance & Excellence" },
-							{ name: "ABI", path: "/monitoring/abi", description: "Anggaran Biaya Investasi", menu: "abi" },
-							{ name: "ABO", path: "/monitoring/abo", description: "Anggaran Biaya Operasi", menu: "abo" },
+							{
+								name: "MIT & MOC",
+								description: "Major Integrity Threat & Management of Change",
+								subItems: [
+									{ name: "MIT", path: "/monitoring/mit", description: "Major Integrity Threat", menu: "mit" },
+									{ name: "MOC", path: "/monitoring/moc", description: "Management of Change", menu: "moc" },
+								],
+							},
+							{ name: "HAZID", path: "/monitoring/hazid", description: "HAZID Monitoring (Bulanan)", menu: "hazid" },
+							{ name: "HAZOP", path: "/monitoring/hazop", description: "HAZOP Monitoring (Bulanan)", menu: "hazop" },
+							{ name: "LOPA", path: "/monitoring/lopa", description: "LOPA Monitoring (Bulanan)", menu: "lopa" },
+							{
+								name: "OPE",
+								description: "Operational Performance & Excellence",
+								subItems: [
+									{ name: "ABI", path: "/monitoring/abi", description: "Anggaran Biaya Investasi", menu: "abi" },
+									{ name: "ABO", path: "/monitoring/abo", description: "Anggaran Biaya Operasi", menu: "abo" },
+								],
+							},
 						],
 					},
 					{
@@ -156,9 +199,11 @@ const AppSidebar: React.FC = () => {
 					},
 					{
 						name: "LCV",
-						path: "/monitoring/lcv",
 						description: "Loss Control & Verification Monitoring.",
-						menu: "lcv",
+						subItems: [
+							{ name: "Project Charter Budaya", path: "/monitoring/lcv_project_charter_budaya", menu: "lcv" },
+							{ name: "LCV Monitoring", path: "/monitoring/lcv_monitoring", menu: "lcv" },
+						],
 					},
 				],
 			},
@@ -188,14 +233,11 @@ const AppSidebar: React.FC = () => {
 	];
 
 	const filterSubItems = useCallback(
-		(items: SubItem[]): SubItem[] =>
-			items
-				.map((item) =>
-					item.subItems
-						? { ...item, subItems: item.subItems.filter((sub) => !sub.menu || canViewMenu(roleName, sub.menu)) }
-						: item,
-				)
-				.filter((item) => (item.subItems ? item.subItems.length > 0 : !item.menu || canViewMenu(roleName, item.menu))),
+		function filter(items: SubItem[]): SubItem[] {
+			return items
+				.map((item) => (item.subItems ? { ...item, subItems: filter(item.subItems) } : item))
+				.filter((item) => (item.subItems ? item.subItems.length > 0 : !item.menu || canViewMenu(roleName, item.menu)));
+		},
 		[roleName],
 	);
 
@@ -216,88 +258,103 @@ const AppSidebar: React.FC = () => {
 
 	const filteredNavItems = filterNavItems(navItems);
 
-	const [openSubmenu, setOpenSubmenu] = useState<{
-		type: "main" | "others";
-		index: number;
-	} | null>(null);
-
-	const [openNestedSubmenu, setOpenNestedSubmenu] = useState<string | null>(null);
+	// Keyed by name path (e.g. "Monitoring-OSF-OPE"), not index — indices shift once items are role-filtered.
+	// Groups only close when the user clicks them; navigating just opens the active branch.
+	const [openKeys, setOpenKeys] = useState<Set<string>>(new Set());
 
 	const isActive = useCallback(
 		(path: string) => pathname.includes(path),
 		[pathname],
 	);
 
-	const handleSubmenuToggle = (index: number, menuType: "main" | "others") => {
-		setOpenSubmenu((prevOpenSubmenu) => {
-			if (
-				prevOpenSubmenu &&
-				prevOpenSubmenu.type === menuType &&
-				prevOpenSubmenu.index === index
-			) {
-				return null;
-			}
-			return { type: menuType, index };
+	const toggleKey = (key: string) => {
+		setOpenKeys((prev) => {
+			const next = new Set(prev);
+			if (next.has(key)) next.delete(key);
+			else next.add(key);
+			return next;
 		});
 	};
 
-	const handleNestedSubmenuToggle = (key: string) => {
-		setOpenNestedSubmenu((prev) => (prev === key ? null : key));
-	};
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: "Intentional"
 	useEffect(() => {
-		let submenuMatched = false;
-		let nestedSubmenuMatched = false;
-		["main"].forEach((menuType) => {
-			const items = menuType === "main" ? navItems : navItems;
-			items.forEach((nav: NavItem, index: number) => {
-				if (nav.subItems) {
-					nav.subItems.forEach((subItem) => {
-						if (subItem.path && isActive(subItem.path)) {
-							setOpenSubmenu({
-								type: menuType as "main" | "others",
-								index,
-							});
-							submenuMatched = true;
-						}
-						if (subItem.subItems) {
-							subItem.subItems.forEach((subSubItem) => {
-								if (isActive(subSubItem.path)) {
-									setOpenSubmenu({
-										type: menuType as "main" | "others",
-										index,
-									});
-									setOpenNestedSubmenu(`${nav.name}-${subItem.name}`);
-									submenuMatched = true;
-									nestedSubmenuMatched = true;
-								}
-							});
-						}
-					});
-				}
-			});
+		const keys = findActiveGroupKeys(navItems, "", isActive);
+		if (keys?.length) setOpenKeys((prev) => new Set([...prev, ...keys]));
+	}, [isActive, navItems]);
+
+	// Level 2..4 items, rendered recursively.
+	const renderSubItems = (items: SubItem[], parentKey: string, depth: number): React.ReactNode =>
+		items.map((item) => {
+			const key = `${parentKey}-${item.name}`;
+			const textSize = depth === 2 ? "text-base py-2" : "text-sm py-1.5";
+
+			if (item.subItems && item.subItems.length > 0) {
+				const isOpen = openKeys.has(key);
+				return (
+					<li key={item.name} className="flex flex-col">
+						<button
+							type="button"
+							onClick={() => toggleKey(key)}
+							className={`relative flex items-center w-full gap-3 px-3 ${textSize} font-medium rounded-lg transition-all ease-in-out duration-300 text-white/90 hover:bg-white/10 group cursor-pointer`}
+						>
+							<span className="flex-1 text-left">{item.name}</span>
+							<ChevronDown
+								className={`w-4 h-4 transition-transform ease-in-out duration-300 text-white/90 ${isOpen ? "rotate-180" : ""}`}
+							/>
+						</button>
+						<div
+							className={`overflow-hidden transition-all duration-300 ease-in-out ${
+								isOpen ? "max-h-[800px] opacity-100 mt-1" : "max-h-0 opacity-0 pointer-events-none"
+							}`}
+						>
+							<ul className="space-y-1 ml-4 border-l border-white/20 pl-3">
+								{renderSubItems(item.subItems, key, depth + 1)}
+							</ul>
+						</div>
+					</li>
+				);
+			}
+
+			if (!item.path) return null;
+			const active = isActive(item.path);
+			return (
+				<li key={item.name}>
+					<Tooltip title={item.description} placement="right" arrow>
+						<Link
+							href={item.path}
+							onMouseEnter={() => {
+								const doc = PREFETCH_DOC[item.name];
+								if (doc) prefetchMonitoringData(doc);
+							}}
+							className={`relative flex items-center gap-3 rounded-lg px-3 ${textSize} font-medium transition-all ease-in-out duration-300 ${
+								active ? "bg-white text-[#1E3A8A] hover:bg-white/95" : "text-white/85 hover:bg-white/10 hover:text-white"
+							}`}
+						>
+							<span className="flex-1">{item.name}</span>
+							{DUMMY_ITEMS.has(item.name) && (
+								<span
+									className={`text-[9px] font-extrabold px-1 py-0.5 rounded uppercase border whitespace-nowrap tracking-wider ${
+										active
+											? "bg-amber-100 text-amber-800 border-amber-200"
+											: "bg-amber-500/20 text-[#fbbf24] border-amber-500/30"
+									}`}
+								>
+									Dummy
+								</span>
+							)}
+						</Link>
+					</Tooltip>
+				</li>
+			);
 		});
 
-		if (!submenuMatched) {
-			setOpenSubmenu(null);
-		}
-		if (!nestedSubmenuMatched) {
-			setOpenNestedSubmenu(null);
-		}
-	}, [pathname, isActive, navItems]);
-
-	const renderMenuItems = (
-		navItems: NavItem[],
-		menuType: "main" | "others",
-	) => (
+	const renderMenuItems = (navItems: NavItem[]) => (
 		<ul className="flex flex-col gap-2">
-			{navItems.map((nav, index) => (
+			{navItems.map((nav) => (
 				<li key={nav.name}>
 					{nav.subItems && nav.subItems.length > 0 ? (
 						<button
 							type="button"
-							onClick={() => handleSubmenuToggle(index, menuType)}
+							onClick={() => toggleKey(nav.name)}
 							className={`relative flex items-center w-full gap-3 ${
 								(isExpanded || isHovered || isMobileOpen) && "px-3 py-2"
 							} font-medium rounded-lg group transition-all ease-in-out duration-300 text-white/90 hover:bg-white/10 group-hover:text-white cursor-pointer ${
@@ -324,8 +381,7 @@ const AppSidebar: React.FC = () => {
 							{(isExpanded || isHovered || isMobileOpen) && (
 								<ChevronDown
 									className={`ml-auto w-5 h-5 transition-transform ease-in-out duration-300 text-white/90 ${
-										openSubmenu?.type === menuType &&
-										openSubmenu?.index === index
+										openKeys.has(nav.name)
 											? "rotate-180"
 											: ""
 									}`}
@@ -341,8 +397,7 @@ const AppSidebar: React.FC = () => {
 										if (nav.path === "/dashboard") prefetchDashboard();
 										else if (nav.path === "/monitoring/produksi") prefetchMonitoringData("produksi");
 										else if (nav.path === "/monitoring/hsse") prefetchMonitoringData("hsse");
-										else if (nav.path === "/monitoring/lcv") prefetchMonitoringData("lcv_monitoring");
-									}}
+																			}}
 									className={`relative flex items-center w-full gap-3 ${
 										(isExpanded || isHovered || isMobileOpen) && "px-3 py-2"
 									} font-medium rounded-lg text-base group transition-all ease-in-out duration-300 ${
@@ -374,15 +429,6 @@ const AppSidebar: React.FC = () => {
 											>
 												{nav.name}
 											</span>
-											{nav.name === "Projects" && (
-												<span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded uppercase border whitespace-nowrap ml-2 ${
-													isActive(nav.path)
-														? "bg-amber-100 text-amber-800 border-amber-200"
-														: "bg-amber-500/20 text-[#fbbf24] border-amber-500/30"
-												}`}>
-													Dummy
-												</span>
-											)}
 										</div>
 									)}
 								</Link>
@@ -392,113 +438,13 @@ const AppSidebar: React.FC = () => {
 					{nav.subItems && nav.subItems.length > 0 && (isExpanded || isHovered || isMobileOpen) && (
 						<div
 							className={`overflow-hidden transition-all duration-300 ease-in-out ${
-								openSubmenu?.type === menuType && openSubmenu?.index === index
-									? "max-h-[800px] opacity-100 mt-2"
+								openKeys.has(nav.name)
+									? "max-h-[1200px] opacity-100 mt-2"
 									: "max-h-0 opacity-0 pointer-events-none"
 							}`}
 						>
 							<ul className="space-y-1 ml-9">
-								{nav.subItems.map((subItem) => {
-									const nestedKey = `${nav.name}-${subItem.name}`;
-									const isNestedOpen = openNestedSubmenu === nestedKey;
-									
-									if (subItem.subItems && subItem.subItems.length > 0) {
-										return (
-											<li key={subItem.name} className="flex flex-col">
-												<button
-													type="button"
-													onClick={() => handleNestedSubmenuToggle(nestedKey)}
-													className="relative flex items-center w-full gap-3 px-3 py-2 text-base font-medium rounded-lg transition-all ease-in-out duration-300 text-white/90 hover:bg-white/10 group cursor-pointer"
-												>
-													<span className="flex-1 text-left">{subItem.name}</span>
-													<ChevronDown
-														className={`w-4 h-4 transition-transform ease-in-out duration-300 text-white/90 ${
-															isNestedOpen ? "rotate-180" : ""
-														}`}
-													/>
-												</button>
-												<div
-													className={`overflow-hidden transition-all duration-300 ease-in-out ${
-														isNestedOpen
-															? "max-h-[500px] opacity-100 mt-1"
-															: "max-h-0 opacity-0 pointer-events-none"
-													}`}
-												>
-													<ul className="space-y-1 ml-6 border-l border-white/20 pl-3">
-														{subItem.subItems.map((subSub) => (
-															<li key={subSub.name}>
-																<Tooltip title={subSub.description} placement="right" arrow>
-																	<Link
-																		href={subSub.path}
-																		onMouseEnter={() => {
-																			if (subSub.name === "AIRMS") prefetchMonitoringData("airms");
-																			else if (subSub.name === "PSAIMS") prefetchMonitoringData("zona_indicator");
-																			else if (subSub.name === "I2AIMS") prefetchMonitoringData("i2aims");
-																			else if (subSub.name.startsWith("MIT")) prefetchMonitoringData("mit");
-																		}}
-																		className={`relative flex items-center gap-3 rounded-lg px-3 py-1.5 text-sm font-medium transition-all ease-in-out duration-300 ${
-																			isActive(subSub.path)
-																				? "bg-white text-[#1E3A8A] hover:bg-white/95"
-																				: "text-white/80 hover:bg-white/10 hover:text-white"
-																		}`}
-																	>
-																		<span className="flex-1">{subSub.name}</span>
-																		{(subSub.name.includes("AIRMS") || subSub.name === "I2AIMS" || subSub.name === "ABI" || subSub.name === "ABO") && (
-																			<span className={`text-[8px] font-extrabold px-1 py-0.5 rounded uppercase border whitespace-nowrap tracking-wider scale-90 ${
-																				isActive(subSub.path)
-																					? "bg-amber-100 text-amber-800 border-amber-200"
-																					: "bg-amber-500/20 text-[#fbbf24] border-amber-500/30"
-																			}`}>
-																				Dummy
-																			</span>
-																		)}
-																	</Link>
-																</Tooltip>
-															</li>
-														))}
-													</ul>
-												</div>
-											</li>
-										);
-									}
-									
-									return (
-										subItem.path && (
-											<li key={subItem.name}>
-												<Tooltip
-													title={subItem.description}
-													placement="right"
-													arrow
-												>
-													<Link
-														href={subItem.path}
-														onMouseEnter={() => {
-															if (subItem.name === "Production") prefetchMonitoringData("produksi");
-															else if (subItem.name === "HSSE") prefetchMonitoringData("hsse");
-															else if (subItem.name === "LCV") prefetchMonitoringData("lcv_monitoring");
-														}}
-														className={`relative flex items-center gap-3 rounded-lg px-3 py-2 text-base font-medium transition-all ease-in-out duration-300 ${
-															isActive(subItem.path)
-																? "bg-white text-[#1E3A8A] hover:bg-white/95"
-																: "text-white/85 hover:bg-white/10 hover:text-white"
-														}`}
-													>
-														<span className="flex-1">{subItem.name}</span>
-														{(subItem.name === "HSSE" || subItem.name === "LCV") && (
-															<span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded uppercase border whitespace-nowrap ml-2 ${
-																isActive(subItem.path)
-																	? "bg-amber-100 text-amber-800 border-amber-200"
-																	: "bg-amber-500/20 text-[#fbbf24] border-amber-500/30"
-															}`}>
-																Dummy
-															</span>
-														)}
-													</Link>
-												</Tooltip>
-											</li>
-										)
-									);
-								})}
+								{renderSubItems(nav.subItems, nav.name, 2)}
 							</ul>
 						</div>
 					)}
@@ -548,7 +494,7 @@ const AppSidebar: React.FC = () => {
 			<div className="flex-1 flex flex-col overflow-x-hidden overflow-y-auto duration-300 ease-linear no-scrollbar mb-4 min-h-0">
 				<nav className="mb-6">
 					<div className="flex flex-col gap-4">
-						<div>{renderMenuItems(filteredNavItems, "main")}</div>
+						<div>{renderMenuItems(filteredNavItems)}</div>
 					</div>
 				</nav>
 			</div>
