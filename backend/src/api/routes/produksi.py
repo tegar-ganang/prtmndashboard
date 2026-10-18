@@ -19,10 +19,9 @@ router = fastapi.APIRouter(prefix="/produksi", tags=["produksi"], dependencies=[
 async def check_period(
     year: int,
     month: int,
-    field: str | None = None,
     repo: ProduksiCRUDRepository = fastapi.Depends(get_repository(repo_type=ProduksiCRUDRepository)),
 ) -> APIResponse:
-    exists = await repo.check_period_exists(year, month, field)
+    exists = await repo.check_period_exists(year, month)
     return APIResponse(
         success=True,
         data={"exists": exists},
@@ -41,7 +40,6 @@ async def upload_excel(
     file: fastapi.UploadFile,
     reporting_year: int = fastapi.Form(...),
     reporting_month: int = fastapi.Form(...),
-    field: str = fastapi.Form(None),
     mode: str = fastapi.Form("append"),
     current_account: Account = fastapi.Depends(get_current_account),
     repo: ProduksiCRUDRepository = fastapi.Depends(get_repository(repo_type=ProduksiCRUDRepository)),
@@ -53,7 +51,6 @@ async def upload_excel(
             owner_account_id=str(current_account.id),
             reporting_year=reporting_year,
             reporting_month=reporting_month,
-            field=field,
             mode=mode,
         )
     except Exception as e:
@@ -95,11 +92,10 @@ async def get_history(
 async def get_targets(
     year: int | None = None,
     month: int | None = None,
-    field: str | None = None,
     repo: ProduksiCRUDRepository = fastapi.Depends(get_repository(repo_type=ProduksiCRUDRepository)),
 ) -> APIResponse:
     """Endpoint khusus untuk mengambil data target bulanan dari tabel produksi_target."""
-    data = await repo.get_targets(year=year, month=month, field=field)
+    data = await repo.get_targets(year=year, month=month)
     return APIResponse(
         success=True,
         message="Target data fetched successfully",
@@ -117,11 +113,10 @@ async def get_data(
     batch_id: str | None = None,
     year: int | None = None,
     month: int | None = None,
-    field: str | None = None,
     repo: ProduksiCRUDRepository = fastapi.Depends(get_repository(repo_type=ProduksiCRUDRepository)),
 ) -> APIResponse:
     """Endpoint untuk mengambil data realisasi harian. Field `target` berisi data target bulanan (nested)."""
-    data = await repo.get_data(batch_id=batch_id, year=year, month=month, field=field)
+    data = await repo.get_data(batch_id=batch_id, year=year, month=month)
     return APIResponse(
         success=True,
         message="Data fetched successfully",

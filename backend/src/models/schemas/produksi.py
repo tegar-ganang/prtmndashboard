@@ -1,7 +1,6 @@
 import typing
 import datetime
 import pydantic
-from src.models.schemas.location import FieldLocationResponse
 
 
 class ProduksiTargetResponse(pydantic.BaseModel):
@@ -11,11 +10,8 @@ class ProduksiTargetResponse(pydantic.BaseModel):
     owner_account_id: typing.Optional[typing.Any]
     reporting_year: int
     reporting_month: int
-    field: typing.Optional[str]
-    field_location: typing.Optional[FieldLocationResponse] = None
     target_dmf: typing.Optional[float]
     target_gas_wpb: typing.Optional[float]
-    target_kondensat: typing.Optional[float]
     target_kondensat_rkap: typing.Optional[float]
     target_kondensat_wpb: typing.Optional[float]
     created_at: datetime.datetime
@@ -34,8 +30,6 @@ class ProduksiResponse(pydantic.BaseModel):
 
     reporting_year: int
     reporting_month: int
-    field: typing.Optional[str]
-    field_location: typing.Optional[FieldLocationResponse] = None
 
     # Target bulanan yang direlasikan (nested)
     target: typing.Optional[ProduksiTargetResponse] = None
@@ -94,7 +88,6 @@ class ProduksiHistoryResponse(pydantic.BaseModel):
     upload_batch_id: typing.Any
     reporting_year: int
     reporting_month: int
-    field: typing.Optional[str]
     upload_date: datetime.datetime
     record_count: int
 

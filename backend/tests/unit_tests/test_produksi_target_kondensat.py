@@ -69,7 +69,6 @@ async def _upload(file_content: bytes, existing: list | None = None) -> _FakeAsy
         owner_account_id="00000000-0000-0000-0000-000000000000",
         reporting_year=2026,
         reporting_month=1,
-        field="DGI",
         mode="append",
     )
     return session
@@ -80,10 +79,10 @@ async def _parse_targets(file_content: bytes) -> list:
     return [o for o in session.added if type(o).__name__ == "ProduksiTarget"]
 
 
-def _stored_target(month: int, dmf: float, kondensat: float | None = None) -> ProduksiTarget:
+def _stored_target(month: int, dmf: float, kondensat_rkap: float | None = None) -> ProduksiTarget:
     return ProduksiTarget(
         id=uuid.uuid4(), upload_batch_id=uuid.uuid4(), reporting_year=2026, reporting_month=month,
-        target_dmf=dmf, target_kondensat=kondensat,
+        target_dmf=dmf, target_kondensat_rkap=kondensat_rkap,
     )
 
 
@@ -100,15 +99,16 @@ async def test_all_four_targets_are_parsed_by_header() -> None:
     assert targets[0].target_dmf == 94.4
     assert targets[0].target_gas_wpb == 93.47
     assert targets[0].target_kondensat_rkap == 738
-    assert targets[0].target_kondensat is None  # legacy column is not written by the new layout
     assert targets[0].target_kondensat_wpb == 724
 
 
 @pytest.mark.asyncio
 async def test_legacy_three_column_layout_still_works() -> None:
+    """The old single "KONDENSAT" header (pre RKAP/WP&B split) lands on target_kondensat_rkap —
+    same KPI, the legacy target_kondensat column no longer exists."""
     targets = await _parse_targets(_build_excel_bytes(["BULAN", "DMF", "KONDENSAT"], [94.4, 12.5]))
     assert targets[0].target_dmf == 94.4
-    assert targets[0].target_kondensat == 12.5
+    assert targets[0].target_kondensat_rkap == 12.5
     assert targets[0].target_gas_wpb is None
     assert targets[0].target_kondensat_wpb is None
 
@@ -123,7 +123,7 @@ async def test_missing_dmf_header_is_rejected() -> None:
 async def test_existing_month_is_updated_in_place_not_duplicated() -> None:
     """Upsert key = (reporting_year, reporting_month): re-uploading Jan must reuse the stored row
     (same id, so realisasi FKs stay valid), overwrite the columns in the sheet, and leave the rest."""
-    stored = _stored_target(month=1, dmf=1.0, kondensat=999.0)
+    stored = _stored_target(month=1, dmf=1.0, kondensat_rkap=999.0)
     stored_id = stored.id
     excel = _build_excel_bytes(["BULAN", "DMF", "GAS WP&B"], [94.4, 93.47])
 
@@ -133,7 +133,7 @@ async def test_existing_month_is_updated_in_place_not_duplicated() -> None:
     assert stored.id == stored_id
     assert stored.target_dmf == 94.4
     assert stored.target_gas_wpb == 93.47
-    assert stored.target_kondensat == 999.0  # column absent from the sheet → untouched
+    assert stored.target_kondensat_rkap == 999.0  # column absent from the sheet → untouched
     produksi = [o for o in session.added if type(o).__name__ == "Produksi"]
     assert [p.target_id for p in produksi] == [stored_id]
 
@@ -145,7 +145,7 @@ async def test_old_duplicates_are_merged_into_the_newest_row() -> None:
 
     session = await _upload(excel, existing=[newest, older])
 
-    assert newest.target_dmf == 94.4 and newest.target_kondensat == 12.5
+    assert newest.target_dmf == 94.4 and newest.target_kondensat_rkap == 12.5
     assert sum(isinstance(st, Delete) for st in session.executed) == 1  # only the duplicate is removed
     produksi = [o for o in session.added if type(o).__name__ == "Produksi"]
     assert [p.target_id for p in produksi] == [newest.id]

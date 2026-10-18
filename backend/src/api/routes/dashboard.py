@@ -53,19 +53,18 @@ async def get_summary(
 
     # 1a. Produksi & Target
     # noload("*"): this endpoint only reads scalar columns below, never the
-    # owner/field_location/target/realisasi_rows relationships — those are
-    # lazy="selectin" on the model (needed by other endpoints), so without
-    # this override every row here pays for eager-loading data nobody reads.
+    # owner/target/realisasi_rows relationships — those are lazy="selectin"
+    # on the model (needed by other endpoints), so without this override
+    # every row here pays for eager-loading data nobody reads.
     stmt_prod = sqlalchemy.select(Produksi).options(noload("*")).where(Produksi.reporting_year == year)
     stmt_target = sqlalchemy.select(ProduksiTarget).options(noload("*")).where(ProduksiTarget.reporting_year == year)
     
     if month is not None:
         stmt_prod = stmt_prod.where(Produksi.reporting_month == month)
         stmt_target = stmt_target.where(ProduksiTarget.reporting_month == month)
-    if field is not None and field != "":
-        stmt_prod = stmt_prod.where(Produksi.field == field)
-        stmt_target = stmt_target.where(ProduksiTarget.field == field)
-        
+    # Produksi/ProduksiTarget tidak punya kolom `field` (dihapus — selalu NULL, upload-nya
+    # mencakup Donggi & Matindok sekaligus), jadi tidak difilter oleh `field` di sini.
+
     res_prod = await db.execute(stmt_prod)
     prod_rows = res_prod.scalars().all()
     
