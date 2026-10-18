@@ -1,6 +1,6 @@
 import typing
 import uuid
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 import sqlalchemy
 from sqlalchemy.sql import functions as sqlalchemy_functions
@@ -14,7 +14,10 @@ def parse_date(date_val: typing.Any) -> date | None:
         return date_val.date()
     if isinstance(date_val, date):
         return date_val
-    
+    # Excel serial day number (cell formatted "General", e.g. 45659 = 2025-01-02). Bare years like 2025 fall through to "%Y".
+    if isinstance(date_val, (int, float)) and not isinstance(date_val, bool) and 20000 <= date_val <= 80000:
+        return date(1899, 12, 30) + timedelta(days=int(date_val))
+
     date_str = str(date_val).strip()
     if not date_str:
         return None

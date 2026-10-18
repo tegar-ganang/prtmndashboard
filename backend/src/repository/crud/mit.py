@@ -34,6 +34,17 @@ class MITCRUDRepository(BaseMonitoringRepository):
     model = MIT
     mapper = MIT_MAPPER
     period_col = "reporting_quarter"
+    # target_closing is free text ("TAR 2027", "Q4 2025"), so it's not parsed as a date.
+    date_columns = ["mit_declaration_date", "closing_date"]
+
+    async def create_batch(self, batch_data: typing.Any, owner_account_id: str) -> str:
+        # Lokasi comes from the Data Gathering field dropdown, not the sheet; a value in the sheet still wins.
+        field = getattr(batch_data, "field", None)
+        batch_data.items = [
+            {**item, "No Registration - Lokasi": item.get("No Registration - Lokasi") or field}
+            for item in batch_data.items
+        ]
+        return await super().create_batch(batch_data=batch_data, owner_account_id=owner_account_id)
 
     # We can keep the specific name get_mit_data if needed by the router, 
     # but the router should preferably use get_data.

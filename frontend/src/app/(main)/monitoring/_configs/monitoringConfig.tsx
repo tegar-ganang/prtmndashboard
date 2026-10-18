@@ -93,7 +93,10 @@ export const renderStatusBadge = (val: any) => {
 
 export const renderDateCell = (v: any) => {
   if (!v) return <span className="text-gray-300">—</span>;
-  return <span className="text-sm font-bold text-red-600 whitespace-nowrap">{format(new Date(v), "dd MMM yyyy")}</span>;
+  const d = new Date(v);
+  // Free-text targets ("TAR 2027", "Q4 2025") are shown as-is.
+  if (Number.isNaN(d.getTime())) return <span className="text-sm font-bold text-red-600 whitespace-pre-line">{String(v)}</span>;
+  return <span className="text-sm font-bold text-red-600 whitespace-nowrap">{format(d, "dd MMM yyyy")}</span>;
 };
 
 export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {

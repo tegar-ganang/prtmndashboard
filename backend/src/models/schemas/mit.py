@@ -42,7 +42,7 @@ class MITResponse(pydantic.BaseModel):
     rec_no: str | None
     recommendation_action: str | None
     pic: str | None
-    target_closing: datetime.date | None
+    target_closing: str | None
     remarks: str | None
     target_likelihood: str | None
     target_severity: str | None
