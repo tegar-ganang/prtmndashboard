@@ -93,7 +93,7 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		period: "month" as const,
 	},
 	ABI: {
-		label: "ABI (Anggaran Biaya Investasi)",
+		label: "Anggaran Biaya Investasi (ABI)",
 		expectedHeaders: [
 			"REF_WBS", "WBS", "NILAI_USD", "NILAI_IDR", "NILAI_PERCENT",
 			"COMMITMENT_NILAI_IDR", "COMMITMENT_PERCENT_IDR",
@@ -108,7 +108,7 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		period: "month" as const,
 	},
 	ABO: {
-		label: "ABO (Anggaran Biaya Operasi)",
+		label: "Anggaran Biaya Operasional (ABO)",
 		expectedHeaders: [
 			"NO_RK", "JENIS_KERANGKA_ANGGARAN",
 			"ANGGARANWPB_OSF_NILAI_USD", "ANGGARANWPB_OSF_NILAI_IDR", "ANGGARANWPB_OSF_PERCENT",
@@ -127,7 +127,7 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		period: "month" as const,
 	},
 	HSSE: {
-		label: "HSSE",
+		label: "Health, Safety, Security, and Environment (HSSE)",
 
 		expectedHeaders: [
 			"ID_Izin", "Tanggal", "Bulan_Tahun", "Lokasi",
@@ -142,7 +142,7 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		period: "month" as const,
 	},
 	AIRMS: {
-		label: "AIRMS",
+		label: "Asset Integrity & Reliability Management System (AIRMS)",
 		expectedHeaders: [
 			"record_id", "date", "asset_id", "asset_name", "area",
 			"availability", "reliability", "mtbf", "mttr", "wo_type",
@@ -156,7 +156,7 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		period: "month" as const,
 	},
 	I2AIMS: {
-		label: "I2AIMS",
+		label: "Intelligent Asset Integrity Management System (i2AIMS)",
 		expectedHeaders: [
 			"record_id", "inspection_date", "asset_id", "asset_name", "asset_type",
 			"area", "sce_category", "integrity_status", "inspection_result",

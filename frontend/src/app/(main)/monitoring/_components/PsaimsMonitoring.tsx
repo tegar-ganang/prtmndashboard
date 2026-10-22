@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import Button from "@/components/button/Button";
 import { useMonitoringData } from "../_hooks/useMonitoringData";
 import { MONITORING_CONFIGS } from "../_configs/monitoringConfig";
+import { TypingDescription } from "./MonitoringView";
 import DataGatheringDetailModal from "../../data-gathering/_components/DataGatheringDetailModal";
 
 // Debounce hook
@@ -170,9 +171,7 @@ export default function PsaimsMonitoring({ activeType }: { activeType: PsaimsTyp
 			<div className="flex items-start justify-between">
 				<div>
 					<h1 className="text-2xl font-bold text-gray-900">PSAIMS Monitoring</h1>
-					<p className="text-sm text-blue-600 font-medium mt-0.5">
-						Process Safety Assurance &amp; Integrity Management System
-					</p>
+					<TypingDescription text="Process Safety & Asset Integrity Management System" />
 				</div>
 				<Button
 					variant="outline"

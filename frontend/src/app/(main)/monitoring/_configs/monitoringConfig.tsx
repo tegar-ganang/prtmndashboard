@@ -6,6 +6,8 @@ export type PeriodType = "month" | "quarter" | "year";
 
 export interface MonitoringConfig {
   title: string;
+  /** Full name shown in blue under the heading; the heading itself stays the short acronym. */
+  fullName?: string;
   periodType: PeriodType;
   getColumns: (ch: ColumnHelper<any>) => any[];
 }
@@ -101,7 +103,8 @@ export const renderDateCell = (v: any) => {
 
 export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
   mit: {
-    title: "Major Integrity Threat (MIT)",
+    title: "MIT",
+    fullName: "Major Integrity Threat",
     periodType: "quarter",
     getColumns: (ch) => [
       ch.accessor("mit_title_asset", { 
@@ -123,7 +126,8 @@ export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
     ]
   },
   hazid: {
-    title: "Hazard Identification (HAZID)",
+    title: "HAZID",
+    fullName: "Hazard Identification",
     periodType: "month",
     getColumns: (ch) => [
       ch.accessor("hazard", {
@@ -145,7 +149,8 @@ export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
     ]
   },
   hazop: {
-    title: "Hazard and Operability Study (HAZOP)",
+    title: "HAZOP",
+    fullName: "Hazard and Operability Study",
     periodType: "month",
     getColumns: (ch) => [
       ch.accessor("deviation", {
@@ -167,7 +172,8 @@ export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
     ]
   },
   lopa: {
-    title: "Layer of Protection Analysis (LOPA)",
+    title: "LOPA",
+    fullName: "Layer of Protection Analysis",
     periodType: "month",
     getColumns: (ch) => [
       ch.accessor("function_name", {
@@ -229,7 +235,8 @@ export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
     ]
   },
   moc: {
-    title: "Management of Change (MOC)",
+    title: "MOC",
+    fullName: "Management of Change",
     periodType: "month",
     getColumns: (ch) => [
       ch.accessor("moc_number", {
@@ -263,7 +270,8 @@ export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
     ]
   },
   abi: {
-    title: "ABI (Anggaran Biaya Investasi)",
+    title: "ABI",
+    fullName: "Anggaran Biaya Investasi",
     periodType: "month",
     getColumns: (ch) => [
       ch.accessor("wbs", {
@@ -293,7 +301,8 @@ export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
     ]
   },
   abo: {
-    title: "ABO (Anggaran Biaya Operasi)",
+    title: "ABO",
+    fullName: "Anggaran Biaya Operasional",
     periodType: "month",
     getColumns: (ch) => [
       ch.accessor("no_rk", {
@@ -316,6 +325,7 @@ export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
   },
   hsse: {
     title: "HSSE",
+    fullName: "Health, Safety, Security, and Environment",
     periodType: "month",
 
     getColumns: (ch) => [
@@ -344,6 +354,7 @@ export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
   },
   airms: {
     title: "AIRMS",
+    fullName: "Asset Integrity & Reliability Management System",
     periodType: "month",
     getColumns: (ch) => [
       ch.accessor("asset_id", {
@@ -424,7 +435,8 @@ export const MONITORING_CONFIGS: Record<string, MonitoringConfig> = {
     ]
   },
   i2aims: {
-    title: "I2AIMS",
+    title: "i2AIMS",
+    fullName: "Intelligent Asset Integrity Management System",
     periodType: "month",
     getColumns: (ch) => [
       ch.accessor("asset_id", {

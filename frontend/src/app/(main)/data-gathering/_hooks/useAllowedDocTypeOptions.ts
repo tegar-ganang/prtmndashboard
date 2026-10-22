@@ -24,8 +24,8 @@ export function useAllowedDocTypeOptions() {
 
 		const documentOptionsWithPsaims: DocumentOption<DocTypeValue>[] = [
 			...documentOptions,
-			...(psaimsOptions.length > 0 ? [{ value: "PSAIMS" as DocTypeValue, label: "PSAIMS" }] : []),
-			...(lcvOptions.length > 0 ? [{ value: "LCV" as DocTypeValue, label: "LCV" }] : []),
+			...(psaimsOptions.length > 0 ? [{ value: "PSAIMS" as DocTypeValue, label: "Process Safety & Asset Integrity Management System (PSAIMS)" }] : []),
+			...(lcvOptions.length > 0 ? [{ value: "LCV" as DocTypeValue, label: "Living Core Values (LCV)" }] : []),
 		];
 
 		return {

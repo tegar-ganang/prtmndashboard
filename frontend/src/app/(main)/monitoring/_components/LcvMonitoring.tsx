@@ -14,6 +14,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Button from "@/components/button/Button";
 import { useMonitoringData } from "../_hooks/useMonitoringData";
 import { MONITORING_CONFIGS } from "../_configs/monitoringConfig";
+import { TypingDescription } from "./MonitoringView";
 import DataGatheringDetailModal from "../../data-gathering/_components/DataGatheringDetailModal";
 import type { DocTypeValue } from "../../data-gathering/_constants/dataGathering.constants";
 
@@ -124,7 +125,7 @@ export default function LcvMonitoring({ activeType }: { activeType: LcvType }) {
 							Dummy Data
 						</span>
 					</h1>
-					<p className="text-sm text-blue-600 font-medium mt-0.5">Loss Control &amp; Verification</p>
+					<TypingDescription text="Living Core Values" />
 				</div>
 				<Button
 					variant="outline"

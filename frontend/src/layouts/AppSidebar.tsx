@@ -161,18 +161,18 @@ const AppSidebar: React.FC = () => {
 					},
 					{
 						name: "OSF",
-						description: "Operational Safety Frontline Monitoring.",
+						description: "Operation & Surface Facilities.",
 						subItems: [
-							{ name: "AIRMS", path: "/monitoring/airms", description: "AIRMS Monitoring", menu: "airms" },
+							{ name: "AIRMS", path: "/monitoring/airms", description: "Asset Integrity & Reliability Management System", menu: "airms" },
 							{
 								name: "PSAIMS",
-								description: "PSAIMS Monitoring",
+								description: "Process Safety & Asset Integrity Management System",
 								subItems: [
 									{ name: "Zona Indicator", path: "/monitoring/zona_indicator", menu: "zona_indicator" },
 									{ name: "Zona PSE List", path: "/monitoring/zona_pse_list", menu: "zona_pse_list" },
 								],
 							},
-							{ name: "I2AIMS", path: "/monitoring/i2aims", description: "I2AIMS Monitoring", menu: "i2aims" },
+							{ name: "i2AIMS", path: "/monitoring/i2aims", description: "Intelligent Asset Integrity Management System", menu: "i2aims" },
 							{
 								name: "MIT & MOC",
 								description: "Major Integrity Threat & Management of Change",
@@ -181,15 +181,15 @@ const AppSidebar: React.FC = () => {
 									{ name: "MOC", path: "/monitoring/moc", description: "Management of Change", menu: "moc" },
 								],
 							},
-							{ name: "HAZID", path: "/monitoring/hazid", description: "HAZID Monitoring (Bulanan)", menu: "hazid" },
-							{ name: "HAZOP", path: "/monitoring/hazop", description: "HAZOP Monitoring (Bulanan)", menu: "hazop" },
-							{ name: "LOPA", path: "/monitoring/lopa", description: "LOPA Monitoring (Bulanan)", menu: "lopa" },
+							{ name: "HAZID", path: "/monitoring/hazid", description: "Hazard Identification", menu: "hazid" },
+							{ name: "HAZOP", path: "/monitoring/hazop", description: "Hazard and Operability Study", menu: "hazop" },
+							{ name: "LOPA", path: "/monitoring/lopa", description: "Layer of Protection Analysis", menu: "lopa" },
 							{
 								name: "OPE",
-								description: "Operational Performance & Excellence",
+								description: "Operation Planning & Evaluation",
 								subItems: [
 									{ name: "ABI", path: "/monitoring/abi", description: "Anggaran Biaya Investasi", menu: "abi" },
-									{ name: "ABO", path: "/monitoring/abo", description: "Anggaran Biaya Operasi", menu: "abo" },
+									{ name: "ABO", path: "/monitoring/abo", description: "Anggaran Biaya Operasional", menu: "abo" },
 								],
 							},
 						],
@@ -197,12 +197,12 @@ const AppSidebar: React.FC = () => {
 					{
 						name: "HSSE",
 						path: "/monitoring/hsse",
-						description: "HSSE Monitoring.",
+						description: "Health, Safety, Security, and Environment.",
 						menu: "hsse",
 					},
 					{
 						name: "LCV",
-						description: "Loss Control & Verification Monitoring.",
+						description: "Living Core Values.",
 						subItems: [
 							{ name: "Project Charter Budaya", path: "/monitoring/lcv_project_charter_budaya", menu: "lcv" },
 							{ name: "LCV Monitoring", path: "/monitoring/lcv_monitoring", menu: "lcv" },
