@@ -56,7 +56,7 @@ export default function ProjectsContainer({ projectType }: { projectType?: Proje
         useDeleteProjectMutation();
     const { data: projects = [], isLoading } = useProjectsQuery();
     const user = useAuthStore.useUser();
-    const canManageProjects = canUploadMenu(user?.role_name, "project");
+    const canManageProjects = canUploadMenu(user, "project");
 
     const columns = useMemo<ColumnDef<ProjectRow>[]>(
         () => [

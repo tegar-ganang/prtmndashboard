@@ -17,7 +17,7 @@ export default function CreateProjectContainer() {
 	const { mutate: createProject, isPending } = useCreateProjectMutation();
 	const user = useAuthStore.useUser();
 
-	if (!canUploadMenu(user?.role_name, "project")) {
+	if (!canUploadMenu(user, "project")) {
 		return <ProjectAccessDenied />;
 	}
 

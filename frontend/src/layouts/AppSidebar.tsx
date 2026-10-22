@@ -133,9 +133,12 @@ const AppSidebar: React.FC = () => {
 			{
 				icon: <Box className="w-5 h-5" />,
 				name: "Projects",
-				path: "/projects",
 				description: "Kelola proyek Anda secara efisien.",
 				menu: "project",
+				subItems: [
+					{ name: "Business Development", path: "/projects/bd", menu: "project" },
+					{ name: "Non Business Development", path: "/projects/non-bd", menu: "project" },
+				],
 			},
 			{
 				icon: <UploadCloud className="w-5 h-5" />,
@@ -225,7 +228,6 @@ const AppSidebar: React.FC = () => {
 		[],
 	);
 
-	const roleName = user?.role_name;
 	const isAdmin = user?.is_admin ?? false;
 	const dataGatheringMenus: MenuKey[] = [
 		"produksi", "i2aims", "airms", "mit", "moc", "hazid", "hazop", "lopa",
@@ -236,9 +238,9 @@ const AppSidebar: React.FC = () => {
 		function filter(items: SubItem[]): SubItem[] {
 			return items
 				.map((item) => (item.subItems ? { ...item, subItems: filter(item.subItems) } : item))
-				.filter((item) => (item.subItems ? item.subItems.length > 0 : !item.menu || canViewMenu(roleName, item.menu)));
+				.filter((item) => (item.subItems ? item.subItems.length > 0 : !item.menu || canViewMenu(user, item.menu)));
 		},
-		[roleName],
+		[user],
 	);
 
 	const filterNavItems = useCallback(
@@ -246,14 +248,14 @@ const AppSidebar: React.FC = () => {
 			items
 				.filter((item) => {
 					if (item.adminOnly) return isAdmin;
-					if (item.name === "Data Gathering") return canUploadAnyMenu(roleName, dataGatheringMenus);
-					if (item.menu) return canViewMenu(roleName, item.menu);
+					if (item.name === "Data Gathering") return canUploadAnyMenu(user, dataGatheringMenus);
+					if (item.menu) return canViewMenu(user, item.menu);
 					return true; // no menu tag (e.g. "Monitoring" group, "OPE") — let sub-items decide
 				})
 				.map((item) => (item.subItems ? { ...item, subItems: filterSubItems(item.subItems) } : item))
 				.filter((item) => !item.subItems || item.subItems.length > 0),
 		// biome-ignore lint/correctness/useExhaustiveDependencies: dataGatheringMenus is a stable literal
-		[roleName, isAdmin, filterSubItems],
+		[user, isAdmin, filterSubItems],
 	);
 
 	const filteredNavItems = filterNavItems(navItems);

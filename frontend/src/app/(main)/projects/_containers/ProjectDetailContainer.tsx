@@ -56,7 +56,7 @@ const DetailRow = ({ children }: { children: React.ReactNode }) => (
 export default function ProjectDetailContainer({ id }: { id: string }) {
 	const { data: project, isLoading } = useProjectDetailQuery(id);
 	const user = useAuthStore.useUser();
-	const canManageProjects = canUploadMenu(user?.role_name, "project");
+	const canManageProjects = canUploadMenu(user, "project");
 
 	return (
 		<div className="p-6 lg:p-8 space-y-6 bg-gray-50 min-h-screen">

@@ -13,10 +13,10 @@ import {
 
 /** Doc type options filtered down to what the logged-in role can upload (RBAC). */
 export function useAllowedDocTypeOptions() {
-	const roleName = useAuthStore.useUser()?.role_name;
+	const user = useAuthStore.useUser();
 
 	return useMemo(() => {
-		const canUpload = (docType: DocTypeValue) => canUploadMenu(roleName, DOC_TYPE_MENU[docType]);
+		const canUpload = (docType: DocTypeValue) => canUploadMenu(user, DOC_TYPE_MENU[docType]);
 
 		const documentOptions = DOCUMENT_OPTIONS.filter((opt) => canUpload(opt.value));
 		const psaimsOptions = PSAIMS_OPTIONS.filter((opt) => canUpload(opt.value));
@@ -35,5 +35,5 @@ export function useAllowedDocTypeOptions() {
 			documentOptionsWithPsaims,
 			hasAnyUploadAccess: documentOptionsWithPsaims.length > 0,
 		};
-	}, [roleName]);
+	}, [user]);
 }

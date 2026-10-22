@@ -16,6 +16,9 @@ def require_menu_access(menu_name: str, require_upload: bool = False) -> typing.
         current_account: Account = fastapi.Depends(get_current_account),
         async_session: SQLAlchemyAsyncSession = fastapi.Depends(get_async_session),
     ) -> Account:
+        if current_account.is_admin:  # admins bypass the role/menu matrix
+            return current_account
+
         if current_account.role_id is None:
             raise fastapi.HTTPException(status_code=fastapi.status.HTTP_403_FORBIDDEN, detail="Account has no role assigned")
 
