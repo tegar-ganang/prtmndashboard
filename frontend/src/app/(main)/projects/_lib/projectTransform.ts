@@ -1,4 +1,9 @@
-import type { CreateProjectRequest, ProjectItem } from "@/types/project";
+import type { CreateProjectRequest, ProjectItem, ProjectType } from "@/types/project";
+
+export const PROJECT_TYPE_LABEL: Record<ProjectType, string> = {
+	BD: "Business Development",
+	NON_BD: "Non Business Development",
+};
 
 export const getTodayDate = () => new Date().toISOString().split("T")[0];
 
@@ -11,6 +16,7 @@ export const defaultProjectFormValues: CreateProjectRequest = {
 	projectLocation: "",
 	projectValue: 0,
 	projectPriority: "high",
+	projectType: "NON_BD",
 	estimatedProgressPercentage: 0,
 	earnedValueEv: 0,
 	plannedValuePv: 0,
@@ -28,6 +34,7 @@ export const toProjectPayload = (data: CreateProjectRequest) => ({
 	project_location: data.projectLocation,
 	project_value: Number(data.projectValue),
 	project_priority: data.projectPriority,
+	project_type: data.projectType,
 	estimated_progress_percentage: Number(data.estimatedProgressPercentage),
 	earned_value_ev: Number(data.earnedValueEv),
 	planned_value_pv: Number(data.plannedValuePv),
@@ -47,6 +54,7 @@ export const projectToFormValues = (
 	projectLocation: project.document_project.project_location,
 	projectValue: project.document_project.project_value,
 	projectPriority: project.document_project.project_priority,
+	projectType: project.document_project.project_type,
 	estimatedProgressPercentage:
 		project.document_project.estimated_progress_percentage,
 	earnedValueEv: project.earned_value_ev,

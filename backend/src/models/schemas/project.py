@@ -14,6 +14,7 @@ class ProjectInCreate(BaseSchemaModel):
     project_location: str
     project_value: float | None = None
     project_priority: pydantic.constr(to_lower=True, regex="^(high|mid|low)$")  # type: ignore
+    project_type: pydantic.constr(to_upper=True, regex="^(BD|NON_BD)$")  # type: ignore
     estimated_progress_percentage: float = pydantic.Field(ge=0, le=100, default=0)
     earned_value_ev: float = 0
     planned_value_pv: float = 0
@@ -31,6 +32,7 @@ class ProjectInUpdate(BaseSchemaModel):
     project_location: str | None = None
     project_value: float | None = None
     project_priority: pydantic.constr(to_lower=True, regex="^(high|mid|low)$") | None = None  # type: ignore
+    project_type: pydantic.constr(to_upper=True, regex="^(BD|NON_BD)$") | None = None  # type: ignore
     estimated_progress_percentage: float | None = pydantic.Field(default=None, ge=0, le=100)
     earned_value_ev: float | None = None
     planned_value_pv: float | None = None

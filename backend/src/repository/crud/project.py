@@ -4,6 +4,7 @@ import sqlalchemy
 from sqlalchemy.sql import functions as sqlalchemy_functions
 
 from src.models.db.project import Project
+from src.models.db.project_progress_summary import ProjectProgressSummary
 from src.models.schemas.project import ProjectInCreate, ProjectInUpdate
 from src.repository.crud.base import BaseCRUDRepository
 from src.utilities.exceptions.database import EntityDoesNotExist
@@ -28,6 +29,22 @@ class ProjectCRUDRepository(BaseCRUDRepository):
             stmt = stmt.where(Project.owner_account_id == owner_account_id)
         query = await self.async_session.execute(statement=stmt)
         return query.scalars().all()
+
+    async def read_latest_actual_progress(self, project_id: str | None = None) -> dict[typing.Any, float]:
+        """project_id -> actual cumulative % of the latest S-Curve week that has an actual (forecast-only weeks skipped)."""
+        ranked = sqlalchemy.select(
+            ProjectProgressSummary.project_id,
+            ProjectProgressSummary.actual_cumulative,
+            sqlalchemy.func.row_number()
+            .over(partition_by=ProjectProgressSummary.project_id, order_by=ProjectProgressSummary.progress_date.desc())
+            .label("rn"),
+        ).where(ProjectProgressSummary.actual_cumulative.is_not(None))
+        if project_id is not None:
+            ranked = ranked.where(ProjectProgressSummary.project_id == project_id)
+        ranked = ranked.subquery()
+        stmt = sqlalchemy.select(ranked.c.project_id, ranked.c.actual_cumulative).where(ranked.c.rn == 1)
+        rows = (await self.async_session.execute(statement=stmt)).all()
+        return {row.project_id: float(row.actual_cumulative) for row in rows}
 
     async def read_project_by_id(self, project_id: str, owner_account_id: str | None = None) -> Project:
         conditions = [Project.id == project_id]

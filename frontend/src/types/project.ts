@@ -1,4 +1,5 @@
 export type ProjectPriority = "low" | "mid" | "high";
+export type ProjectType = "BD" | "NON_BD";
 
 export type CreateProjectRequest = {
 	documentCreatedAt: string;
@@ -9,6 +10,7 @@ export type CreateProjectRequest = {
 	projectLocation: string;
 	projectValue: number;
 	projectPriority: ProjectPriority;
+	projectType: ProjectType;
 	estimatedProgressPercentage: number;
 	earnedValueEv: number;
 	plannedValuePv: number;
@@ -26,6 +28,7 @@ export type ProjectDocument = {
 	project_location: string;
 	project_value: number;
 	project_priority: ProjectPriority;
+	project_type: ProjectType;
 	estimated_progress_percentage: number;
 };
 

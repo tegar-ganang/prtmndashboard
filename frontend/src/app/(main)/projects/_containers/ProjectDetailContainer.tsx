@@ -2,6 +2,7 @@
 
 import {
 	ArrowLeft,
+	Briefcase,
 	Calendar,
 	CalendarCheck,
 	ChevronDown,
@@ -13,7 +14,7 @@ import type { LucideIcon } from "lucide-react";
 import useAuthStore from "@/app/stores/useAuthStore";
 import ButtonLink from "@/components/links/ButtonLink";
 import { canUploadMenu } from "@/configs/rbac";
-import { formatProjectDate } from "../_lib/projectTransform";
+import { formatProjectDate, PROJECT_TYPE_LABEL } from "../_lib/projectTransform";
 import { useProjectDetailQuery } from "../_hooks/useProjectDetailQuery";
 import ProjectScurveSection from "./ProjectScurveSection";
 
@@ -107,6 +108,11 @@ export default function ProjectDetailContainer({ id }: { id: string }) {
 								icon={CalendarCheck}
 								label="End Date"
 								value={formatProjectDate(project.document_project.estimated_completion_date)}
+							/>
+							<DetailItem
+								icon={Briefcase}
+								label="Project Type"
+								value={PROJECT_TYPE_LABEL[project.document_project.project_type]}
 							/>
 						</DetailRow>
 					</div>

@@ -8,6 +8,7 @@ import Input from "@/components/form/Input";
 import SelectInput from "@/components/form/SelectInput";
 import type { CreateProjectRequest } from "@/types/project";
 import { useLocationsQuery } from "@/app/(main)/data-gathering/_hooks/useLocationsQuery";
+import { PROJECT_TYPE_LABEL } from "../_lib/projectTransform";
 
 type ProjectFormProps = {
 	defaultValues: CreateProjectRequest;
@@ -21,6 +22,8 @@ const projectPriorityOptions = [
 	{ value: "mid", label: "Medium" },
 	{ value: "high", label: "High" },
 ];
+
+const projectTypeOptions = Object.entries(PROJECT_TYPE_LABEL).map(([value, label]) => ({ value, label }));
 
 const priorityDotColor: Record<string, string> = {
 	low: "bg-green-500",
@@ -112,6 +115,14 @@ export default function ProjectForm({
 							formatOptionLabel={formatPriorityOption}
 							isSearchable={false}
 							validation={{ required: "Project priority is required" }}
+						/>
+						<SelectInput
+							id="projectType"
+							label="Project Type"
+							placeholder="Select type"
+							options={projectTypeOptions}
+							isSearchable={false}
+							validation={{ required: "Project type is required" }}
 						/>
 					</div>
 				</FormSection>
