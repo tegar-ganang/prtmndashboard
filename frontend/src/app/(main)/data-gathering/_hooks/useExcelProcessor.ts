@@ -100,7 +100,8 @@ export function validateMitRow(obj: ExcelRow): string[] {
 
 	// NONMIT rows legitimately have "N/A"; real MIT rows need an actual date.
 	const jenis = String(obj["No Registration - Jenis MIT"] ?? "").trim().toUpperCase();
-	if (jenis === "MIT" && !/^\d{4}-\d{2}-\d{2}$/.test(String(obj["MIT Declaration Date"] ?? ""))) {
+	const declared = obj["MIT Declaration Date"];
+	if (jenis === "MIT" && typeof declared !== "number" && !PARSEABLE_DATE.test(String(declared ?? "").trim())) {
 		errors.push("MIT Declaration Date harus tanggal untuk Jenis MIT");
 	}
 

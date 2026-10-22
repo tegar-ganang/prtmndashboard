@@ -70,3 +70,13 @@ async def test_reg_lokasi_falls_back_to_dropdown_field_and_target_closing_kept_a
     assert first["target_closing"] == "TAR 2027"
     assert str(first["mit_declaration_date"]) == "2025-03-21"
     assert second["target_closing"] == "2026"
+
+
+def test_mit_response_accepts_target_closing_before_and_after_migration() -> None:
+    import datetime
+
+    from src.models.schemas.mit import MITResponse
+
+    base = dict(id=1, upload_batch_id=1, created_at=datetime.datetime(2026, 1, 1))
+    assert MITResponse.parse_obj({**base, "target_closing": datetime.date(2025, 1, 1)}).target_closing == datetime.date(2025, 1, 1)
+    assert MITResponse.parse_obj({**base, "target_closing": "TAR 2027"}).target_closing == "TAR 2027"

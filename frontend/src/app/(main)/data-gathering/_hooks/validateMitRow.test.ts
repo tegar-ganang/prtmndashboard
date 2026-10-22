@@ -49,3 +49,10 @@ describe("parseRows", () => {
 		expect(rows[0]._errors).toEqual(['COMPLETION DATE harus tanggal (tertulis "potential closed 2026")']);
 	});
 });
+
+describe("validateMitRow dates", () => {
+	it("accepts every date format the backend parses", () => {
+		expect(validateMitRow({ ...base, "MIT Declaration Date": "21/03/2025" })).toEqual([]);
+		expect(validateMitRow({ ...base, "MIT Declaration Date": 45737 })).toEqual([]);
+	});
+});

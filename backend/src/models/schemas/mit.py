@@ -42,7 +42,8 @@ class MITResponse(pydantic.BaseModel):
     rec_no: str | None
     recommendation_action: str | None
     pic: str | None
-    target_closing: str | None
+    # str after migration a1b2c3mittc1; a DB not yet migrated still returns DATE.
+    target_closing: str | datetime.date | None
     remarks: str | None
     target_likelihood: str | None
     target_severity: str | None
