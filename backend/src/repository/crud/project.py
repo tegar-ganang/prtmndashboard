@@ -85,4 +85,4 @@ class ProjectCRUDRepository(BaseCRUDRepository):
         await self.async_session.execute(statement=stmt)
         await self.async_session.commit()
 
-        return f"Project with id '{project_id}' is successfully deleted!"
+        return f"Project '{db_project.project_name}' is successfully deleted!"

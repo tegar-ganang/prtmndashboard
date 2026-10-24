@@ -1,8 +1,13 @@
-import type { CreateProjectRequest, ProjectItem, ProjectType } from "@/types/project";
+import type { CreateProjectRequest, ProjectItem, ProjectStatus, ProjectType } from "@/types/project";
 
 export const PROJECT_TYPE_LABEL: Record<ProjectType, string> = {
 	BD: "Business Development",
 	NON_BD: "Non Business Development",
+};
+
+export const PROJECT_STATUS_LABEL: Record<ProjectStatus, string> = {
+	PRE_EKSEKUSI: "Pre Eksekusi",
+	EKSEKUSI: "Eksekusi",
 };
 
 export const getTodayDate = () => new Date().toISOString().split("T")[0];
@@ -13,6 +18,7 @@ export const defaultProjectFormValues: CreateProjectRequest = {
 	estimatedCompletionDate: getTodayDate(),
 	projectName: "",
 	pic: "",
+	ownerProject: "",
 	projectLocation: "",
 	projectValue: 0,
 	projectPriority: "high",
@@ -31,6 +37,7 @@ export const toProjectPayload = (data: CreateProjectRequest) => ({
 	estimated_completion_date: data.estimatedCompletionDate,
 	project_name: data.projectName,
 	pic: data.pic,
+	owner_project: data.ownerProject,
 	project_location: data.projectLocation,
 	project_value: Number(data.projectValue),
 	project_priority: data.projectPriority,
@@ -41,6 +48,7 @@ export const toProjectPayload = (data: CreateProjectRequest) => ({
 	actual_cost_ac: Number(data.actualCostAc),
 	budget_bac: Number(data.budgetBac),
 	milestone_and_work_stages: data.milestoneAndWorkStages,
+	status: data.status,
 });
 
 export const projectToFormValues = (
@@ -51,6 +59,7 @@ export const projectToFormValues = (
 	estimatedCompletionDate: project.document_project.estimated_completion_date,
 	projectName: project.document_project.project_name,
 	pic: project.document_project.pic ?? "",
+	ownerProject: project.document_project.owner_project ?? "",
 	projectLocation: project.document_project.project_location,
 	projectValue: project.document_project.project_value,
 	projectPriority: project.document_project.project_priority,

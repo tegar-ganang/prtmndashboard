@@ -11,6 +11,7 @@ class ProjectInCreate(BaseSchemaModel):
     estimated_completion_date: datetime.date
     project_name: str
     pic: str | None = None
+    owner_project: str | None = None
     project_location: str
     project_value: float | None = None
     project_priority: pydantic.constr(to_lower=True, regex="^(high|mid|low)$")  # type: ignore
@@ -29,10 +30,13 @@ class ProjectInUpdate(BaseSchemaModel):
     estimated_completion_date: datetime.date | None = None
     project_name: str | None = None
     pic: str | None = None
+    owner_project: str | None = None
     project_location: str | None = None
     project_value: float | None = None
     project_priority: pydantic.constr(to_lower=True, regex="^(high|mid|low)$") | None = None  # type: ignore
     project_type: pydantic.constr(to_upper=True, regex="^(BD|NON_BD)$") | None = None  # type: ignore
+    # One-way: a project can only be moved to EKSEKUSI, never back to PRE_EKSEKUSI.
+    status: pydantic.constr(to_upper=True, regex="^EKSEKUSI$") | None = None  # type: ignore
     estimated_progress_percentage: float | None = pydantic.Field(default=None, ge=0, le=100)
     earned_value_ev: float | None = None
     planned_value_pv: float | None = None

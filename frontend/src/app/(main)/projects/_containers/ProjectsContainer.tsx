@@ -10,8 +10,8 @@ import ButtonLink from "@/components/links/ButtonLink";
 import IconLink from "@/components/links/IconLink";
 import Table from "@/components/table/Table";
 import { canUploadMenu } from "@/configs/rbac";
-import type { ProjectItem, ProjectType } from "@/types/project";
-import { formatProjectDate, PROJECT_TYPE_LABEL } from "../_lib/projectTransform";
+import type { ProjectItem, ProjectStatus, ProjectType } from "@/types/project";
+import { formatProjectDate, PROJECT_STATUS_LABEL, PROJECT_TYPE_LABEL } from "../_lib/projectTransform";
 import { useDeleteProjectMutation } from "../_hooks/useDeleteProjectMutation";
 import { useProjectsQuery } from "../_hooks/useProjectsQuery";
 
@@ -21,6 +21,7 @@ type ProjectRow = {
     projectLocation: string;
     priority: string;
     projectType: ProjectType;
+    status: ProjectStatus;
     estimatedProgressPercentage: number;
     documentCreatedAt: string;
     operationalStartDate: string;
@@ -35,6 +36,7 @@ const mapProjectToRow = (project: ProjectItem): ProjectRow => ({
     projectLocation: project.document_project.project_location,
     priority: project.document_project.project_priority,
     projectType: project.document_project.project_type,
+    status: project.document_project.status,
     estimatedProgressPercentage:
         project.document_project.estimated_progress_percentage,
     documentCreatedAt: project.document_project.document_created_at,
@@ -97,6 +99,22 @@ export default function ProjectsContainer({ projectType }: { projectType?: Proje
                     } satisfies ColumnDef<ProjectRow>,
                 ]
                 : []),
+            {
+                accessorKey: "status",
+                header: "Status",
+                cell: (props) => {
+                    const status = props.getValue() as ProjectStatus;
+                    return (
+                        <span
+                            className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                                status === "EKSEKUSI" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
+                            }`}
+                        >
+                            {PROJECT_STATUS_LABEL[status]}
+                        </span>
+                    );
+                },
+            },
             {
                 accessorKey: "estimatedProgressPercentage",
                 header: "Progress",
@@ -187,7 +205,7 @@ export default function ProjectsContainer({ projectType }: { projectType?: Proje
                     </p>
                 </div>
                 {canManageProjects && (
-                    <ButtonLink href="/projects/create" variant="blue">
+                    <ButtonLink href={projectType ? `/projects/create?type=${projectType}` : "/projects/create"} variant="blue">
                         Create New Project
                     </ButtonLink>
                 )}

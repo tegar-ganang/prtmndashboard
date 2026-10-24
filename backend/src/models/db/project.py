@@ -29,6 +29,11 @@ class Project(Base):  # type: ignore
     project_type: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(
         sqlalchemy.String(length=20), nullable=False, default="NON_BD", server_default="NON_BD"
     )
+    # PRE_EKSEKUSI -> EKSEKUSI (CHECK constraint in migration a1b2c3projstatus1). S-Curve upload is blocked until EKSEKUSI.
+    status: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(
+        sqlalchemy.String(length=20), nullable=False, default="PRE_EKSEKUSI", server_default="PRE_EKSEKUSI"
+    )
+    owner_project: SQLAlchemyMapped[str | None] = sqlalchemy_mapped_column(sqlalchemy.String(length=150), nullable=True)
     estimated_progress_percentage: SQLAlchemyMapped[float] = sqlalchemy_mapped_column(
         sqlalchemy.Float, nullable=False, default=0.0
     )

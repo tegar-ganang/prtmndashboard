@@ -8,6 +8,7 @@ from io import BytesIO
 import openpyxl
 import sqlalchemy
 
+from src.models.db.project import Project
 from src.models.db.project_progress import ProjectProgress
 from src.models.db.project_progress_summary import ProjectProgressSummary
 from src.models.db.project_scurve_upload import ProjectScurveUpload
@@ -70,6 +71,10 @@ class ProjectScurveCRUDRepository(BaseCRUDRepository):
         file_name: str,
         uploaded_by_account_id: str | None,
     ) -> dict[str, typing.Any]:
+        project = await self.async_session.get(Project, project_id)
+        if project is not None and project.status == "PRE_EKSEKUSI":
+            raise ValueError("Project masih PRE EKSEKUSI, ubah status ke EKSEKUSI dulu sebelum upload progress.")
+
         workbook = openpyxl.load_workbook(BytesIO(file_content), data_only=True)
 
         for sheet_name in ("Exe Sum", "S-Overall"):

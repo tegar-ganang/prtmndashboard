@@ -1,3 +1,5 @@
+import datetime
+
 import fastapi
 
 from src.api.dependencies.authentication import get_current_account
@@ -23,6 +25,13 @@ def _project_category(project_value: float | None) -> str | None:
     return "Proyek <IDR 5M"
 
 
+def _duration_days(start: datetime.date | None, end: datetime.date | None) -> int | None:
+    if start is None or end is None:
+        return None
+
+    return (end - start).days
+
+
 def _project_to_data(project: Project, scurve_progress: float | None = None) -> dict:
     return {
         "id": project.id,
@@ -43,6 +52,9 @@ def _project_to_data(project: Project, scurve_progress: float | None = None) -> 
             "project_value": project.project_value,
             "project_priority": project.project_priority,
             "project_type": project.project_type,
+            "status": project.status,
+            "owner_project": project.owner_project,
+            "target_duration_days": _duration_days(project.operational_start_date, project.estimated_completion_date),
             # Latest S-Curve actual cumulative when the project has uploads; the stored field is never filled in by the form.
             "estimated_progress_percentage": (
                 scurve_progress if scurve_progress is not None else project.estimated_progress_percentage
@@ -69,7 +81,7 @@ async def create_project(
 
     return APIResponse(
         success=True,
-        message="Project created successfully",
+        message=f"Project '{new_project.project_name}' created successfully",
         data=_project_to_data(project=new_project),
         err=None,
     )
@@ -140,7 +152,7 @@ async def update_project(
 
     return APIResponse(
         success=True,
-        message="Project updated successfully",
+        message=f"Project '{updated_project.project_name}' updated successfully",
         data=_project_to_data(project=updated_project),
         err=None,
     )

@@ -98,6 +98,12 @@ export default function ProjectForm({
 							placeholder="Enter person in charge"
 							validation={{ required: "PIC is required" }}
 						/>
+						<Input
+							id="ownerProject"
+							label="Owner Project"
+							placeholder="Enter project owner"
+							validation={{ required: "Owner project is required" }}
+						/>
 						<SelectInput
 							id="projectLocation"
 							label="Project Location"
@@ -134,14 +140,22 @@ export default function ProjectForm({
 						<Input
 							id="operationalStartDate"
 							type="date"
-							label="Start Date"
+							label="Target Timeline Start"
 							validation={{ required: "Start date is required" }}
 						/>
 						<Input
 							id="estimatedCompletionDate"
 							type="date"
-							label="End Date"
+							label="Target Timeline Deliverable"
 							validation={{ required: "End date is required" }}
+						/>
+						<Input
+							id="projectValue"
+							type="number"
+							step="0.01"
+							min={0}
+							label="Estimated Cost (IDR)"
+							validation={{ required: "Estimated cost is required" }}
 						/>
 					</div>
 				</FormSection>
