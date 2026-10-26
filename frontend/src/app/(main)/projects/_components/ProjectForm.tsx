@@ -8,6 +8,7 @@ import Input from "@/components/form/Input";
 import SelectInput from "@/components/form/SelectInput";
 import type { CreateProjectRequest } from "@/types/project";
 import { useLocationsQuery } from "@/app/(main)/data-gathering/_hooks/useLocationsQuery";
+import { PROJECT_TYPE_LABEL } from "../_lib/projectTransform";
 
 type ProjectFormProps = {
 	defaultValues: CreateProjectRequest;
@@ -21,6 +22,8 @@ const projectPriorityOptions = [
 	{ value: "mid", label: "Medium" },
 	{ value: "high", label: "High" },
 ];
+
+const projectTypeOptions = Object.entries(PROJECT_TYPE_LABEL).map(([value, label]) => ({ value, label }));
 
 const priorityDotColor: Record<string, string> = {
 	low: "bg-green-500",
@@ -95,6 +98,12 @@ export default function ProjectForm({
 							placeholder="Enter person in charge"
 							validation={{ required: "PIC is required" }}
 						/>
+						<Input
+							id="ownerProject"
+							label="Owner Project"
+							placeholder="Enter project owner"
+							validation={{ required: "Owner project is required" }}
+						/>
 						<SelectInput
 							id="projectLocation"
 							label="Project Location"
@@ -113,6 +122,14 @@ export default function ProjectForm({
 							isSearchable={false}
 							validation={{ required: "Project priority is required" }}
 						/>
+						<SelectInput
+							id="projectType"
+							label="Project Type"
+							placeholder="Select type"
+							options={projectTypeOptions}
+							isSearchable={false}
+							validation={{ required: "Project type is required" }}
+						/>
 					</div>
 				</FormSection>
 
@@ -123,14 +140,22 @@ export default function ProjectForm({
 						<Input
 							id="operationalStartDate"
 							type="date"
-							label="Start Date"
+							label="Target Timeline Start"
 							validation={{ required: "Start date is required" }}
 						/>
 						<Input
 							id="estimatedCompletionDate"
 							type="date"
-							label="End Date"
+							label="Target Timeline Deliverable"
 							validation={{ required: "End date is required" }}
+						/>
+						<Input
+							id="projectValue"
+							type="number"
+							step="0.01"
+							min={0}
+							label="Estimated Cost (IDR)"
+							validation={{ required: "Estimated cost is required" }}
 						/>
 					</div>
 				</FormSection>

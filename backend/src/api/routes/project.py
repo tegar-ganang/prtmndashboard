@@ -1,3 +1,5 @@
+import datetime
+
 import fastapi
 
 from src.api.dependencies.authentication import get_current_account
@@ -23,7 +25,14 @@ def _project_category(project_value: float | None) -> str | None:
     return "Proyek <IDR 5M"
 
 
-def _project_to_data(project: Project) -> dict:
+def _duration_days(start: datetime.date | None, end: datetime.date | None) -> int | None:
+    if start is None or end is None:
+        return None
+
+    return (end - start).days
+
+
+def _project_to_data(project: Project, scurve_progress: float | None = None) -> dict:
     return {
         "id": project.id,
         "owner_account_id": project.owner_account_id,
@@ -42,7 +51,14 @@ def _project_to_data(project: Project) -> dict:
             "project_location": project.project_location,
             "project_value": project.project_value,
             "project_priority": project.project_priority,
-            "estimated_progress_percentage": project.estimated_progress_percentage,
+            "project_type": project.project_type,
+            "status": project.status,
+            "owner_project": project.owner_project,
+            "target_duration_days": _duration_days(project.operational_start_date, project.estimated_completion_date),
+            # Latest S-Curve actual cumulative when the project has uploads; the stored field is never filled in by the form.
+            "estimated_progress_percentage": (
+                scurve_progress if scurve_progress is not None else project.estimated_progress_percentage
+            ),
         },
         "created_at": project.created_at,
         "updated_at": project.updated_at,
@@ -65,7 +81,7 @@ async def create_project(
 
     return APIResponse(
         success=True,
-        message="Project created successfully",
+        message=f"Project '{new_project.project_name}' created successfully",
         data=_project_to_data(project=new_project),
         err=None,
     )
@@ -76,11 +92,12 @@ async def get_projects(
     project_repo: ProjectCRUDRepository = fastapi.Depends(get_repository(repo_type=ProjectCRUDRepository)),
 ) -> APIResponse:
     db_projects = await project_repo.read_projects()
+    progress = await project_repo.read_latest_actual_progress()
 
     return APIResponse(
         success=True,
         message="Projects fetched successfully",
-        data=[_project_to_data(project=db_project) for db_project in db_projects],
+        data=[_project_to_data(project=p, scurve_progress=progress.get(p.id)) for p in db_projects],
         err=None,
     )
 
@@ -97,6 +114,7 @@ async def get_project(
 ) -> APIResponse:
     try:
         db_project = await project_repo.read_project_by_id(project_id=project_id)
+        progress = await project_repo.read_latest_actual_progress(project_id=project_id)
 
     except EntityDoesNotExist:
         raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="Project not found")
@@ -104,7 +122,7 @@ async def get_project(
     return APIResponse(
         success=True,
         message="Project fetched successfully",
-        data=_project_to_data(project=db_project),
+        data=_project_to_data(project=db_project, scurve_progress=progress.get(db_project.id)),
         err=None,
     )
 
@@ -134,7 +152,7 @@ async def update_project(
 
     return APIResponse(
         success=True,
-        message="Project updated successfully",
+        message=f"Project '{updated_project.project_name}' updated successfully",
         data=_project_to_data(project=updated_project),
         err=None,
     )

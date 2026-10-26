@@ -395,7 +395,6 @@ export default function DataGatheringContainer() {
 				file: produksiFile,
 				reporting_year: parseInt(year.value, 10),
 				reporting_month: parseInt(month.value, 10),
-				field: undefined,
 				mode,
 			});
 			return;

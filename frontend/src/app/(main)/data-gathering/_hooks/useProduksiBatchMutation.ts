@@ -11,7 +11,6 @@ interface ProduksiUploadPayload {
 	file: File;
 	reporting_year: number;
 	reporting_month: number;
-	field?: string;
 	mode?: "append" | "overwrite";
 }
 
@@ -26,7 +25,6 @@ export const useProduksiBatchMutation = ({ onSuccess }: UseProduksiBatchMutation
 			formData.append("file", payload.file);
 			formData.append("reporting_year", String(payload.reporting_year));
 			formData.append("reporting_month", String(payload.reporting_month));
-			if (payload.field) formData.append("field", payload.field);
 			formData.append("mode", payload.mode ?? "append");
 
 			const { data } = await axiosInstance.post("/produksi/upload-excel", formData, {

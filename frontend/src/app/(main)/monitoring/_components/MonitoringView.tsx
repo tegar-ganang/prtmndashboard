@@ -54,7 +54,7 @@ const YEAR_OPTIONS = [
 
 const EMPTY_DATA: any[] = [];
 
-function TypingDescription({ text }: { text: string }) {
+export function TypingDescription({ text }: { text: string }) {
 	const [displayedText, setDisplayedText] = useState("");
 
 	useEffect(() => {
@@ -267,7 +267,7 @@ export default function MonitoringView({ docTypeSlug }: MonitoringViewProps) {
 							</span>
 						)}
 					</h1>
-					<TypingDescription text={`Monitoring progress dan status ${docTypeSlug.toUpperCase()}`} />
+					<TypingDescription text={config.fullName ?? `Monitoring progress dan status ${config.title}`} />
 				</div>
 				<Button 
 					variant="outline" 
@@ -279,7 +279,7 @@ export default function MonitoringView({ docTypeSlug }: MonitoringViewProps) {
 			</div>
 
 			<div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-				<h3 className="text-sm font-bold text-gray-900 mb-4">Filter Data {docTypeSlug.toUpperCase()}</h3>
+				<h3 className="text-sm font-bold text-gray-900 mb-4">Filter Data {config.title}</h3>
 				{batchId ? (
 					<div className="flex items-center gap-3 bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-lg w-fit">
 						<span className="text-xs font-semibold text-blue-700">Filter Aktif: Batch Upload</span>

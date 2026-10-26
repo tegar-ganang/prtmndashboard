@@ -14,11 +14,11 @@ from src.repository.crud.base import BaseCRUDRepository
 
 
 # Header Sheet 2 (uppercase, spasi dirapikan) → kolom ProduksiTarget.
-# "KONDENSAT" polos = format lama sebelum RKAP/WP&B dipisah; tetap ke kolom lamanya.
+# "KONDENSAT" polos = format lama sebelum RKAP/WP&B dipisah; sama artinya dengan RKAP.
 _TARGET_HEADERS = {
     "DMF": "target_dmf",
     "GAS WP&B": "target_gas_wpb",
-    "KONDENSAT": "target_kondensat",
+    "KONDENSAT": "target_kondensat_rkap",
     "KONDENSAT RKAP": "target_kondensat_rkap",
     "KONDENSAT WP&B": "target_kondensat_wpb",
 }
@@ -62,7 +62,6 @@ class ProduksiCRUDRepository(BaseCRUDRepository):
                 Produksi.upload_batch_id,
                 Produksi.reporting_year,
                 Produksi.reporting_month,
-                Produksi.field,
                 sqlalchemy.func.min(Produksi.created_at).label("upload_date"),
                 sqlalchemy.func.count(Produksi.id).label("record_count"),
             )
@@ -70,7 +69,6 @@ class ProduksiCRUDRepository(BaseCRUDRepository):
                 Produksi.upload_batch_id,
                 Produksi.reporting_year,
                 Produksi.reporting_month,
-                Produksi.field,
             )
             .order_by(sqlalchemy.func.min(Produksi.created_at).desc())
         )
@@ -82,7 +80,6 @@ class ProduksiCRUDRepository(BaseCRUDRepository):
         batch_id: str | None = None,
         year: int | None = None,
         month: int | None = None,
-        field: str | None = None,
     ) -> typing.Sequence[Produksi]:
         """Fetch realisasi harian rows. Target bulanan dapat diakses via row.target."""
         stmt = sqlalchemy.select(Produksi).order_by(Produksi.tanggal.asc())
@@ -92,8 +89,6 @@ class ProduksiCRUDRepository(BaseCRUDRepository):
             stmt = stmt.where(Produksi.reporting_year == year)
         if month is not None:
             stmt = stmt.where(Produksi.reporting_month == month)
-        if field is not None:
-            stmt = stmt.where(Produksi.field == field)
 
         # ponytail: safety cap, not real pagination — see base_monitoring.get_data.
         stmt = stmt.limit(5000)
@@ -105,7 +100,6 @@ class ProduksiCRUDRepository(BaseCRUDRepository):
         self,
         year: int | None = None,
         month: int | None = None,
-        field: str | None = None,
     ) -> typing.Sequence[ProduksiTarget]:
         """Fetch target bulanan rows secara langsung dari tabel produksi_target."""
         stmt = sqlalchemy.select(ProduksiTarget).order_by(
@@ -116,23 +110,16 @@ class ProduksiCRUDRepository(BaseCRUDRepository):
             stmt = stmt.where(ProduksiTarget.reporting_year == year)
         if month is not None:
             stmt = stmt.where(ProduksiTarget.reporting_month == month)
-        if field is not None:
-            stmt = stmt.where(ProduksiTarget.field == field)
 
         res = await self.async_session.execute(stmt)
         return res.scalars().all()
 
-    async def check_period_exists(
-        self, year: int, month: int, field: str | None = None
-    ) -> bool:
-        conditions = [
-            Produksi.reporting_year == year,
-            Produksi.reporting_month == month,
-        ]
-        if field is not None:
-            conditions.append(Produksi.field == field)
-
-        stmt = sqlalchemy.select(Produksi.id).where(*conditions).limit(1)
+    async def check_period_exists(self, year: int, month: int) -> bool:
+        stmt = (
+            sqlalchemy.select(Produksi.id)
+            .where(Produksi.reporting_year == year, Produksi.reporting_month == month)
+            .limit(1)
+        )
         res = await self.async_session.execute(stmt)
         return res.first() is not None
 
@@ -146,7 +133,6 @@ class ProduksiCRUDRepository(BaseCRUDRepository):
         owner_account_id: str,
         reporting_year: int,
         reporting_month: int,
-        field: str | None = None,
         mode: str = "append",
     ) -> str:
         upload_batch_uuid = uuid.uuid4()
@@ -195,13 +181,12 @@ class ProduksiCRUDRepository(BaseCRUDRepository):
 
         if mode == "overwrite":
             # Hapus realisasi dulu (FK dependency)
-            conditions_realisasi = [
-                Produksi.reporting_year == reporting_year,
-                Produksi.reporting_month == reporting_month,
-            ]
-            if field is not None:
-                conditions_realisasi.append(Produksi.field == field)
-            await self.async_session.execute(sqlalchemy.delete(Produksi).where(*conditions_realisasi))
+            await self.async_session.execute(
+                sqlalchemy.delete(Produksi).where(
+                    Produksi.reporting_year == reporting_year,
+                    Produksi.reporting_month == reporting_month,
+                )
+            )
             await self.async_session.flush()
             # Target tidak dihapus di sini: di-upsert di bawah (baris target dirujuk realisasi bulan lain via FK).
 
@@ -241,7 +226,6 @@ class ProduksiCRUDRepository(BaseCRUDRepository):
                 target_obj.updated_at = datetime.now(timezone.utc)
             target_obj.upload_batch_id = upload_batch_uuid
             target_obj.owner_account_id = owner_account_uuid
-            target_obj.field = field
             for attr, val in values.items():  # hanya kolom yang ada di sheet, kolom lain tidak ditimpa
                 setattr(target_obj, attr, val)
             target_by_month[target_month] = target_obj
@@ -350,7 +334,6 @@ class ProduksiCRUDRepository(BaseCRUDRepository):
                 "target_id": target_id,
                 "reporting_year": reporting_year,
                 "reporting_month": reporting_month,
-                "field": field,
                 "tanggal": tgl,
             }
 

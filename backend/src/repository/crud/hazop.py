@@ -3,7 +3,8 @@ from src.repository.crud.base_monitoring import BaseMonitoringRepository
 
 HAZOP_MAPPER = {
     "NODE NO": "node_no",
-    "REC. NO.": "rec_no",
+    # Sheet has two columns: "Rec. No." (e.g. "1.1.", -> mart REC_NO) and "REC. NO." (e.g. 1, mart REC_NO_2 — not stored yet).
+    "Rec. No.": "rec_no",
     "NODE": "node",
     "DEVIATION": "deviation",
     "POSSIBLE CAUSE": "possible_cause",

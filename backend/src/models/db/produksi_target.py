@@ -11,14 +11,13 @@ from src.repository.table import Base
 
 if TYPE_CHECKING:
     from src.models.db.account import Account
-    from src.models.db.location import FieldLocation
     from src.models.db.produksi import Produksi
 
 
 class ProduksiTarget(Base):
     """
     Tabel target bulanan produksi gas (berasal dari Sheet 2 Excel).
-    Setiap baris mewakili 1 bulan target untuk suatu field.
+    Setiap baris mewakili 1 bulan target, mencakup Donggi & Matindok sekaligus.
     Tabel realisasi harian (produksi_monitoring) berelasi ke tabel ini via FK target_id.
     """
     __tablename__ = "produksi_target"
@@ -40,11 +39,6 @@ class ProduksiTarget(Base):
     reporting_month: SQLAlchemyMapped[int] = sqlalchemy_mapped_column(
         sqlalchemy.SmallInteger, nullable=False
     )
-    field: SQLAlchemyMapped[str | None] = sqlalchemy_mapped_column(
-        sqlalchemy.String(length=50),
-        sqlalchemy.ForeignKey("field_location.code"),
-        nullable=True,
-    )
 
     # Target MMSCFD DMF (Donggi-Matindok Field) — GAS RKAP
     target_dmf: SQLAlchemyMapped[float | None] = sqlalchemy_mapped_column(
@@ -52,10 +46,6 @@ class ProduksiTarget(Base):
     )
     # Target GAS WP&B
     target_gas_wpb: SQLAlchemyMapped[float | None] = sqlalchemy_mapped_column(
-        sqlalchemy.Numeric(15, 4), nullable=True
-    )
-    # Target KONDENSAT (format Excel lama, satu kolom "KONDENSAT"; tidak dipakai lagi oleh sync mart)
-    target_kondensat: SQLAlchemyMapped[float | None] = sqlalchemy_mapped_column(
         sqlalchemy.Numeric(15, 4), nullable=True
     )
     # Target KONDENSAT RKAP
@@ -82,9 +72,6 @@ class ProduksiTarget(Base):
     # Relationships
     owner: SQLAlchemyMapped[typing.Optional["Account"]] = relationship(
         "Account", lazy="selectin"
-    )
-    field_location: SQLAlchemyMapped[typing.Optional["FieldLocation"]] = relationship(
-        "FieldLocation", lazy="selectin"
     )
     realisasi_rows: SQLAlchemyMapped[typing.List["Produksi"]] = relationship(
         "Produksi", back_populates="target", lazy="selectin"

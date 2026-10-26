@@ -11,12 +11,14 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 	glanceCols: string[];
 	templateUrl: string;
 	requiredFields: string[];
+	// Columns the backend stores as DATE; anything it can't parse would silently become NULL.
+	dateFields?: string[];
 	period: "quarter" | "month";
 }> = {
 	MIT: {
 		label: "Major Integrity Threat (MIT)",
+		// Lokasi isn't a column: it comes from the Lokasi / Field dropdown.
 		expectedHeaders: [
-			"No Registration - Lokasi",
 			"No Registration - Jenis MIT",
 			"No Registration - Kategori", "No Registration - Tahun", "No Registration - No",
 			"MIT Declaration Date", "MIT Title / Asset", "Integrity Threats",
@@ -33,6 +35,7 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		],
 		templateUrl: "/templates/Template MIT Quartal.xlsx",
 		requiredFields: ["MIT Title / Asset"],
+		dateFields: ["Closing Date"],
 		period: "quarter",
 	},
 	HAZID: {
@@ -46,6 +49,7 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		glanceCols: ["NODE", "HAZARD", "RISK", "STATUS", "RESPONSIBILITY/PIC"],
 		templateUrl: "/templates/Template HAZID.xlsx",
 		requiredFields: ["NODE"],
+		dateFields: ["TARGET DATE", "COMPLETION DATE"],
 		period: "month",
 	},
 	HAZOP: {
@@ -59,6 +63,7 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		glanceCols: ["NODE", "DEVIATION", "RISK", "STATUS", "RESPONSIBILITY/PIC"],
 		templateUrl: "/templates/Template HAZOP.xlsx",
 		requiredFields: ["NODE"],
+		dateFields: ["TARGET DATE", "COMPLETION DATE"],
 		period: "month",
 	},
 	LOPA: {
@@ -72,6 +77,7 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		glanceCols: ["FUNCTION NAME", "FINAL ELEMENT", "RRF GAP VALUE", "STATUS", "RESPONSIBILITY/PIC"],
 		templateUrl: "/templates/Template LOPA.xlsx",
 		requiredFields: ["FUNCTION NAME"],
+		dateFields: ["TARGET DATE", "COMPLETION DATE"],
 		period: "month",
 	},
 	MOC: {
@@ -83,10 +89,11 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		glanceCols: ["MOC_NUMBER", "CHANGE_DESC", "STATUS", "PIC", "ISSUED_DATE"],
 		templateUrl: "/templates/Template MOC.xlsx",
 		requiredFields: ["MOC_NUMBER"],
+		dateFields: ["ISSUED_DATE", "LAST_UPDATED"],
 		period: "month" as const,
 	},
 	ABI: {
-		label: "ABI (Anggaran Biaya Investasi)",
+		label: "Anggaran Biaya Investasi (ABI)",
 		expectedHeaders: [
 			"REF_WBS", "WBS", "NILAI_USD", "NILAI_IDR", "NILAI_PERCENT",
 			"COMMITMENT_NILAI_IDR", "COMMITMENT_PERCENT_IDR",
@@ -101,7 +108,7 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		period: "month" as const,
 	},
 	ABO: {
-		label: "ABO (Anggaran Biaya Operasi)",
+		label: "Anggaran Biaya Operasional (ABO)",
 		expectedHeaders: [
 			"NO_RK", "JENIS_KERANGKA_ANGGARAN",
 			"ANGGARANWPB_OSF_NILAI_USD", "ANGGARANWPB_OSF_NILAI_IDR", "ANGGARANWPB_OSF_PERCENT",
@@ -120,7 +127,7 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		period: "month" as const,
 	},
 	HSSE: {
-		label: "HSSE",
+		label: "Health, Safety, Security, and Environment (HSSE)",
 
 		expectedHeaders: [
 			"ID_Izin", "Tanggal", "Bulan_Tahun", "Lokasi",
@@ -131,10 +138,11 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		glanceCols: ["ID_Izin", "Tanggal", "Lokasi", "Jenis_Izin_Kerja", "Tingkat_Resiko"],
 		templateUrl: "/templates/Template Izin Kerja HSSE.xlsx",
 		requiredFields: ["ID_Izin"],
+		dateFields: ["Tanggal"],
 		period: "month" as const,
 	},
 	AIRMS: {
-		label: "AIRMS",
+		label: "Asset Integrity & Reliability Management System (AIRMS)",
 		expectedHeaders: [
 			"record_id", "date", "asset_id", "asset_name", "area",
 			"availability", "reliability", "mtbf", "mttr", "wo_type",
@@ -144,10 +152,11 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		glanceCols: ["record_id", "date", "asset_id", "asset_name", "health_index"],
 		templateUrl: "/templates/Template AIRMS.xlsx",
 		requiredFields: ["record_id"],
+		dateFields: ["date"],
 		period: "month" as const,
 	},
 	I2AIMS: {
-		label: "I2AIMS",
+		label: "Intelligent Asset Integrity Management System (i2AIMS)",
 		expectedHeaders: [
 			"record_id", "inspection_date", "asset_id", "asset_name", "asset_type",
 			"area", "sce_category", "integrity_status", "inspection_result",
@@ -158,6 +167,7 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		glanceCols: ["record_id", "inspection_date", "asset_id", "asset_name", "integrity_status", "barrier_health"],
 		templateUrl: "/templates/Template I2AIMS.xlsx",
 		requiredFields: ["record_id"],
+		dateFields: ["inspection_date"],
 		period: "month" as const,
 	},
 
@@ -219,6 +229,7 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		glanceCols: ["NO", "FIELD / AREA", "LOKASI", "SHORT DESCRIPTION", "PSE TIER", "DATE START (DD/MM/YYYY)"],
 		templateUrl: "/templates/Template Zona PSE List.xlsx",
 		requiredFields: ["NO"],
+		dateFields: ["DATE START (DD/MM/YYYY)"],
 		period: "month" as const,
 	},
 	LCV_PROJECT_CHARTER_BUDAYA: {
@@ -227,6 +238,7 @@ export const DOC_TYPE_CONFIG: Record<DocTypeValue, {
 		glanceCols: ["id_project", "tanggal", "judul_project"],
 		templateUrl: "/templates/Template LCV Project Charter Budaya.xlsx",
 		requiredFields: ["id_project"],
+		dateFields: ["tanggal"],
 		period: "month" as const,
 	},
 	LCV_MONITORING: {
@@ -297,7 +309,7 @@ export const YEAR_OPTIONS = Array.from({ length: 5 }, (_, i) => {
 });
 
 export const DRAWER_SECTIONS = [
-	{ title: "Identitas & Registration", keys: ["No Registration - Lokasi", "No Registration - Jenis MIT", "No Registration - Kategori", "No Registration - Tahun", "No Registration - No"] },
+	{ title: "Identitas & Registration", keys: ["No Registration - Jenis MIT", "No Registration - Kategori", "No Registration - Tahun", "No Registration - No"] },
 	{ title: "Informasi MIT", keys: ["MIT Declaration Date", "MIT Title / Asset", "Integrity Threats", "Possible Scenario", "Consequences", "Available Safeguard/Control"] },
 	{ title: "Current Risk", keys: ["Current Risk - Likelihood", "Current Risk - Severity", "Current Risk - Risk"] },
 	{ title: "Rekomendasi", keys: ["Rec. No.", "Recommendation / Action", "PIC", "Target Closing", "Remarks"] },

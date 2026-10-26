@@ -143,7 +143,7 @@ class AccountCRUDRepository(BaseCRUDRepository):
         await self.async_session.execute(statement=stmt)
         await self.async_session.commit()
 
-        return f"Account with id '{id}' is successfully deleted!"
+        return f"Account '{delete_account.name or delete_account.email}' is successfully deleted!"
 
     async def update_account_role_by_id(self, id: str, role_id: int | None) -> Account:
         stmt = sqlalchemy.select(Account).where(Account.id == id)

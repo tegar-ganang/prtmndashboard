@@ -589,7 +589,7 @@ export default function DashboardPage() {
 			{/* Executive Summary Title & Filter bar */}
 			<div className="flex flex-col gap-4">
 				<div className="flex items-center justify-between">
-					<h1 className="text-2xl font-black text-gray-900 tracking-tight">RINGKASAN EKSEKUTIF</h1>
+					<h1 className="text-2xl font-black text-gray-900 tracking-tight">DASHBOARD - RINGKASAN EKSEKUTIF</h1>
 				</div>
 
 				{/* Filters Panel */}

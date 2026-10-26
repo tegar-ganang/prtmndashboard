@@ -10,8 +10,8 @@ import ButtonLink from "@/components/links/ButtonLink";
 import IconLink from "@/components/links/IconLink";
 import Table from "@/components/table/Table";
 import { canUploadMenu } from "@/configs/rbac";
-import type { ProjectItem } from "@/types/project";
-import { formatProjectCurrency, formatProjectDate } from "../_lib/projectTransform";
+import type { ProjectItem, ProjectStatus, ProjectType } from "@/types/project";
+import { formatProjectDate, PROJECT_STATUS_LABEL, PROJECT_TYPE_LABEL } from "../_lib/projectTransform";
 import { useDeleteProjectMutation } from "../_hooks/useDeleteProjectMutation";
 import { useProjectsQuery } from "../_hooks/useProjectsQuery";
 
@@ -20,7 +20,8 @@ type ProjectRow = {
     projectName: string;
     projectLocation: string;
     priority: string;
-    projectValue: number;
+    projectType: ProjectType;
+    status: ProjectStatus;
     estimatedProgressPercentage: number;
     documentCreatedAt: string;
     operationalStartDate: string;
@@ -34,7 +35,8 @@ const mapProjectToRow = (project: ProjectItem): ProjectRow => ({
     projectName: project.document_project.project_name,
     projectLocation: project.document_project.project_location,
     priority: project.document_project.project_priority,
-    projectValue: project.document_project.project_value,
+    projectType: project.document_project.project_type,
+    status: project.document_project.status,
     estimatedProgressPercentage:
         project.document_project.estimated_progress_percentage,
     documentCreatedAt: project.document_project.document_created_at,
@@ -49,13 +51,14 @@ const mapProjectToRow = (project: ProjectItem): ProjectRow => ({
 // asks for it. Don't delete the column itself.
 const SHOW_CATEGORY_COLUMN = false;
 
-export default function ProjectsContainer() {
+// projectType set = the sidebar's BD / Non-BD page; unset = /projects showing every type.
+export default function ProjectsContainer({ projectType }: { projectType?: ProjectType }) {
     const [selectedDeleteId, setSelectedDeleteId] = useState<string | null>(null);
     const { mutate: deleteProject, isPending: isDeleting } =
         useDeleteProjectMutation();
     const { data: projects = [], isLoading } = useProjectsQuery();
     const user = useAuthStore.useUser();
-    const canManageProjects = canUploadMenu(user?.role_name, "project");
+    const canManageProjects = canUploadMenu(user, "project");
 
     const columns = useMemo<ColumnDef<ProjectRow>[]>(
         () => [
@@ -76,6 +79,17 @@ export default function ProjectsContainer() {
                     <span className="uppercase font-medium">{`${props.getValue()}`}</span>
                 ),
             },
+            ...(projectType
+                ? []
+                : [
+                    {
+                        accessorKey: "projectType",
+                        header: "Type",
+                        cell: (props: { getValue: () => unknown }) => (
+                            <span>{PROJECT_TYPE_LABEL[props.getValue() as ProjectType]}</span>
+                        ),
+                    } satisfies ColumnDef<ProjectRow>,
+                ]),
             ...(SHOW_CATEGORY_COLUMN
                 ? [
                     {
@@ -86,11 +100,20 @@ export default function ProjectsContainer() {
                 ]
                 : []),
             {
-                accessorKey: "projectValue",
-                header: "Project Value",
-                cell: (props) => (
-                    <span>{formatProjectCurrency(Number(props.getValue() || 0))}</span>
-                ),
+                accessorKey: "status",
+                header: "Status",
+                cell: (props) => {
+                    const status = props.getValue() as ProjectStatus;
+                    return (
+                        <span
+                            className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                                status === "EKSEKUSI" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
+                            }`}
+                        >
+                            {PROJECT_STATUS_LABEL[status]}
+                        </span>
+                    );
+                },
             },
             {
                 accessorKey: "estimatedProgressPercentage",
@@ -150,12 +173,13 @@ export default function ProjectsContainer() {
                 ),
             },
         ],
-        [canManageProjects],
+        [canManageProjects, projectType],
     );
 
     const projectRows = useMemo(() => {
-        return projects.map(mapProjectToRow);
-    }, [projects]);
+        const rows = projects.map(mapProjectToRow);
+        return projectType ? rows.filter((row) => row.projectType === projectType) : rows;
+    }, [projects, projectType]);
 
     const handleDelete = () => {
         if (!selectedDeleteId) {
@@ -174,24 +198,23 @@ export default function ProjectsContainer() {
             <div className="flex items-center justify-between gap-4">
                 <div>
                     <h1 className="flex items-center gap-3 text-2xl font-bold text-gray-900">
-                        Projects Management
-                        <span className="px-2.5 py-0.5 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-full animate-pulse">
-                            Dummy Data
-                        </span>
+                        {projectType ? `Projects ${PROJECT_TYPE_LABEL[projectType]}` : "Projects Management"}
                     </h1>
                     <p className="text-sm text-gray-600 mt-1">
                         Manage project list and open detail, update, or delete actions.
                     </p>
                 </div>
                 {canManageProjects && (
-                    <ButtonLink href="/projects/create" variant="blue">
+                    <ButtonLink href={projectType ? `/projects/create?type=${projectType}` : "/projects/create"} variant="blue">
                         Create New Project
                     </ButtonLink>
                 )}
             </div>
 
             <section className="rounded-xl bg-white shadow-sm ring-1 ring-gray-200 p-5 lg:p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">All Projects</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                    {projectType ? PROJECT_TYPE_LABEL[projectType] : "All Projects"}
+                </h2>
                 <Table
                     className="text-black"
                     data={projectRows}

@@ -104,6 +104,10 @@ def _parse_time(value: typing.Any) -> str | None:
         return None
     if isinstance(value, time):
         return value.strftime("%H:%M")
+    # Excel fraction of a day from a "General" cell, e.g. 0.5375 = 12:54
+    if isinstance(value, (int, float)) and not isinstance(value, bool) and 0 <= value < 1:
+        minutes = round(value * 24 * 60)
+        return f"{minutes // 60:02d}:{minutes % 60:02d}"
     return str(value).strip()[:20] if str(value).strip() else None
 
 

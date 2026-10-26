@@ -1,4 +1,6 @@
 export type ProjectPriority = "low" | "mid" | "high";
+export type ProjectType = "BD" | "NON_BD";
+export type ProjectStatus = "PRE_EKSEKUSI" | "EKSEKUSI";
 
 export type CreateProjectRequest = {
 	documentCreatedAt: string;
@@ -6,15 +8,19 @@ export type CreateProjectRequest = {
 	estimatedCompletionDate: string;
 	projectName: string;
 	pic: string;
+	ownerProject: string;
 	projectLocation: string;
 	projectValue: number;
 	projectPriority: ProjectPriority;
+	projectType: ProjectType;
 	estimatedProgressPercentage: number;
 	earnedValueEv: number;
 	plannedValuePv: number;
 	actualCostAc: number;
 	budgetBac: number;
 	milestoneAndWorkStages: string;
+	// Only sent to move a project to EKSEKUSI; the backend rejects any other value.
+	status?: "EKSEKUSI";
 };
 
 export type ProjectDocument = {
@@ -26,6 +32,10 @@ export type ProjectDocument = {
 	project_location: string;
 	project_value: number;
 	project_priority: ProjectPriority;
+	project_type: ProjectType;
+	status: ProjectStatus;
+	owner_project: string | null;
+	target_duration_days: number | null;
 	estimated_progress_percentage: number;
 };
 

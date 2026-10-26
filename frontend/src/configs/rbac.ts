@@ -69,20 +69,25 @@ export const ROLE_MENU_ACCESS: Record<string, Partial<Record<MenuKey, MenuAccess
 	},
 };
 
-export function canViewMenu(roleName: string | null | undefined, menu: MenuKey): boolean {
-	if (!roleName) return false;
-	return Boolean(ROLE_MENU_ACCESS[roleName]?.[menu]?.view);
+type RbacUser = { role_name?: string | null; is_admin?: boolean } | null | undefined;
+
+// Admins (is_admin) bypass the role matrix — mirrors require_menu_access in backend/src/api/dependencies/rbac.py.
+export function canViewMenu(user: RbacUser, menu: MenuKey): boolean {
+	if (user?.is_admin) return true;
+	if (!user?.role_name) return false;
+	return Boolean(ROLE_MENU_ACCESS[user.role_name]?.[menu]?.view);
 }
 
-export function canUploadMenu(roleName: string | null | undefined, menu: MenuKey): boolean {
-	if (!roleName) return false;
-	return Boolean(ROLE_MENU_ACCESS[roleName]?.[menu]?.upload);
+export function canUploadMenu(user: RbacUser, menu: MenuKey): boolean {
+	if (user?.is_admin) return true;
+	if (!user?.role_name) return false;
+	return Boolean(ROLE_MENU_ACCESS[user.role_name]?.[menu]?.upload);
 }
 
-export function canViewAnyMenu(roleName: string | null | undefined, menus: MenuKey[]): boolean {
-	return menus.some((menu) => canViewMenu(roleName, menu));
+export function canViewAnyMenu(user: RbacUser, menus: MenuKey[]): boolean {
+	return menus.some((menu) => canViewMenu(user, menu));
 }
 
-export function canUploadAnyMenu(roleName: string | null | undefined, menus: MenuKey[]): boolean {
-	return menus.some((menu) => canUploadMenu(roleName, menu));
+export function canUploadAnyMenu(user: RbacUser, menus: MenuKey[]): boolean {
+	return menus.some((menu) => canUploadMenu(user, menu));
 }

@@ -24,7 +24,7 @@ export default function EditProjectContainer({ id }: { id: string }) {
 		[project],
 	);
 
-	if (!canUploadMenu(user?.role_name, "project")) {
+	if (!canUploadMenu(user, "project")) {
 		return <ProjectAccessDenied />;
 	}
 
