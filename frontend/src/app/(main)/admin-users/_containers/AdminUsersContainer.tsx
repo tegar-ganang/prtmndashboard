@@ -65,7 +65,11 @@ export default function AdminUsersContainer() {
 			{
 				accessorKey: "email",
 				header: "Email",
-				cell: (props) => <span>{`${props.getValue()}`}</span>,
+				cell: (props) => (
+					<span className="block max-w-[220px] truncate" title={`${props.getValue()}`}>
+						{`${props.getValue()}`}
+					</span>
+				),
 			},
 			{
 				id: "role",

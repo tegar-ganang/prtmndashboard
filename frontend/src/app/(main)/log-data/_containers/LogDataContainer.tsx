@@ -2,7 +2,7 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { RefreshCw, PlayCircle } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import AccessDeniedCard from "@/components/feedback/AccessDeniedCard";
 import Button from "@/components/button/Button";
 import Table from "@/components/table/Table";
@@ -10,6 +10,16 @@ import useAuthStore from "@/app/stores/useAuthStore";
 import type { MartSyncCountRow } from "@/types/martSync";
 import { useMartSyncCountsQuery } from "../_hooks/useMartSyncCountsQuery";
 import { useRunMartSyncMutation } from "../_hooks/useRunMartSyncMutation";
+
+// Same groups as the Monitoring sidebar. Jobs live in the DB without a group column, so match by name.
+const GROUP_RULES: [string, RegExp][] = [
+	["Projects", /^(project|field)/i],
+	["Production", /^(produksi|safe man)/i],
+	["HSSE", /^hsse/i],
+	["LCV", /^lcv/i],
+	["OSF", /^(psa|mit|moc|airms|i2aims|hazid|hazop|lopa|abi|abo)/i],
+];
+const groupOf = (name: string) => GROUP_RULES.find(([, re]) => re.test(name))?.[0] ?? "Lainnya";
 
 function CountCell({ count, error }: { count: number | null; error: string | null }) {
 	if (error) return <span className="text-xs font-medium text-red-500">{error}</span>;
@@ -52,8 +62,14 @@ export default function LogDataContainer() {
 	const { data: rows = [], isLoading, isFetching, refetch } = useMartSyncCountsQuery();
 	const { mutate: runSync, isPending: isSyncing, data: syncResult } = useRunMartSyncMutation();
 
-	const columns = useMemo<ColumnDef<MartSyncCountRow>[]>(
+	const [group, setGroup] = useState("");
+	const grouped = useMemo(() => rows.map((r) => ({ ...r, group: groupOf(r.name) })), [rows]);
+	const groups = useMemo(() => [...new Set(grouped.map((r) => r.group))], [grouped]);
+	const visible = useMemo(() => (group ? grouped.filter((r) => r.group === group) : grouped), [grouped, group]);
+
+	const columns = useMemo<ColumnDef<MartSyncCountRow & { group: string }>[]>(
 		() => [
+			{ accessorKey: "group", header: "Kelompok" },
 			{ accessorKey: "name", header: "Modul" },
 			{
 				id: "app",
@@ -135,7 +151,28 @@ export default function LogDataContainer() {
 					bisa lebih banyak dari app. Untuk tabel seperti itu, status dibandingkan dengan jumlah yang <em>diharapkan</em>,
 					bukan jumlah baris app.
 				</p>
-				<Table className="text-black" data={rows} columns={columns} withEntries isLoading={isLoading} />
+				<Table
+						className="text-black"
+						data={visible}
+						columns={columns}
+						initialPageSize={Math.max(visible.length, 10)}
+						isLoading={isLoading}
+						leftExtras={
+							<select
+								value={group}
+								onChange={(e) => setGroup(e.target.value)}
+								className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
+								aria-label="Filter kelompok"
+							>
+								<option value="">Semua kelompok</option>
+								{groups.map((g) => (
+									<option key={g} value={g}>
+										{g}
+									</option>
+								))}
+							</select>
+						}
+					/>
 			</section>
 
 			{syncResult && (
