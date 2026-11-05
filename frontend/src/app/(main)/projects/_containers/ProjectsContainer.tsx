@@ -155,8 +155,8 @@ export default function ProjectsContainer({ projectType }: { projectType?: Proje
                                     variant="yellow"
                                     size="sm"
                                     icon={Pencil}
-                                    title="Update project"
-                                    aria-label="Update project"
+                                    title="Edit project"
+                                    aria-label="Edit project"
                                 />
                                 <IconButton
                                     type="button"

@@ -34,7 +34,6 @@ type SubItem = {
 	subItems?: SubItem[];
 };
 
-const DUMMY_ITEMS = new Set(["HSSE", "Project Charter Budaya", "LCV Monitoring", "AIRMS", "I2AIMS", "ABI", "ABO"]);
 const PREFETCH_DOC: Record<string, string> = {
 	Production: "produksi",
 	HSSE: "hsse",
@@ -332,17 +331,6 @@ const AppSidebar: React.FC = () => {
 							}`}
 						>
 							<span className="flex-1">{item.name}</span>
-							{DUMMY_ITEMS.has(item.name) && (
-								<span
-									className={`text-[9px] font-extrabold px-1 py-0.5 rounded uppercase border whitespace-nowrap tracking-wider ${
-										active
-											? "bg-amber-100 text-amber-800 border-amber-200"
-											: "bg-amber-500/20 text-[#fbbf24] border-amber-500/30"
-									}`}
-								>
-									Dummy
-								</span>
-							)}
 						</Link>
 					</Tooltip>
 				</li>
